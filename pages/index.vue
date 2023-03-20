@@ -103,7 +103,7 @@ export default Vue.extend({
     },
 
     zoom (event: WheelEvent) {
-      this.canvasZoom += event.deltaY / 100
+      this.canvasZoom -= event.deltaY / 100
       this.canvasZoom = clamp(this.canvasZoom, 1, 64)
       this.updateCanvasStyle()
     },
