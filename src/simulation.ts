@@ -3,16 +3,15 @@ import Bot from '~/src/bot'
 export class CellSimulation {
   width: number
   height: number
-  field: Bot[][]
+  bots: Array<Bot>
 
   generateMap () {
     for (let y = 0; y < this.height; y++) {
-      this.field[y] = new Array(this.width)
       for (let x = 0; x < this.width; x++) {
         if (Math.random() < 0.2) {
-          this.field[y][x] = new Bot()
+          this.bots[y * this.width + x] = new Bot()
         } else {
-          this.field[y][x] = Bot.createEmpty()
+          this.bots[y * this.width + x] = Bot.createEmpty()
         }
       }
     }
@@ -26,11 +25,15 @@ export class CellSimulation {
     this.width = width
     this.height = height
 
-    this.field = new Array(this.height)
+    this.bots = new Array<Bot>(this.width * this.height)
     this.generateMap()
   }
 
   update () {
-
+    for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        this.bots[y * this.width + x].update(this)
+      }
+    }
   }
 }

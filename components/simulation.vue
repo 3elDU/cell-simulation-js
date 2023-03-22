@@ -3,8 +3,8 @@
     ref="canvas"
     class="rounded-sm drop-shadow-md"
     style="image-rendering: pixelated"
-    :width="simulation.width"
-    :height="simulation.height"
+    :width="width"
+    :height="height"
   />
 </template>
 
@@ -19,8 +19,11 @@ export default Vue.extend({
   }),
 
   computed: {
-    simulation () {
-      return this.$store.getters.getSimulation
+    width () {
+      return this.$store.getters.getSimulationWidth
+    },
+    height () {
+      return this.$store.getters.getSimulationHeight
     }
   },
 
@@ -30,15 +33,14 @@ export default Vue.extend({
     this.render()
 
     setInterval(this.tick)
+    setInterval(this.render, 50)
   },
 
   methods: {
     tick () {
-      if (this.$store.getters.isPaused) {
-        this.$store.getters.getSimulation.update()
+      if (!this.$store.getters.isPaused) {
+        this.$store.commit('updateSimulation')
       }
-
-      this.render()
     },
 
     render () {
@@ -46,8 +48,8 @@ export default Vue.extend({
       const { width, height } = this.$refs.canvas as HTMLCanvasElement
       this.ctx.fillRect(0, 0, width, height)
 
-      for (let x = 0; x < this.simulation.width; x++) {
-        for (let y = 0; y < this.simulation.height; y++) {
+      for (let x = 0; x < this.width; x++) {
+        for (let y = 0; y < this.height; y++) {
           const bot = this.$store.getters.getCellAt(y, x)
           this.ctx.fillStyle = `rgb(${bot.color.r}, ${bot.color.g}, ${bot.color.b})`
           this.ctx.fillRect(x, y, 1, 1)
