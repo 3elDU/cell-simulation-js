@@ -9,8 +9,6 @@ export const state = () => ({
 
 export const getters = {
   getSimulation: state => state.simulation,
-  getSimulationWidth: state => state.simulation.width,
-  getSimulationHeight: state => state.simulation.height,
   getCellAt: (state) => (x, y) => state.simulation.field[y][x],
 
   isPaused: (state) => state.paused

@@ -3,8 +3,8 @@
     ref="canvas"
     class="rounded-sm drop-shadow-md"
     style="image-rendering: pixelated"
-    :width="width"
-    :height="height"
+    :width="simulation.width"
+    :height="simulation.height"
   />
 </template>
 
@@ -19,22 +19,8 @@ export default Vue.extend({
   }),
 
   computed: {
-    width: {
-      get () {
-        return this.$store.getters.getSimulationWidth
-      },
-      set (width: number) {
-        this.$store.commit('setWidth', width)
-      }
-    },
-
-    height: {
-      get () {
-        return this.$store.getters.getSimulationHeight
-      },
-      set (height: number) {
-        this.$store.commit('setHeight', height)
-      }
+    simulation () {
+      return this.$store.getters.getSimulation
     }
   },
 
@@ -60,8 +46,8 @@ export default Vue.extend({
       const { width, height } = this.$refs.canvas as HTMLCanvasElement
       this.ctx.fillRect(0, 0, width, height)
 
-      for (let x = 0; x < this.width; x++) {
-        for (let y = 0; y < this.height; y++) {
+      for (let x = 0; x < this.simulation.width; x++) {
+        for (let y = 0; y < this.simulation.height; y++) {
           const bot = this.$store.getters.getCellAt(y, x)
           this.ctx.fillStyle = `rgb(${bot.color.r}, ${bot.color.g}, ${bot.color.b})`
           this.ctx.fillRect(x, y, 1, 1)
