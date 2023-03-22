@@ -15,7 +15,7 @@
       </p>
 
       <div class="flex">
-        <button class="bg-stone-500 rounded-md w-full mr-2" @click="$store.dispatch('generateMap')">
+        <button class="bg-stone-500 rounded-md w-full mr-2" @click="$store.commit('generateMap')">
           Generate map
         </button>
         <button class="bg-stone-500 rounded-md w-full" @click="paused = !paused;">

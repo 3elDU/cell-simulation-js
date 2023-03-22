@@ -17,16 +17,13 @@ export const getters = {
 }
 
 export const mutations = {
+  generateMap: (state) => state.simulation.generateMap(),
+
   setPaused(state, paused) {
-    console.log(`Set paused to ${paused}`)
     state.paused = paused
   }
 }
 
-export const actions = {
-  generateMap({state}) {
-    state.simulation.generateMap()
-  },
-}
+export const actions = {}
 
 
