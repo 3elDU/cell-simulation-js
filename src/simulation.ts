@@ -1,30 +1,4 @@
-export class RGB {
-  r: number
-  g: number
-  b: number
-
-  constructor (r: number, g: number, b: number) {
-    this.r = r
-    this.g = g
-    this.b = b
-  }
-
-  static random () {
-    return new RGB(
-      Math.random() * 255,
-      Math.random() * 255,
-      Math.random() * 255
-    )
-  }
-}
-
-export class Bot {
-  color: RGB
-
-  constructor (color: undefined | RGB) {
-    this.color = color ?? RGB.random()
-  }
-}
+import Bot from '~/src/bot'
 
 export class CellSimulation {
   width: number
@@ -36,9 +10,9 @@ export class CellSimulation {
       this.field[y] = new Array(this.width)
       for (let x = 0; x < this.width; x++) {
         if (Math.random() < 0.2) {
-          this.field[y][x] = new Bot(undefined)
+          this.field[y][x] = new Bot()
         } else {
-          this.field[y][x] = new Bot(new RGB(0, 0, 0))
+          this.field[y][x] = Bot.createEmpty()
         }
       }
     }
@@ -56,5 +30,7 @@ export class CellSimulation {
     this.generateMap()
   }
 
-  update () {}
+  update () {
+
+  }
 }

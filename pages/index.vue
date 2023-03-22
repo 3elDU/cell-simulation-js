@@ -5,7 +5,7 @@
     @mousemove="handleMouseMove($event)"
     @mouseup="handleMouseUp()"
   >
-    <div class="flex z-20 flex-col bg-stone-800 px-4 pt-4" :style="{ maxWidth: sidebarWidth + 'px' }">
+    <div class="flex gap-y-2 z-20 flex-col bg-stone-800 px-4 pt-4" :style="{ maxWidth: sidebarWidth + 'px' }">
       <p class="text-2xl font-bold">
         Hello!
       </p>
@@ -15,7 +15,7 @@
       </p>
 
       <div class="flex">
-        <button class="bg-stone-500 rounded-md w-full mr-2" @click="regenerateMap()">
+        <button class="bg-stone-500 rounded-md w-full mr-2" @click="$store.dispatch('generateMap')">
           Generate map
         </button>
         <button class="bg-stone-500 rounded-md w-full" @click="paused = !paused;">
@@ -38,23 +38,20 @@
       @wheel="zoom($event)"
       @mousedown="canvasDragLock = true"
     >
-      <canvas ref="field" class="rounded-sm drop-shadow-md" width="64" height="64" style="image-rendering: pixelated" />
+      <CellSimulationComponent :style="`transform: translate(${canvasX}px, ${canvasY}px) scale(${canvasZoom})`" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import { CellSimulation } from '~/src/simulation'
 import clamp from '~/src/clamp'
+import CellSimulationComponent from '~/components/simulation.vue'
 
 export default Vue.extend({
-  name: 'IndexPage',
+  components: { CellSimulationComponent },
   data () {
     return {
-      ctx: {} as CanvasRenderingContext2D,
-      simulation: {} as CellSimulation,
-      paused: true,
       cursor: 'auto',
       canvasZoom: 4,
       canvasDragLock: false,
@@ -64,48 +61,26 @@ export default Vue.extend({
       sidebarWidth: 0
     }
   },
-  mounted () {
-    const canvas: HTMLCanvasElement = this.$refs.field as HTMLCanvasElement
-    this.ctx = canvas.getContext('2d') as CanvasRenderingContext2D
 
-    this.sidebarWidth = window.innerWidth * 0.2
-
-    this.simulation = new CellSimulation(64, 64)
-    this.updateCanvasStyle()
-    this.render()
-
-    setInterval(() => {
-      if (!this.paused) {
-        this.simulation.update()
-        this.render()
+  computed: {
+    paused: {
+      get () {
+        return this.$store.getters.isPaused
+      },
+      set (paused) {
+        this.$store.commit('setPaused', paused)
       }
-    })
+    }
+  },
+
+  mounted () {
+    this.sidebarWidth = window.innerWidth * 0.2
   },
 
   methods: {
-    render () {
-      this.ctx.fillStyle = 'black'
-      const { width, height } = this.$refs.field as HTMLCanvasElement
-      this.ctx.fillRect(0, 0, width, height)
-
-      for (let x = 0; x < this.simulation.width; x++) {
-        for (let y = 0; y < this.simulation.height; y++) {
-          const bot = this.simulation.field[y][x]
-          this.ctx.fillStyle = `rgb(${bot.color.r}, ${bot.color.g}, ${bot.color.b})`
-          this.ctx.fillRect(x, y, 1, 1)
-        }
-      }
-    },
-
-    updateCanvasStyle () {
-      const canvas = this.$refs.field as HTMLCanvasElement
-      canvas.style.transform = `translate(${this.canvasX}px, ${this.canvasY}px) scale(${this.canvasZoom})`
-    },
-
     zoom (event: WheelEvent) {
       this.canvasZoom -= event.deltaY / 100
       this.canvasZoom = clamp(this.canvasZoom, 1, 64)
-      this.updateCanvasStyle()
     },
 
     handleMouseMove (event: MouseEvent) {
@@ -145,13 +120,6 @@ export default Vue.extend({
 
       this.canvasX += event.movementX
       this.canvasY += event.movementY
-
-      this.updateCanvasStyle()
-    },
-
-    regenerateMap () {
-      this.simulation.generateMap()
-      this.render()
     }
   }
 })
