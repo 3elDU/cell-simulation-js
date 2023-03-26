@@ -1,3 +1,5 @@
+import { randomRange } from '~/src/rand'
+
 export class RGB {
   r: number
   g: number
@@ -11,9 +13,9 @@ export class RGB {
 
   static random () {
     return new RGB(
-      Math.random() * 255,
-      Math.random() * 255,
-      Math.random() * 255
+      randomRange(0, 255),
+      randomRange(0, 255),
+      randomRange(0, 255)
     )
   }
 }

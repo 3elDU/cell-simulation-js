@@ -14,12 +14,15 @@
         voluptates pariatur non ut libero vel, qui iusto soluta temporibus minus repellat molestias iure omnis officia.
       </p>
 
-      <div class="flex">
-        <button class="bg-stone-500 rounded-md w-full mr-2" @click="$store.commit('generateMap')">
+      <div class="grid grid-cols-2 gap-2">
+        <button class="bg-stone-500 rounded-md" @click="$store.commit('generateMap')">
           Generate map
         </button>
-        <button class="bg-stone-500 rounded-md w-full" @click="paused = !paused;">
+        <button class="bg-stone-500 rounded-md" @click="paused = !paused;">
           Pause
+        </button>
+        <button class="bg-stone-500 rounded-md" @click="$store.commit('clearMap')">
+          Clear map
         </button>
       </div>
     </div>
@@ -50,12 +53,11 @@ import CellSimulationComponent from '~/components/simulation.vue'
 
 export default Vue.extend({
   components: { CellSimulationComponent },
+
   data () {
     return {
       cursor: 'auto',
-      canvasZoom: 4,
-      canvasDragLock: false,
-      sidebarResizeDragLock: false,
+      canvasZoom: 8,
       canvasX: 0,
       canvasY: 0,
       sidebarWidth: 0
@@ -70,6 +72,24 @@ export default Vue.extend({
       set (paused) {
         this.$store.commit('setPaused', paused)
       }
+    },
+
+    canvasDragLock: {
+      get () {
+        return this.$store.getters.getCanvasDragLock
+      },
+      set (lock) {
+        this.$store.commit('setCanvasDragLock', lock)
+      }
+    },
+
+    sidebarResizeDragLock: {
+      get () {
+        return this.$store.getters.getSidebarResizeDragLock
+      },
+      set (lock) {
+        this.$store.commit('setSidebarResizeDragLock', lock)
+      }
     }
   },
 
@@ -79,7 +99,7 @@ export default Vue.extend({
 
   methods: {
     zoom (event: WheelEvent) {
-      this.canvasZoom -= event.deltaY / 100
+      this.canvasZoom -= event.deltaY / 300
       this.canvasZoom = clamp(this.canvasZoom, 1, 64)
     },
 
