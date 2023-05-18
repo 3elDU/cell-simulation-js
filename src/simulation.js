@@ -1,12 +1,6 @@
-import Bot from '~/src/bot'
-import { Config } from '~/src/config'
+import Bot from './bot.js';
 
 export class CellSimulation {
-  width: number
-  height: number
-  bots: Array<Bot>
-  config: Config
-
   generateMap () {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
@@ -28,7 +22,11 @@ export class CellSimulation {
     }
   }
 
-  constructor (width: number, height: number, config: Config) {
+  cellAt(x, y) {
+    return this.bots[y * this.width + x];
+  }
+
+  constructor (width, height, config) {
     if (width < 0 || height < 0) {
       throw new Error('invalid width and/or height')
     }
@@ -37,7 +35,7 @@ export class CellSimulation {
     this.height = height
     this.config = config
 
-    this.bots = new Array<Bot>(this.width * this.height)
+    this.bots = new Array(this.width * this.height)
     this.generateMap()
   }
 

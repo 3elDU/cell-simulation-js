@@ -1,11 +1,7 @@
-import { randomRange } from '~/src/rand'
+import { randomRange } from './rand.js'
 
-export class RGB {
-  r: number
-  g: number
-  b: number
-
-  constructor (r: number, g: number, b: number) {
+export default class RGB {
+  constructor (r, g, b) {
     this.r = r
     this.g = g
     this.b = b

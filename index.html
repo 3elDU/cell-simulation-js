@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cell simulation</title>
+
+  <style>
+    body {
+      margin: 0;
+      font-family: monospace;
+    }
+
+    #container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100%;
+      height: 100vh;
+      overflow: hidden;
+      margin: 0;
+      padding: 0;
+    }
+
+    .controls-container {
+      position: absolute;
+      margin: 0.5rem;
+      background-color: white;
+    }
+
+    canvas {
+      background-color: black;
+      image-rendering: pixelated;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="controls-container">
+    <button id="pause">Unpause</button>
+    <button id="canvas-zoom-out">-</button>
+    <button id="canvas-zoom-in">+</button>
+    <button id="reset-map">reset map</button>
+    <p>
+      Skip frames: 0 <input id="skipFrames" type="range" min="0" max="10" value="1" /> 10
+    </p>
+    <p>
+    <div id="fps-text"></div>
+    </p>
+  </div>
+
+  <div id="container">
+    <canvas id="canvas" width="64" height="64"></canvas>
+  </div>
+
+  <script type="module" src="src/zoom.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+
+</html>

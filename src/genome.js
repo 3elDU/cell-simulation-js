@@ -1,64 +1,67 @@
-import { Config } from '~/src/config'
-import { randomRange } from '~/src/rand'
+import { randomRange } from './rand.js'
 
-export enum Instruction {
+export const Instruction = {
   // do nothing
-  NOOP,
+  NOOP: "No-op",
 
   // movement
-  TURN_LEFT,
-  TURN_RIGHT,
-  MOVE_FORWARDS,
+  TURN_LEFT: "Turn left",
+  TURN_RIGHT: "Turn right",
+  MOVE_FORWARDS: "Move forwards",
 
-  PHOTOSYNTHESIS,
+  PHOTOSYNTHESIS: "Photosynthesis",
 
   // gives e energy to cell in front
-  GIVE_ENERGY,
+  GIVE_ENERGY: "Give energy",
 
   // attacks cell in front
   // if cell class is hunter cell, it kills the cell immediately
-  ATTACK_CELL,
+  ATTACK_CELL: "Attack cell",
 
   // eats dead cell in front
-  RECYCLE_DEAD_CELL,
+  RECYCLE_DEAD_CELL: "Recycle dead cell",
 
   // jump to instruction b1 if cell has more than e energy
   // otherwise, jump to instruction b2
-  CHECK_ENERGY,
+  CHECK_ENERGY: "Check energy",
 
   // if left -> b1
-  // if right ->
-  CHECK_ROTATION,
+  // if right -> b2
+  // if up -> b3
+  // if down -> b4
+  CHECK_ROTATION: "Check rotation",
 
   // jump to instruction BX, if there's alive cell in front
-  JMP_IF_FACING_ALIVE_CELL,
+  JMP_IF_FACING_ALIVE_CELL: "Check if facing alive cell",
 
   // jump to instruction BX, if there's dead cell in front
-  JMP_IF_FACING_DEAD_CELL,
+  JMP_IF_FACING_DEAD_CELL: "Check if facing dead cell",
 
   // jump to instruction BX, if facing empty space
-  JMP_IF_FACING_VOID,
+  JMP_IF_FACING_VOID: "Check if facing void",
 
   // if cell's genome is at least CX% similar to other's cell genome, jumping to instruction bx
-  JMP_IF_FACING_RELATIVE,
+  JMP_IF_FACING_RELATIVE: "Check if facing relative",
 
   // works, if cell has more than REPRODUCTION_REQUIRED_ENERGY energy
-  MAKE_CHILD
+  MAKE_CHILD: "Make child",
+}
+function randomInstruction() {
+  const values = Object.values(Instruction);
+  return values[Math.floor(Math.random() * values.length)];
 }
 
 export class Gene {
-  instruction: Instruction
+  instruction
+  
+  opt
+  e
+  b1
+  b2
+  b3
+  b4
 
-  opt: boolean
-
-  e: number
-
-  b1: number
-  b2: number
-  b3: number
-  b4: number
-
-  constructor (instruction: Instruction, opt: boolean, e: number, b1: number, b2: number, b3: number, b4: number) {
+  constructor (instruction, opt, e, b1, b2, b3, b4) {
     this.instruction = instruction
     this.opt = opt
     this.e = e
@@ -68,9 +71,9 @@ export class Gene {
     this.b4 = b4
   }
 
-  static generate (config: Config): Gene {
+  static generate (config) {
     return new Gene(
-      randomRange(0, Instruction.MAKE_CHILD + 1),
+      randomInstruction(),
       Math.random() > 0.5,
       randomRange(0, config.reproductionRequiredEnergy * 2),
       randomRange(0, config.genomeLength),
@@ -80,7 +83,7 @@ export class Gene {
     )
   }
 
-  clone (): Gene {
+  clone () {
     return new Gene(
       this.instruction,
       this.opt,
@@ -89,7 +92,7 @@ export class Gene {
     )
   }
 
-  static fromJSON (obj: any): Gene {
+  static fromJSON (obj) {
     return new Gene(
       obj.instruction,
       obj.opt,
