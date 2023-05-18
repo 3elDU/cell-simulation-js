@@ -46,7 +46,7 @@ export const Instruction = {
   // works, if cell has more than REPRODUCTION_REQUIRED_ENERGY energy
   MAKE_CHILD: "Make child",
 }
-function randomInstruction() {
+export function randomInstruction() {
   const values = Object.values(Instruction);
   return values[Math.floor(Math.random() * values.length)];
 }

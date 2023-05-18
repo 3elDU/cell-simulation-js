@@ -1,5 +1,5 @@
 import RGB from './color.js'
-import { Instruction, Gene } from './genome.js'
+import { Instruction, Gene, randomInstruction } from './genome.js'
 import { randomRange } from './rand.js'
 import clamp from './clamp.js'
 
@@ -280,7 +280,7 @@ export default class Bot {
         if (randomRange(1, 100) < config.mutationPercent) {
           const geneToMutate = randomRange(0, config.genomeLength)
 
-          child.genome[geneToMutate].instruction = randomRange(0, Instruction.MAKE_CHILD + 1)
+          child.genome[geneToMutate].instruction = randomInstruction()
           child.genome[geneToMutate].opt = Math.random() > 0.5
           child.genome[geneToMutate].e += randomRange(-3, 3)
           child.genome[geneToMutate].b1 += randomRange(-2, 2)
