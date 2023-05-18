@@ -6,6 +6,7 @@ const ctx = canvas.getContext("2d");
 
 const simulation = new CellSimulation(64, 64, config);
 let paused = true;
+let selectedCell = null;
 
 // How many frames to skip when rendering
 // 1 - render each frame, lowest performance
@@ -35,6 +36,26 @@ document.getElementById("reset-map").addEventListener("click", () => {
 	simulation.generateMap();
 })
 
+// handle click on the canvas (select cell)
+document.getElementById("canvas").addEventListener("click", (event) => {
+	const rect = canvas.getBoundingClientRect();
+	const scaleX = canvas.width / rect.width;
+	const scaleY = canvas.height / rect.height;
+	const x = Math.trunc((event.clientX - rect.left) * scaleX);
+	const y = Math.trunc((event.clientY - rect.top) * scaleY);
+
+	selectedCell = simulation.cellAt(x, y);
+
+	// gnome is constant through cell's lifetine, so update it here once, rather than re-rendering it every time
+	const cellGenome = document.getElementById("cell-genome")
+	cellGenome.innerHTML = ``;
+	for (let gene of selectedCell.genome) {
+		const li = document.createElement('li');
+		li.innerText = JSON.stringify(gene);
+		cellGenome.appendChild(li);
+	}
+})
+
 // update simulation
 setInterval(() => {
 	if (!paused) {
@@ -50,14 +71,42 @@ setInterval(() => {
 }, 1000);
 
 let renderFrame = 0;
-// render
 setInterval(() => {
 	renderFrame++;
-
-	if (skipFrames == 0 || renderFrame % skipFrames != 0 ) {
+	if (skipFrames == 0 || renderFrame % skipFrames != 0) {
 		return;
 	}
-	
+
+	if (selectedCell !== null && !selectedCell.empty) {
+		// show a notice that the cell is dead
+		document.getElementById("cell-is-dead").style.display = selectedCell.alive ? "none" : "block";
+
+		document.getElementById("cell-info-card").style.display = "block";
+		const cellDescription = document.getElementById("cell-description")
+		cellDescription.innerText = `X: ${selectedCell.x}
+			Y: ${selectedCell.y}
+			Direction: ${selectedCell.direction}
+			Color: ${JSON.stringify(selectedCell.color)}
+			Energy: ${selectedCell.energy}
+			Age: ${selectedCell.age}
+
+			Current instruction: ${selectedCell.currentInstruction}
+		`
+
+		let genomeNodes = document.getElementById("cell-genome").children;
+		// Highlight current instruction
+		for (let i = 0; i < selectedCell.genome.length; i++) {
+			if (i == selectedCell.currentInstruction) {
+				genomeNodes[i].id = "current-instruction";
+			} else {
+				genomeNodes[i].id = "";
+			}
+		}
+
+	} else {
+		document.getElementById("cell-info-card").style.display = "none";
+	}
+
 	ctx.fillStyle = 'black'
 	const { width, height } = canvas
 	ctx.fillRect(0, 0, width, height)

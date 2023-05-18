@@ -1,0 +1,81 @@
+body {
+	margin: 0;
+	font-family: sans-serif;
+	background-color: #1d2021;
+	color: #ebdbb2;
+}
+
+#root {
+	display: flex;
+	flex-direction: row;
+	height: 100vh;
+}
+
+#container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 100%;
+	overflow: hidden;
+	margin: 0;
+	padding: 0;
+}
+
+.controls-container {
+	background-color: #3c3836;
+	padding: 1rem;
+	min-width: 300px;
+	max-width: 300px;
+	max-height: 100%;
+	overflow-y: scroll;
+	scrollbar-width: none;
+}
+
+.control-buttons {
+	margin-bottom: 1rem;
+}
+
+#fps-text {
+	margin-bottom: 1rem;
+}
+
+.controls-container::-webkit-scrollbar {
+	display: none;
+}
+
+#cell-is-dead {
+	background-color: #cc241d;
+	text-align: center;
+	border-radius: 4px;
+	margin-bottom: 1rem;
+}
+
+#cell-genome {
+	font-family: monospace;
+	background-color: black;
+	border-radius: 10px;
+	max-height: none;
+	overflow-wrap: break-word;
+}
+
+#cell-genome #current-instruction {
+	background-color: red;
+}
+
+canvas {
+	background-color: black;
+	image-rendering: pixelated;
+}
+
+button {
+	border: none;
+	padding: 0.3rem 0.7rem;
+	border-radius: 6px;
+
+	background-color: #665c54;
+	color: #ebdbb2;
+}
+
+button:hover {
+	background-color: #504945;
+}
