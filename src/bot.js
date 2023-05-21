@@ -53,8 +53,8 @@ export default class Bot {
     return new Bot(x, y, new RGB(0, 0, 0), Direction.Left, 0, false, true)
   }
 
-  static fromJSON(obj) {
-    const bot = new Bot(obj.x, obj.y, obj.color, obj.direction, obj.energy, obj.alive, obj.empty)
+  static fromJSON(x, y, obj) {
+    const bot = new Bot(x, y, obj.color, obj.direction, obj.energy, obj.alive, obj.empty)
 
     for (const gene of obj.genome) {
       bot.genome.push(Gene.fromJSON(gene))

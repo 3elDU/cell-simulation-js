@@ -7,23 +7,33 @@
   <title>Cell simulation</title>
 
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="modal.css">
 </head>
 
 <body>
   <div id="root">
+    <div id="modal" style="display: none">
+      <div id="modal-container">
+        <div id="modal-wrapper"></div>
+      </div>
+    </div>
+
     <div class="controls-container">
       <div class="control-buttons">
         <button id="pause">Unpause</button>
         <button id="canvas-zoom-out">-</button>
         <button id="canvas-zoom-in">+</button>
         <button id="reset-map">reset map</button>
+        <button id="clear-map">clear map</button>
       </div>
-      <div>
-        Skip frames: 0 <input id="skipFrames" type="range" min="0" max="10" value="1" /> 10
-      </div>
+      <button id="cell-load">Load</button>
       <div id="fps-text"></div>
       <div id="cell-info-card">
         <div id="cell-is-dead">Selected cell is dead</div>
+        <div id="cell-button-controls">
+          <button id="cell-save">Save</button>
+          <button id="cell-kill">Kill</button>
+        </div>
         <div id="cell-description"></div>
         <ol id="cell-genome"></ol>
       </div>

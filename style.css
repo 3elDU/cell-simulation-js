@@ -1,8 +1,14 @@
+html,
 body {
 	margin: 0;
 	font-family: sans-serif;
 	background-color: #1d2021;
 	color: #ebdbb2;
+
+	/* To disable scroll bouncing on Safari */
+	overflow-x: hidden;
+	overflow-y: hidden;
+	overscroll-behavior-y: none;
 }
 
 #root {
@@ -32,7 +38,22 @@ body {
 }
 
 .control-buttons {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: .5rem;
+
 	margin-bottom: 1rem;
+}
+
+#speed-slider {
+	display: flex;
+	flex-wrap: nowrap;
+}
+
+#speed-slider input {
+	flex-grow: 1;
+	flex-shrink: 1;
 }
 
 #fps-text {
@@ -50,6 +71,17 @@ body {
 	margin-bottom: 1rem;
 }
 
+#cell-button-controls {
+	display: flex;
+	justify-content: space-evenly;
+	justify-items: stretch;
+	column-gap: .5rem;
+}
+
+#cell-button-controls button {
+	flex-grow: 1;
+}
+
 #cell-genome {
 	font-family: monospace;
 	background-color: black;
@@ -60,6 +92,7 @@ body {
 
 #cell-genome #current-instruction {
 	background-color: red;
+	border-radius: 10px;
 }
 
 canvas {
