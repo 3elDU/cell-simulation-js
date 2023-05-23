@@ -20,10 +20,16 @@ document.getElementById("pause").addEventListener("click", () => {
 })
 
 document.getElementById("reset-map").addEventListener("click", () => {
+	if (!confirm("Do you really want to RESET the map")) {
+		return
+	}
 	simulation.generateMap();
 })
 
 document.getElementById("clear-map").addEventListener("click", () => {
+	if (!confirm("Do you really want to CLEAR the map")) {
+		return
+	}
 	simulation.clearMap();
 })
 
