@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cell simulation</title>
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="modal.css">
+</head>
+
+<body>
+  <div id="root">
+    <div id="modal" style="display: none">
+      <div id="modal-container">
+        <div id="modal-wrapper"></div>
+      </div>
+    </div>
+
+    <div class="controls-container">
+      <div class="control-buttons">
+        <button id="pause">Unpause</button>
+        <button id="canvas-zoom-out">-</button>
+        <button id="canvas-zoom-in">+</button>
+        <button id="reset-map">reset map</button>
+        <button id="clear-map">clear map</button>
+      </div>
+      <button id="cell-load">Load</button>
+      <div id="fps-text"></div>
+      <div id="cell-info-card">
+        <div id="cell-is-dead">Selected cell is dead</div>
+        <div id="cell-button-controls">
+          <button id="cell-save">Save</button>
+          <button id="cell-kill">Kill</button>
+        </div>
+        <div id="cell-description"></div>
+        <ol id="cell-genome"></ol>
+      </div>
+    </div>
+
+    <div id="container">
+      <canvas id="canvas" width="64" height="64"></canvas>
+      <noscript>
+        <h1 style="color: red">JavaScript is required.<br>Please enable JavaScript for this web-page to work.</h1>
+      </noscript>
+    </div>
+  </div>
+
+  <script type="module" src="src/zoom.js"></script>
+  <script type="module" src="src/main.js"></script>
+</body>
+
+</html>

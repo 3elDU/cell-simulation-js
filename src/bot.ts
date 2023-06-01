@@ -1,27 +1,30 @@
-import RGB from './color.js'
-import { Instruction, Gene, randomInstruction } from './genome.js'
-import { randomRange } from './rand.js'
-import clamp from './clamp.js'
+import { RGB } from '~/src/color'
+import { CellSimulation } from '~/src/simulation'
+import { Gene, Instruction } from '~/src/genome'
+import { randomRange } from '~/src/rand'
+import clamp from '~/src/clamp'
+import config from './config'
 
-const Direction = {
-  Left: 0,
-  Right: 1,
-  Up: 2,
-  Down: 3,
+export enum Direction {
+  LEFT,
+  RIGHT,
+  UP,
+  DOWN
 }
 
 export default class Bot {
-  x
-  y
-  direction
-  color
-  energy
-  currentInstruction = 0
-  alive = true
-  empty = false
-  age = 0
+  x: number
+  y: number
+  direction: Direction
+  color: RGB
+  energy: number
+  genome: Array<Gene>
+  currentInstruction: number = 0
+  alive: boolean = true
+  empty: boolean = false
+  age: number = 0
 
-  constructor(x, y, color, direction, energy, alive, empty) {
+  constructor(x: number, y: number, color: RGB, direction: Direction, energy: number, alive: boolean, empty: boolean) {
     this.x = x
     this.y = y
     this.color = color
@@ -32,11 +35,11 @@ export default class Bot {
     this.genome = []
   }
 
-  static generateRandom(x, y, config) {
+  static generateRandom(x: number, y: number): Bot {
     const bot = new Bot(
       x, y,
       RGB.random(),
-      randomRange(0, Direction.Down),
+      randomRange(0, Direction.DOWN),
       config.startEnergy,
       true, false
     )
@@ -49,12 +52,12 @@ export default class Bot {
     return bot
   }
 
-  static createEmpty(x, y) {
-    return new Bot(x, y, new RGB(0, 0, 0), Direction.Left, 0, false, true)
+  static createEmpty(x: number, y: number): Bot {
+    return new Bot(x, y, new RGB(0, 0, 0), 0, 0, false, true)
   }
 
-  static fromJSON(x, y, obj) {
-    const bot = new Bot(x, y, obj.color, obj.direction, obj.energy, obj.alive, obj.empty)
+  static fromJSON(obj: any): Bot {
+    const bot = new Bot(obj.x, obj.y, obj.color, obj.direction, obj.energy, obj.alive, obj.empty)
 
     for (const gene of obj.genome) {
       bot.genome.push(Gene.fromJSON(gene))
@@ -63,7 +66,7 @@ export default class Bot {
     return bot
   }
 
-  update(ctx, config) {
+  update(ctx: CellSimulation) {
     if (!this.alive) {
       return
     }
@@ -75,16 +78,16 @@ export default class Bot {
     let facingX = this.x
     let facingY = this.y
     switch (this.direction) {
-      case Direction.Left:
+      case Direction.LEFT:
         facingX -= 1
         break
-      case Direction.Right:
+      case Direction.RIGHT:
         facingX += 1
         break
-      case Direction.Up:
+      case Direction.UP:
         facingY -= 1
         break
-      case Direction.Down:
+      case Direction.DOWN:
         facingY += 1
     }
 
@@ -107,10 +110,10 @@ export default class Bot {
         break
 
       case Instruction.TURN_LEFT:
-        if (this.direction + 1 === 4) {
-          this.direction = 0
+        if (this.direction - 1 === -1) {
+          this.direction = Direction.DOWN
         } else {
-          this.direction++
+          this.direction--
         }
         break
 
@@ -141,6 +144,7 @@ export default class Bot {
           break
         }
 
+        // eslint-disable-next-line no-case-declarations
         const energyToGive = this.energy * currentInstruction.e
         if (energyToGive > this.energy) {
           break
@@ -162,6 +166,7 @@ export default class Bot {
           break
         }
 
+        // eslint-disable-next-line no-case-declarations
         let takenEnergy = 0
 
         // if option is true, kill cell in front
@@ -198,16 +203,16 @@ export default class Bot {
 
       case Instruction.CHECK_ROTATION:
         switch (this.direction) {
-          case Direction.Left:
+          case Direction.LEFT:
             nextInstruction = currentInstruction.b1
             break
-          case Direction.Right:
+          case Direction.RIGHT:
             nextInstruction = currentInstruction.b2
             break
-          case Direction.Up:
+          case Direction.UP:
             nextInstruction = currentInstruction.b3
             break
-          case Direction.Down:
+          case Direction.DOWN:
             nextInstruction = currentInstruction.b4
         }
         break
@@ -241,6 +246,7 @@ export default class Bot {
           break
         }
 
+        // eslint-disable-next-line no-case-declarations
         let similarGenes = 0
 
         for (let i = 0; i < config.genomeLength; i++) {
@@ -263,6 +269,7 @@ export default class Bot {
           break
         }
 
+        // eslint-disable-next-line no-case-declarations
         const child = new Bot(
           facingX, facingY,
           new RGB(this.color.r, this.color.g, this.color.b),
@@ -280,7 +287,7 @@ export default class Bot {
         if (randomRange(1, 100) < config.mutationPercent) {
           const geneToMutate = randomRange(0, config.genomeLength)
 
-          child.genome[geneToMutate].instruction = randomInstruction()
+          child.genome[geneToMutate].instruction = randomRange(0, Instruction.MAKE_CHILD + 1)
           child.genome[geneToMutate].opt = Math.random() > 0.5
           child.genome[geneToMutate].e += randomRange(-3, 3)
           child.genome[geneToMutate].b1 += randomRange(-2, 2)
@@ -326,7 +333,6 @@ export default class Bot {
     }
 
     this.age++
-
-    ctx.bots[this.y * ctx.width + this.x] = this
+    ctx.setCellAt(this.x, this.y, this)
   }
 }
