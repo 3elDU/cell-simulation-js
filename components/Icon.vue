@@ -45,7 +45,6 @@ async function getSvgIconText(name: string): Promise<string> {
     } else {
       const string = await (response.value as Blob).text();
       cache.set(name, string);
-      console.log(string);
       return string;
     }
   }
