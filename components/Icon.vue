@@ -96,15 +96,19 @@ async function load() {
 
 let parsedSvg = await load();
 
+// Place SVG in the DOM
 function replaceSVG(parsedSvg: Element) {
   span.value.replaceChildren(parsedSvg);
 }
 
+// Watch for change in props, and reload the icon
 watch(props, async (newProps, oldProps) => {
   parsedSvg = await load();
   replaceSVG(parsedSvg);
 })
 
+// The element hasn't been mounted yet, so we can't access `span` - the reference doesn't exist yet.
+// Because of that, wrap the call to replaceSVG() inside onMounted() hook
 onMounted(() => {
   replaceSVG(parsedSvg);
 })
