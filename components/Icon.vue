@@ -31,7 +31,7 @@ const cache = new Map();
 async function getSvgIconText(name: string): Promise<string> {
   if (!cache.has(name)) {
     // Fetch icon from server
-    const [response, error] = await fetch(`/icons/${name}.svg`)
+    const [response, error] = await fetch(`icons/${name}.svg`)
       .then(async (response) => {
         return [await response.text(), null];
       })
@@ -57,6 +57,8 @@ async function getSvgIconText(name: string): Promise<string> {
 </script>
 
 <script setup lang="ts">
+import nuxtConfig from '~/nuxt.config';
+
 const props = defineProps({
   name: {
     type: String,
