@@ -26,14 +26,13 @@
 </style>
 
 <script lang="ts">
-const cache = new Map();
-
 async function getSvgIconText(name: string): Promise<string> {
-  if (!cache.has(name)) {
-    const { data: response, error: error } = await useFetch(`/icons/${name}.svg`);
+  const { data: response, error: error } = await useFetch(`/icons/${name}.svg`, {
+    cache: 'force-cache'
+  });
 
-    if (error.value) {
-      return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+  if (error.value) {
+    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
         <defs>
           <path id="icTwotoneHourglassTop0" fill="currentColor" d="m8 7.5l4 4l4-4V4H8z" opacity=".3" />
         </defs>
@@ -42,13 +41,10 @@ async function getSvgIconText(name: string): Promise<string> {
         <path fill="currentColor"
           d="M18 2H6v6l4 4l-3.99 4.01L6 22h12l-.01-5.99L14 12l4-3.99V2zm-2 14.5V20H8v-3.5l4-4l4 4zm0-9l-4 4l-4-4V4h8v3.5z" />
       </svg>`
-    } else {
-      const string = await (response.value as Blob).text();
-      cache.set(name, string);
-      return string;
-    }
+  } else {
+    const string = await (response.value as Blob).text();
+    return string;
   }
-  return cache.get(name);
 }
 </script>
 
@@ -96,15 +92,19 @@ async function load() {
 
 let parsedSvg = await load();
 
+// Place svg in the DOM
 function replaceSVG(parsedSvg: Element) {
   span.value.replaceChildren(parsedSvg);
 }
 
+// Watch for props changed, and reload the icon
 watch(props, async (newProps, oldProps) => {
   parsedSvg = await load();
   replaceSVG(parsedSvg);
 })
 
+// The element hasn't been mounted yet, so we can't access `span` - the reference doesn't exist yet.
+// Because of that, wrap the call to replaceSVG() inside onMounted() hook
 onMounted(() => {
   replaceSVG(parsedSvg);
 })
