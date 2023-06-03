@@ -17,7 +17,7 @@
 #icon {
   display: inline-block;
 
-  /* HACK: Without this the text is not vertically centered, relative to other text */
+  /* HACK: Without this the icon is not vertically centered, relative to other text */
   text-align: center;
   vertical-align: middle;
   position: relative;
@@ -30,7 +30,9 @@ const cache = new Map();
 
 async function getSvgIconText(name: string): Promise<string> {
   if (!cache.has(name)) {
-    const { data: response, error: error } = await useFetch(`/icons/${name}.svg`);
+    const { data: response, error: error } = await useFetch(`/icons/${name}.svg`, {
+      cache: 'force-cache',
+    });
 
     if (error.value) {
       return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
