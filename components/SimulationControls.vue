@@ -13,6 +13,7 @@
       <Icon name="baseline-fast-forward"></Icon>
     </button>
   </div>
+  <div class="mb-14"></div>
 </template>
 
 <script setup lang="ts">
@@ -24,6 +25,7 @@ const pauseIcon = ref('baseline-play-arrow');
 function togglePause() {
   simulation.togglePause()
   pauseIcon.value = simulation.isPaused ? "baseline-play-arrow" : "baseline-pause";
+  forceRender();
 }
 
 function step() {
@@ -34,6 +36,9 @@ function step() {
 
 <style scoped>
 .control-buttons {
+  position: fixed;
+  z-index: 10;
+
   background-color: black;
   border: 2px solid #323232;
   border-radius: 9999px;
@@ -43,7 +48,6 @@ function step() {
   gap: .3rem;
 
   padding: 0.3rem;
-  margin-bottom: 1rem;
 }
 
 button {

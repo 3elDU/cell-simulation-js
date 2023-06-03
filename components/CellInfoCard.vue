@@ -5,9 +5,20 @@
       Selected cell is dead
     </div>
 
-    <div id="cell-info-container">
-      <div id="cell-direction">
-        <Icon name="baseline-rotate-left"></Icon>
+    <div id="cell-info-container" class="relative">
+      <button class="absolute top-0 right-0 border-transparent bg-inherit" @click="close()" title="Close this menu">
+        <Icon name="baseline-cancel"></Icon>
+      </button>
+
+      <div id="cell-direction" class="relative">
+        <button class="bg-inherit border-transparent absolute top-1 left-0" @click="rotateCellLeft()"
+          title="Rotate cell left">
+          <Icon name="baseline-rotate-left"></Icon>
+        </button>
+        <button class="bg-inherit border-transparent absolute top-1 right-0" @click="rotateCellRight()"
+          title="Rotate cell right">
+          <Icon name="baseline-rotate-right"></Icon>
+        </button>
 
         <div style="grid-area: b" :style="{ visibility: cell.direction == Direction.Up ? 'visible' : 'hidden' }">
           <Icon name="baseline-arrow-upward"></Icon>
@@ -45,9 +56,9 @@
 </template>
 
 <script setup lang=ts>
-import { subscribe } from '~/src/render';
+import { forceRender, subscribe } from '~/src/render';
 import simulation from '~/src/simulation';
-import { Direction } from '~/src/direction';
+import { Direction, rotateLeft, rotateRight } from '~/src/direction';
 import Icon from './Icon.vue';
 
 const genomeUpdateKey = ref(0);
@@ -64,9 +75,28 @@ const cell = shallowReactive({
   color: undefined,
 });
 
+// Deselect the cell
+function close() {
+  simulation.selectedCell = null;
+  forceRender();
+}
+
+function rotateCellLeft() {
+  simulation.selectedCell.direction = rotateLeft(simulation.selectedCell.direction);
+  forceRender();
+}
+function rotateCellRight() {
+  simulation.selectedCell.direction = rotateRight(simulation.selectedCell.direction);
+  forceRender();
+}
 
 onMounted(() => {
   subscribe((force: boolean) => {
+    if (simulation.selectedCell == null) {
+      show.value = false;
+      return;
+    }
+
     cell.dead = !simulation.selectedCell.alive;
 
     if (force || (!simulation.isPaused && simulation.selectedCell.alive)) {

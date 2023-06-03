@@ -1,11 +1,5 @@
 <template>
   <div id="root">
-    <div id="modal" style="display: none">
-      <div id="modal-container">
-        <div id="modal-wrapper"></div>
-      </div>
-    </div>
-
     <div class="controls-container">
       <SimulationControls></SimulationControls>
 
@@ -30,10 +24,10 @@ const iterations = ref(0);
 const fps = ref(0);
 
 onMounted(() => {
-  setInterval(() => {
+  subscribe(() => {
     iterations.value = simulation.iterations;
     fps.value = simulation.fps;
-  }, 1000);
+  });
 })
 </script>
 
@@ -53,7 +47,7 @@ body {
 #root {
   display: flex;
   flex-direction: row;
-  height: 100vh;
+  height: 100dvh;
 }
 
 .controls-container {
@@ -88,32 +82,5 @@ button {
 button:focus {
   outline: none;
   border: 2px solid white;
-}
-
-#modal {
-  position: fixed;
-  z-index: 9998;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-}
-
-#modal-container {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#modal-wrapper {
-  margin: 25%;
-  padding: 1rem;
-
-  background-color: white;
-  color: #1d2021;
-
-  border-radius: 16px;
 }
 </style>
