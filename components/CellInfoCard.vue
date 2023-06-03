@@ -9,19 +9,19 @@
       <div id="cell-direction">
         <Icon name="baseline-rotate-left"></Icon>
 
-        <div style="grid-area: b" :style="{ visibility: cell.direction == Direction.UP ? 'visible' : 'hidden' }">
+        <div style="grid-area: b" :style="{ visibility: cell.direction == Direction.Up ? 'visible' : 'hidden' }">
           <Icon name="baseline-arrow-upward"></Icon>
         </div>
 
-        <div style="grid-area: d" :style="{ visibility: cell.direction == Direction.LEFT ? 'visible' : 'hidden' }">
+        <div style="grid-area: d" :style="{ visibility: cell.direction == Direction.Left ? 'visible' : 'hidden' }">
           <Icon name="baseline-arrow-back"></Icon>
         </div>
         <div id="cell" style="grid-area: e" :style="{ backgroundColor: cell.color }"></div>
-        <div style="grid-area: f" :style="{ visibility: cell.direction == Direction.RIGHT ? 'visible' : 'hidden' }">
+        <div style="grid-area: f" :style="{ visibility: cell.direction == Direction.Right ? 'visible' : 'hidden' }">
           <Icon name="baseline-arrow-forward"></Icon>
         </div>
 
-        <div style="grid-area: i" :style="{ visibility: cell.direction == Direction.DOWN ? 'visible' : 'hidden' }">
+        <div style="grid-area: i" :style="{ visibility: cell.direction == Direction.Down ? 'visible' : 'hidden' }">
           <Icon name="baseline-arrow-downward"></Icon>
         </div>
       </div>
@@ -47,7 +47,7 @@
 <script setup lang=ts>
 import { subscribe } from '~/src/render';
 import simulation from '~/src/simulation';
-import { Direction } from '~/src/bot';
+import { Direction } from '~/src/direction';
 import Icon from './Icon.vue';
 
 const genomeUpdateKey = ref(0);
@@ -67,17 +67,6 @@ const cell = shallowReactive({
 
 onMounted(() => {
   subscribe((force: boolean) => {
-
-    /*
-    dead.value = !sc.alive;
-    direction.value = sc.direction;
-    gene.value = sc.genome[sc.currentInstruction];
-    cellColor.value = sc.color.toCSS();
-
-    energy.value = Math.floor(sc.energy)
-    age.value = sc.age
-    */
-
     cell.dead = !simulation.selectedCell.alive;
 
     if (force || (!simulation.isPaused && simulation.selectedCell.alive)) {

@@ -1,4 +1,5 @@
-import { randomRange } from '~/src/rand'
+import { randomRange, randomRangeInclusive } from '~/src/rand'
+import clamp from './clamp'
 
 export class RGB {
   r: number
@@ -21,5 +22,19 @@ export class RGB {
 
   toCSS(): string {
     return `rgb(${this.r}, ${this.g}, ${this.b})`
+  }
+
+  mutate() {
+    const colorToChange = randomRangeInclusive(0, 2)
+
+    switch (colorToChange) {
+      case 0: this.r += randomRangeInclusive(-16, 16);
+      case 1: this.g += randomRangeInclusive(-16, 16);
+      case 2: this.b += randomRangeInclusive(-16, 16);
+    }
+
+    this.r = clamp(this.r, 0, 255)
+    this.g = clamp(this.g, 0, 255)
+    this.b = clamp(this.b, 0, 255)
   }
 }
