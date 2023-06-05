@@ -10,6 +10,19 @@
     </div>
     <button @click="cancelSelection()">Cancel</button>
   </div>
+
+  <div v-if="
+    /* Do not draw outline when user is selecting where to paste a saved cell
+      ( in that case outline would be displayed in where the cell was saved,
+      but the actuall cell hasn't been placed into the world yet )
+    */
+    !isSelecting
+    // Draw outline only when there is a selected sell, and it's alive
+    && selectedCell !== null && selectedCell.alive
+    " class="absolute border-2 rounded-[25%] border-white"
+    :style="{ width: indicatorSize, height: indicatorSize, translate: indicatorPosition }">
+
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -21,12 +34,15 @@ const { selectedCell, setSelectedCell } = useSelectedCell();
 const canvas: Ref<HTMLCanvasElement> = ref();
 const canvasSize: Ref<number> = ref(8 * 64);
 let ctx: CanvasRenderingContext2D;
+const indicatorSize = ref('0px');
+const indicatorPosition = ref('0 0');
 
 onMounted(() => {
   ctx = canvas.value.getContext('2d')
   addZoom(0)
 
   subscribe(render);
+  requestAnimationFrame(renderIndicator);
 })
 
 let zoom = 8;
@@ -86,6 +102,24 @@ function render() {
   }
 
   ctx.putImageData(imageData, 0, 0);
+}
+
+function renderIndicator() {
+  if (selectedCell.value !== null && selectedCell.value.alive) {
+    // calculate indicator position on the screen
+    const rect = canvas.value.getBoundingClientRect();
+    const scale = rect.width / simulation.width;
+    // How bigger is an outline than an actual cell on the screen
+    const extraOutline = scale * (1 / 3);
+
+    const positionX = selectedCell.value.x * scale - extraOutline / 2;
+    const positionY = selectedCell.value.y * scale - extraOutline / 2;
+
+    indicatorSize.value = `${scale + extraOutline}px`
+    indicatorPosition.value = `${rect.left + positionX}px ${rect.top + positionY}px`
+  }
+
+  requestAnimationFrame(renderIndicator);
 }
 </script>
 
