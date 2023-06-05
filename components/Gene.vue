@@ -1,18 +1,18 @@
 <template>
-  <div id="gene" :class="current ? 'selected' : null" :style="{ color: textColor, backgroundColor: background }"
+  <span id="gene" :class="current ? 'selected' : null" :style="{ color: textColor, backgroundColor: background }"
     :title="title">
     {{ abbreviation }}
-  </div>
+  </span>
 </template>
 
 <script setup lang="ts">
-import { Gene, Instruction, InstructionInfoList } from '~/src/genome';
+import { Gene, InstructionInfoList } from '~/src/genome';
 
-const { id, gene, current } = defineProps({
-  id: Number,
+const { id, gene, current } = defineProps<{
+  id: number,
   gene: Gene,
-  current: Boolean,
-})
+  current: boolean,
+}>()
 
 // Different gene groups have different colors
 const background = ref('white');
@@ -38,7 +38,7 @@ B2: ${gene.b2}`;
 
 <style scoped>
 #gene {
-  width: 100%;
+  width: 2em;
   aspect-ratio: 1/1;
   border-radius: 5px;
 

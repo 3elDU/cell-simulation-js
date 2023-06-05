@@ -17,8 +17,6 @@ export class CellSimulation {
   prevIterations: number
   fps: number
 
-  selectedCell: ShallowReactive<Bot>
-
   togglePause() {
     this.pause = !this.pause;
 
@@ -58,11 +56,9 @@ export class CellSimulation {
     return this.bots[y * this.width + x]
   }
   setCellAt(x: number, y: number, cell: Bot) {
+    cell.x = x
+    cell.y = y
     this.bots[y * this.width + x] = cell
-  }
-
-  selectCell(x: number, y: number) {
-    this.selectedCell = shallowReactive(this.bots[y * this.width + x])
   }
 
   constructor(width: number, height: number) {
@@ -71,7 +67,6 @@ export class CellSimulation {
 
     this.bots = new Array<Bot>(this.width * this.height)
     this.generateMap()
-    this.selectCell(randomRange(0, 64), randomRange(0, 64))
 
     this.pause = true
     this.iterations = 0

@@ -1,14 +1,25 @@
 <template>
   <div id="canvas-container" @wheel="addZoom($event.deltaY / 50)">
-    <canvas ref="canvas" id="canvas" width="64" height="64" @click="selectCell($event)"></canvas>
+    <canvas ref="canvas" id="canvas" width="64" height="64" @click="selectCell($event)"
+      :style="{ width: `${canvasSize}px`, height: `${canvasSize}px` }"></canvas>
+  </div>
+
+  <div v-if="isSelecting" class="absolute top-0 right-0 flex gap-2 m-2">
+    <div class="bg-[#111111] border-2 border-[#444444] rounded-md px-2">
+      <Icon name="ic:info" class="mr-1"></Icon><span>Click where to place a cell</span>
+    </div>
+    <button @click="cancelSelection()">Cancel</button>
   </div>
 </template>
 
 <script setup lang="ts">
 import { forceRender, subscribe } from '~/src/render';
 import simulation from '~/src/simulation';
+const { isSelecting, setIsSelecting } = useIsSelecting();
+const { selectedCell, setSelectedCell } = useSelectedCell();
 
-const canvas: Ref<HTMLCanvasElement> = ref()
+const canvas: Ref<HTMLCanvasElement> = ref();
+const canvasSize: Ref<number> = ref(8 * 64);
 let ctx: CanvasRenderingContext2D;
 
 onMounted(() => {
@@ -28,9 +39,7 @@ function addZoom(amount: number) {
     zoom = 20;
   }
 
-  const sizePixels = Math.round(64 * zoom);
-  canvas.value.style.width = `${sizePixels}px`
-  canvas.value.style.height = `${sizePixels}px`
+  canvasSize.value = Math.round(64 * zoom);
 }
 
 function selectCell(event: MouseEvent) {
@@ -40,8 +49,18 @@ function selectCell(event: MouseEvent) {
   const x = Math.trunc((event.clientX - rect.left) * scaleX);
   const y = Math.trunc((event.clientY - rect.top) * scaleY);
 
-  simulation.selectCell(x, y)
-  forceRender();
+  if (isSelecting.value) {
+    simulation.setCellAt(x, y, selectedCell.value);
+    setIsSelecting(false);
+  } else {
+    setSelectedCell(simulation.getCellAt(x, y));
+    forceRender();
+  }
+}
+
+function cancelSelection() {
+  setSelectedCell(null);
+  setIsSelecting(false);
 }
 
 const imageData = new ImageData(simulation.width, simulation.height);

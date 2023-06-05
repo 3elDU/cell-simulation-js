@@ -4,14 +4,15 @@
       <Icon :name="pauseIcon"></Icon>
     </button>
     <button @click="simulation.generateMap()" title="Regenerate the map">
-      <Icon name="baseline-replay"></Icon>
+      <Icon name="ic:baseline-replay"></Icon>
     </button>
     <button @click="simulation.clearMap()" title="Clear the map">
-      <Icon name="baseline-clear"></Icon>
+      <Icon name="ic:baseline-clear"></Icon>
     </button>
     <button @click="step()" title="Single step through the simulation">
-      <Icon name="baseline-fast-forward"></Icon>
+      <Icon name="ic:baseline-fast-forward"></Icon>
     </button>
+    <LoadCellButton></LoadCellButton>
   </div>
   <div class="mb-14"></div>
 </template>
@@ -20,11 +21,11 @@
 import { forceRender, subscribe } from '~/src/render';
 import simulation from '~/src/simulation';
 
-const pauseIcon = ref('baseline-play-arrow');
+const pauseIcon = ref('ic:baseline-play-arrow');
 
 function togglePause() {
   simulation.togglePause()
-  pauseIcon.value = simulation.isPaused ? "baseline-play-arrow" : "baseline-pause";
+  pauseIcon.value = simulation.isPaused ? "ic:baseline-play-arrow" : "ic:baseline-pause";
   forceRender();
 }
 
@@ -57,6 +58,9 @@ button {
   background-color: #222222;
   border: 2px solid #434343;
   border-radius: 9999px;
+
+  display: flex;
+  align-items: center;
 }
 
 button:active {

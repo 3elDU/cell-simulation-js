@@ -4,5 +4,5 @@ export default defineNuxtConfig({
   app: {
     baseURL: "/cell-simulation-js",
   },
-  modules: ['@nuxtjs/tailwindcss'],
+  modules: ['@nuxtjs/tailwindcss', 'nuxt-icon'],
 })

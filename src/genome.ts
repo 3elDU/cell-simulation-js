@@ -10,7 +10,7 @@ export enum Instruction {
   TurnRight,
   MoveForwards,
 
-  PHOTOSYNTHESIS,
+  Photosynthesis,
 
   // gives e energy to cell in front
   GiveEnergy,
@@ -50,8 +50,7 @@ export const InstructionInfoList = {
   [Instruction.TurnLeft]: { backgroundColor: '#b55088', color: 'white', abbreviation: 'L', name: 'Turn left' },
   [Instruction.TurnRight]: { backgroundColor: '#b55088', color: 'white', abbreviation: 'R', name: 'Turn right' },
   [Instruction.MoveForwards]: { backgroundColor: '#68386c', color: 'white', abbreviation: 'M', name: 'Move forwards' },
-  [Instruction.MoveForwards]: { backgroundColor: '#68386c', color: 'white', abbreviation: 'B', name: 'Move backwards' },
-  [Instruction.PHOTOSYNTHESIS]: { backgroundColor: '#63c74d', color: 'black', abbreviation: 'P', name: 'Produce energy by photosynthesis' },
+  [Instruction.Photosynthesis]: { backgroundColor: '#63c74d', color: 'black', abbreviation: 'P', name: 'Produce energy by photosynthesis' },
   [Instruction.GiveEnergy]: { backgroundColor: '#f77622', color: 'white', abbreviation: 'G', name: 'Give energy to cell in front' },
   [Instruction.AttackCell]: { backgroundColor: '#e43b44', color: 'white', abbreviation: 'A', name: 'Attack cell in front' },
   [Instruction.RecycleDeadCell]: { backgroundColor: '#3e8948', color: 'white', abbreviation: 'R', name: 'Recycle dead cell in front' },

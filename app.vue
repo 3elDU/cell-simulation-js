@@ -44,6 +44,10 @@ body {
   overscroll-behavior-y: none;
 }
 
+span {
+  vertical-align: middle;
+}
+
 #root {
   display: flex;
   flex-direction: row;
@@ -71,16 +75,43 @@ body {
 }
 
 button {
-  padding-left: 0.3rem;
-  padding-right: 0.3rem;
-  border-radius: 4px;
-  font-size: small;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
+  border-radius: 6px;
   background-color: #111111;
-  border: 2px solid #888888;
+  border: 2px solid #444444;
+
+  transition: all 50ms;
 }
 
 button:focus {
   outline: none;
-  border: 2px solid white;
+}
+
+button:active {
+  background-color: #343434;
+  border-color: white;
+}
+
+dialog {
+  border: 2px solid #3f3f3f;
+  border-radius: 10px;
+
+  background-color: #222222;
+  color: white;
+
+  padding: 0.7rem;
+
+  min-width: 400px;
+  width: 30%;
+  max-width: 600px;
+}
+
+dialog:focus {
+  outline: none;
+}
+
+dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
 }
 </style>

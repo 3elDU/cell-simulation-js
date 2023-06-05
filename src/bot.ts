@@ -51,8 +51,10 @@ export default class Bot {
   }
 
   // Load bot from JSON object
-  static fromJSON(obj: any): Bot {
-    const bot = new Bot(obj.x, obj.y, obj.color, obj.direction, obj.energy, obj.alive, obj.empty)
+  static fromJSON(obj: Bot): Bot {
+    const bot = new Bot(obj.x, obj.y, new RGB(obj.color.r, obj.color.g, obj.color.b), obj.direction, obj.energy, obj.alive, obj.empty)
+    bot.currentInstruction = obj.currentInstruction
+    bot.age = obj.age
 
     for (const gene of obj.genome) {
       bot.genome.push(Gene.fromJSON(gene))
@@ -110,7 +112,7 @@ export default class Bot {
         this.energy -= config.movementCost
         break
 
-      case Instruction.PHOTOSYNTHESIS:
+      case Instruction.Photosynthesis:
         this.energy += config.photosynthesisEnergy
         break
 
