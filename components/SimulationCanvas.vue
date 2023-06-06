@@ -41,7 +41,7 @@ onMounted(() => {
   ctx = canvas.value.getContext('2d')
   addZoom(0)
 
-  subscribe(render);
+  requestAnimationFrame(render);
   requestAnimationFrame(renderIndicator);
 })
 
@@ -102,6 +102,7 @@ function render() {
   }
 
   ctx.putImageData(imageData, 0, 0);
+  requestAnimationFrame(render);
 }
 
 function renderIndicator() {

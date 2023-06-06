@@ -9,6 +9,15 @@
       <Icon name="ic:close"></Icon>
     </div>
 
+    <div v-if="savedCells.length == 0" class="text-red-400 text-lg">
+      <p>There are no saved cells!</p>
+      <span class="text-blue-400">
+        <Icon name="ic:info" class="mr-2"></Icon>You can save a cell by selecting one, and clicking a "Save" button,
+        giving it a title,
+        and optionally,
+        description.
+      </span>
+    </div>
     <SavedCellPane class="mt-2" v-for="cell of savedCells" :saved-cell="cell" :reload-hook="reloadHook"></SavedCellPane>
   </dialog>
 </template>
