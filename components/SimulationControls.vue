@@ -1,5 +1,9 @@
 <template>
   <div class="control-buttons">
+    <button @click="toggleSidebar()">
+      <Icon name="ic:menu"></Icon>
+    </button>
+
     <button @click="togglePause()" title="Toggle pause">
       <Icon :name="pauseIcon"></Icon>
     </button>
@@ -20,8 +24,13 @@
 <script setup lang="ts">
 import { forceRender, subscribe } from '~/src/render';
 import simulation from '~/src/simulation';
+const { isOpened, setIsOpened } = useOpenSidebar();
 
 const pauseIcon = ref('ic:baseline-play-arrow');
+
+function toggleSidebar() {
+  setIsOpened(!isOpened.value);
+}
 
 function togglePause() {
   simulation.togglePause()
@@ -37,8 +46,10 @@ function step() {
 
 <style scoped>
 .control-buttons {
-  position: fixed;
-  z-index: 10;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  z-index: 30;
 
   background-color: black;
   border: 2px solid #323232;
@@ -50,6 +61,8 @@ function step() {
 
   padding: 0.3rem;
 }
+
+@media (min-width: 900px) {}
 
 button {
   width: 2rem;

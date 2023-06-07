@@ -13,7 +13,7 @@
     <form @submit="submit($event)">
       <input class="w-full mb-2" type="text" name="name" placeholder="Cell name" required v-model="name" /> <br />
       <textarea class="w-full" name="description" placeholder="Description" v-model="description" />
-      <button type="submit">Save</button>
+      <button type="submit" class="ml-auto">Save</button>
     </form>
   </dialog>
 </template>

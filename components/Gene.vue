@@ -38,7 +38,7 @@ B2: ${gene.b2}`;
 
 <style scoped>
 #gene {
-  width: 2em;
+  min-width: 2em;
   aspect-ratio: 1/1;
   border-radius: 5px;
 

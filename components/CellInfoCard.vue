@@ -129,7 +129,6 @@ onMounted(() => {
 <style scoped>
 #cell-info-card {
   margin-top: 1rem;
-  margin-bottom: 1rem;
 }
 
 #cell-is-dead {
