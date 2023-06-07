@@ -1,5 +1,5 @@
 <template>
-  <button @click="showModal">
+  <button @click="showModal" class="border-blue-500 text-blue-500 bg-transparent">
     <Icon name="ic:baseline-save" class="mr-1"></Icon><span>Save cell</span>
   </button>
 
@@ -63,10 +63,5 @@ textarea {
   padding: 2px;
   padding-left: 4px;
   padding-right: 4px;
-}
-
-button {
-  display: block;
-  margin-top: 1rem;
 }
 </style>

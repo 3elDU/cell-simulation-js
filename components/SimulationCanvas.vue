@@ -1,7 +1,8 @@
 <template>
   <div id="canvas-container" @wheel="addZoom($event.deltaY / 50)">
     <canvas ref="canvas" id="canvas" width="64" height="64" @click="selectCell($event)"
-      :style="{ width: `${canvasSize}px`, height: `${canvasSize}px` }"></canvas>
+      :style="{ width: `${canvasSize}px`, height: `${canvasSize}px` }" :class="isOpened ? 'sidebar-opened' : ''">
+    </canvas>
   </div>
 
   <div v-if="isSelecting" class="absolute top-0 right-0 flex gap-2 m-2">
@@ -17,9 +18,8 @@
       but the actuall cell hasn't been placed into the world yet )
     */
     !isSelecting
-    // Draw outline only when there is a selected sell, and it's alive
-    && selectedCell !== null && selectedCell.alive
-    " class="absolute border-2 rounded-[25%] border-white"
+    // Draw outline only when there is a selected sell
+    && selectedCell !== null" class="absolute border-2 rounded-[25%] border-white pointer-events-none"
     :style="{ width: indicatorSize, height: indicatorSize, translate: indicatorPosition }">
 
   </div>
@@ -30,6 +30,7 @@ import { forceRender, subscribe } from '~/src/render';
 import simulation from '~/src/simulation';
 const { isSelecting, setIsSelecting } = useIsSelecting();
 const { selectedCell, setSelectedCell } = useSelectedCell();
+const { isOpened } = useOpenSidebar();
 
 const canvas: Ref<HTMLCanvasElement> = ref();
 const canvasSize: Ref<number> = ref(8 * 64);
@@ -106,7 +107,7 @@ function render() {
 }
 
 function renderIndicator() {
-  if (selectedCell.value !== null && selectedCell.value.alive) {
+  if (selectedCell.value !== null) {
     // calculate indicator position on the screen
     const rect = canvas.value.getBoundingClientRect();
     const scale = rect.width / simulation.width;
@@ -137,10 +138,20 @@ function renderIndicator() {
 }
 
 canvas {
+  position: relative;
   background-color: black;
   image-rendering: pixelated;
 
   border-radius: calc(100% / 100);
   border: 1.5px solid #222222;
+
+  transition: left 300ms ease-in-out;
+  left: 0px;
+}
+
+@media (min-width: 600px) {
+  .sidebar-opened {
+    left: 150px;
+  }
 }
 </style>

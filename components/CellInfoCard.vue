@@ -1,11 +1,23 @@
 <template>
   <div id="cell-info-card" v-if="show">
-    <div v-if="cell.dead" id="cell-is-dead">
-      <Icon name="ic:baseline-info" class="mr-1"></Icon>
-      <span>Selected cell is dead</span>
-    </div>
+    <div id="cell-controls">
+      <div v-if="cell.dead" class="border-[2px] rounded-[6px] border-red-700 text-red-600 bg-transparent px-[0.4rem]">
+        <Icon name="ic:baseline-info" class="mr-1"></Icon>
+        <span>Selected cell is dead</span>
+      </div>
 
-    <SaveCellButton></SaveCellButton>
+      <button v-if="cell.dead" @click="revive()" class="border-blue-500 text-blue-500 bg-transparent">
+        <Icon name="ic:baseline-undo" class="mr-1"></Icon>
+        <span>Revive</span>
+      </button>
+
+      <button v-if="!cell.dead" @click="kill()" class="border-red-600 text-red-600 bg-transparent">
+        <Icon name="ic:baseline-delete" class="mr-1"></Icon>
+        <span>Kill</span>
+      </button>
+
+      <SaveCellButton></SaveCellButton>
+    </div>
 
     <div id="cell-info-container" class="relative">
       <div class="absolute top-0 right-0 border-transparent bg-inherit cursor-pointer" @click="close()"
@@ -68,6 +80,7 @@
 import { forceRender, subscribe } from '~/src/render';
 import simulation from '~/src/simulation';
 import { Direction, rotateLeft, rotateRight } from '~/src/direction';
+import config from '~/src/config';
 const { selectedCell, setSelectedCell } = useSelectedCell();
 
 const genomeUpdateKey = ref(0);
@@ -82,6 +95,21 @@ const cell = shallowReactive({
   age: undefined,
   color: undefined,
 });
+
+function revive() {
+  if (selectedCell.value.energy < config.startEnergy) {
+    selectedCell.value.energy = config.startEnergy;
+  }
+  selectedCell.value.age = 0;
+  selectedCell.value.alive = true;
+  simulation.setCellAt(selectedCell.value.x, selectedCell.value.y, selectedCell.value);
+  forceRender();
+}
+
+function kill() {
+  selectedCell.value.alive = false;
+  forceRender();
+}
 
 // Deselect the cell
 function close() {
@@ -131,10 +159,11 @@ onMounted(() => {
   margin-top: 1rem;
 }
 
-#cell-is-dead {
-  background-color: #a22633;
-  text-align: center;
-  border-radius: 6px;
+#cell-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+
   margin-top: 1rem;
   margin-bottom: 1rem;
 }

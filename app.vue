@@ -38,8 +38,15 @@ watch(isOpened, (opened) => {
   if (opened) {
     sidebar.value.style.left = '0px';
   } else {
-    // sidebar.value.style.left = `-${sidebar.value.getBoundingClientRect().right}px`
-    sidebar.value.style.left = `-100%`;
+    sidebar.value.style.left = `-${sidebar.value.getBoundingClientRect().width}px`
+  }
+})
+
+addEventListener("resize", () => {
+  console.log("resize")
+  if (!isOpened.value) {
+    // update `left` property for the sidebar, when window was resized
+    sidebar.value.style.left = `-${sidebar.value.getBoundingClientRect().width}px`
   }
 })
 </script>
@@ -78,18 +85,18 @@ span {
   position: fixed;
   z-index: 20;
 
-  min-width: 300px;
+  width: 300px;
+  height: 100%;
   padding: 1rem;
   padding-top: 5rem;
-  height: 100%;
-  overflow-y: scroll;
-  scrollbar-width: none;
 
   background-color: #222222;
   border-right: 2px solid #323232;
 
-  left: 0px;
+  overflow-y: scroll;
+  scrollbar-width: none;
 
+  left: 0px;
   transition-property: left, min-width, width, max-width, min-height, height, max-height, border;
   transition-duration: 300ms;
   transition-timing-function: ease-in-out;
