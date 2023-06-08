@@ -34,19 +34,21 @@ onMounted(() => {
   });
 })
 
+let sidebarVisibilityTimeout: NodeJS.Timeout;
 watch(isOpened, (opened) => {
   if (opened) {
     sidebar.value.style.left = '0px';
+
+    // clear the timeout, otherwise the sidebar transition could bug out and stay in the hidden state
+    // ( for example,  when the user opens and closes the sidebar too fast )
+    clearTimeout(sidebarVisibilityTimeout);
+    sidebar.value.style.visibility = 'visible';
   } else {
     sidebar.value.style.left = `-${sidebar.value.getBoundingClientRect().width}px`
-  }
-})
 
-addEventListener("resize", () => {
-  console.log("resize")
-  if (!isOpened.value) {
-    // update `left` property for the sidebar, when window was resized
-    sidebar.value.style.left = `-${sidebar.value.getBoundingClientRect().width}px`
+    //  hide the sidebar completely.
+    // `setTimeout` is used, because we first need to wait before the CSS transition ends
+    sidebarVisibilityTimeout = setTimeout(() => sidebar.value.style.visibility = 'hidden', 300);
   }
 })
 </script>
@@ -91,15 +93,12 @@ span {
   padding-top: 5rem;
 
   background-color: #222222;
-  border-right: 2px solid #323232;
 
   overflow-y: scroll;
   scrollbar-width: none;
 
   left: 0px;
-  transition-property: left, min-width, width, max-width, min-height, height, max-height, border;
-  transition-duration: 300ms;
-  transition-timing-function: ease-in-out;
+  transition: left 300ms ease-in-out;
 }
 
 #controls-wrapper::-webkit-scrollbar {

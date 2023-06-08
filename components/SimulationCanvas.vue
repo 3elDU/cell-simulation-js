@@ -5,11 +5,11 @@
     </canvas>
   </div>
 
-  <div v-if="isSelecting" class="absolute top-0 right-0 flex gap-2 m-2">
+  <div v-if="isSelecting" id="select-cell-tooltip">
+    <button @click="cancelSelection()">Cancel</button>
     <div class="bg-[#111111] border-2 border-[#444444] rounded-md px-2">
       <Icon name="ic:info" class="mr-1"></Icon><span>Click where to place a cell</span>
     </div>
-    <button @click="cancelSelection()">Cancel</button>
   </div>
 
   <div v-if="
@@ -135,6 +135,31 @@ function renderIndicator() {
   margin: 0;
   padding: 0;
   background-color: #101010;
+}
+
+#select-cell-tooltip {
+  position: absolute;
+  top: 0;
+  right: 0;
+
+  margin: 1rem;
+
+  display: flex;
+  justify-content: right;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+@media (max-width: 600px) {
+
+  /*
+  On mobile, display the cell selection tooltip on the bottom on the screen,
+  otherwise it would be overlayed by simulation controls
+  */
+  #select-cell-tooltip {
+    top: unset;
+    bottom: 0;
+  }
 }
 
 canvas {
