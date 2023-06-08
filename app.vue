@@ -4,13 +4,14 @@
     <div id="controls-wrapper" ref="sidebar">
       <div id="controls-container">
 
-        <p>
+        <Accordion name="Simulation statistics">
           Iterations: {{ iterations }} <br />
           FPS: {{ fps }}
-        </p>
+        </Accordion>
 
-
-        <CellInfoCard></CellInfoCard>
+        <Accordion v-if="selectedCell != null && !selectedCell.empty" name="Selected cell">
+          <CellInfoCard></CellInfoCard>
+        </Accordion>
       </div>
     </div>
 
@@ -22,6 +23,7 @@
 import { subscribe } from './src/render';
 import simulation from './src/simulation';
 const { isOpened, setIsOpened } = useOpenSidebar();
+const { selectedCell } = useSelectedCell();
 
 const iterations = ref(0);
 const fps = ref(0);

@@ -240,6 +240,7 @@ export default class Bot {
         if (this.energy < config.reproductionRequiredEnergy || !botInFront.empty) {
           break
         }
+        this.energy -= config.reproductionRequiredEnergy;
 
         const child = new Bot(
           facingX, facingY,
