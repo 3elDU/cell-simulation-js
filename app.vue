@@ -16,7 +16,11 @@
     </div>
 
     <SimulationCanvas></SimulationCanvas>
-    <InputModeSelector></InputModeSelector>
+
+    <div class="absolute right-3 bottom-3 flex flex-wrap gap-2 justify-end items-end">
+      <PlaceCellTooltip v-if="isSelecting"></PlaceCellTooltip>
+      <InputModeSelector></InputModeSelector>
+    </div>
   </div>
 </template>
 
@@ -25,6 +29,7 @@ import { subscribe } from './src/render';
 import simulation from './src/simulation';
 const { isOpened, setIsOpened } = useOpenSidebar();
 const { selectedCell } = useSelectedCell();
+const { isSelecting } = useIsSelecting();
 
 const iterations = ref(0);
 const fps = ref(0);

@@ -12,13 +12,6 @@
     </canvas>
   </div>
 
-  <div v-if="isSelecting" id="select-cell-tooltip">
-    <button @click="cancelSelection()">Cancel</button>
-    <div class="bg-[#111111] border-2 border-[#444444] rounded-md px-2">
-      <Icon name="ic:info" class="mr-1"></Icon><span>Click where to place a cell</span>
-    </div>
-  </div>
-
   <div v-if="
     /* Do not draw outline when user is selecting where to paste a saved cell
       ( in that case outline would be displayed in where the cell was saved,
@@ -199,11 +192,6 @@ function handlePointerMove(event: PointerEvent) {
   event.preventDefault();
 }
 
-function cancelSelection() {
-  setSelectedCell(null);
-  setIsSelecting(false);
-}
-
 const imageData = new ImageData(simulation.width, simulation.height);
 function render() {
   for (let x = 0; x < simulation.width; x++) {
@@ -260,31 +248,6 @@ function renderIndicator() {
   padding: 0;
   background-color: #101010;
   touch-action: none;
-}
-
-#select-cell-tooltip {
-  position: absolute;
-  top: 0;
-  right: 0;
-
-  margin: 1rem;
-
-  display: flex;
-  justify-content: right;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-}
-
-@media (max-width: 600px) {
-
-  /*
-  On mobile, display the cell selection tooltip on the bottom on the screen,
-  otherwise it would be overlayed by simulation controls
-  */
-  #select-cell-tooltip {
-    top: unset;
-    bottom: 0;
-  }
 }
 
 canvas {

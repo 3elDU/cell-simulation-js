@@ -22,10 +22,6 @@ const { inputMode, setInputMode } = useInputMode();
 
 <style scoped>
 #container {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  margin: 0.6em;
   padding: 0.1em;
 
   display: flex;
