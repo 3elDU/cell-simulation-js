@@ -16,6 +16,7 @@
     </div>
 
     <SimulationCanvas></SimulationCanvas>
+    <InputModeSelector></InputModeSelector>
   </div>
 </template>
 

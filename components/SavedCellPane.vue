@@ -52,9 +52,10 @@
 <script setup lang="ts">
 import Bot from '~/src/bot';
 import { Direction } from '~/src/direction';
-import { SavedCell } from '~/src/types';
-const { isSelecting, setIsSelecting } = useIsSelecting();
-const { selectedCell, setSelectedCell } = useSelectedCell();
+import { InputMode, SavedCell } from '~/src/types';
+const { setIsSelecting } = useIsSelecting();
+const { setSelectedCell } = useSelectedCell();
+const { setInputMode } = useInputMode();
 
 const { savedCell, reloadHook } = defineProps<{
   savedCell: SavedCell,
@@ -79,6 +80,7 @@ function load() {
   const cloned = Bot.fromJSON(JSON.parse(JSON.stringify(cell.value)));
   setSelectedCell(cloned);
   setIsSelecting(true);
+  setInputMode(InputMode.SelectCell);
 }
 
 function deleteCell() {
