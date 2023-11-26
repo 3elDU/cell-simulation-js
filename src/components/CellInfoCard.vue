@@ -1,18 +1,19 @@
 <template>
   <div id="cell-info-card">
     <div id="cell-controls">
-      <div v-if="cell.dead" class="border-[2px] rounded-[6px] border-red-700 text-red-600 bg-transparent px-[0.4rem]">
-        <Icon name="ic:baseline-info" class="mr-1"></Icon>
+      <div v-if="cell.dead"
+        class="border-[2px] rounded-[6px] border-red-700 text-red-600 bg-transparent px-[0.4rem] flex items-center gap-1">
+        <IconMdiSkull />
         <span>Selected cell is dead</span>
       </div>
 
       <button v-if="cell.dead" @click="revive()" class="border-blue-500 text-blue-500 bg-transparent">
-        <Icon name="ic:baseline-undo" class="mr-1"></Icon>
+        <IconMdiUndo />
         <span>Revive</span>
       </button>
 
       <button v-if="!cell.dead" @click="kill()" class="border-red-600 text-red-600 bg-transparent">
-        <Icon name="ic:baseline-delete" class="mr-1"></Icon>
+        <IconMdiDelete />
         <span>Kill</span>
       </button>
 
@@ -22,7 +23,7 @@
     <div id="cell-info-container">
       <div class="absolute top-0 right-0 border-transparent bg-inherit cursor-pointer" @click="close()"
         title="Close this menu">
-        <Icon name="ic:baseline-cancel"></Icon>
+        <IconMdiClose />
       </div>
 
       <div id="cell-direction" class="relative flex justify-center items-center">
@@ -32,44 +33,44 @@
         -->
         <div class="z-10 bg-inherit border-transparent absolute top-0 left-1 cursor-pointer" @click="rotateCellLeft()"
           title="Rotate cell left">
-          <Icon name="ic:baseline-rotate-left"></Icon>
+          <IconMdiRotateLeft />
         </div>
         <div class="z-10 bg-inherit border-transparent absolute top-0 right-1 cursor-pointer" @click="rotateCellRight()"
           title="Rotate cell right">
-          <Icon name="ic:baseline-rotate-right"></Icon>
+          <IconMdiRotateRight />
         </div>
 
         <div id="cell" :style="{ backgroundColor: cell.color }"></div>
 
         <div class="absolute w-full h-full flex p-2 justify-end items-center" :style="{ rotate: cellRotation }">
-          <Icon name="ic:baseline-arrow-forward"></Icon>
+          <IconMdiArrowRight />
         </div>
       </div>
 
       <div>
-        <Icon name="ic:baseline-bolt" class="mr-2"></Icon>
+        <IconMdiLightningBolt class="mr-2" />
         <span>Energy: {{ cell.energy }}</span><br />
 
-        <Icon name="ic:outline-access-time" class="mr-2"></Icon>
+        <IconMdiClock class="mr-2 " />
         <span>Age: {{ cell.age }}</span><br />
 
-        <Icon name="ic:baseline-gps-fixed" class="mr-2"></Icon>
+        <IconMdiCrosshairsGps class="mr-2" />
         <span>X: {{ cell.x }}</span><br />
         <span class="ml-6">Y: {{ cell.y }}</span>
       </div>
     </div>
 
 
-    <Icon name="ic:baseline-sd-storage"></Icon><span>Genome:</span>
+    <IconMdiDna /><span>Genome:</span>
     <Genome :key="genomeUpdateKey" :genome="selectedCell.genome" :current="cell.currentInstruction"></Genome>
   </div>
 </template>
 
 <script setup lang=ts>
-import { forceRender, subscribe } from '~/src/render';
-import simulation from '~/src/simulation';
-import { Direction, rotateLeft, rotateRight } from '~/src/direction';
-import config from '~/src/config';
+import { forceRender, subscribe } from '@/render';
+import simulation from '@/simulation';
+import { Direction, rotateLeft, rotateRight } from '@/direction';
+import config from '@/config';
 const { selectedCell, setSelectedCell } = useSelectedCell();
 
 const cell = shallowReactive({
@@ -77,10 +78,10 @@ const cell = shallowReactive({
   x: 0,
   y: 0,
   currentInstruction: 0,
-  direction: undefined,
-  energy: undefined,
-  age: undefined,
-  color: undefined,
+  direction: Direction.Left,
+  energy: 0,
+  age: 0,
+  color: '',
 });
 const genomeUpdateKey = ref(0);
 

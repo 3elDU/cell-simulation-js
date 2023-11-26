@@ -1,11 +1,12 @@
 <template>
   <button @click="showModal" class="border-blue-500 text-blue-500 bg-transparent">
-    <Icon name="ic:baseline-save" class="mr-1"></Icon><span>Save cell</span>
+    <IconMdiContentSave class="mr-1" />
+    <span>Save cell</span>
   </button>
 
   <dialog ref="modal">
     <div @click="modal.close()" class="absolute top-1 right-2 cursor-pointer">
-      <Icon name="ic:close"></Icon>
+      <IconMdiClose />
     </div>
 
     <p>Save a cell</p>
@@ -19,11 +20,11 @@
 </template>
 
 <script setup lang="ts">
-import simulation from '~/src/simulation';
-import { type SavedCell } from '~/src/types';
+import simulation from '@/simulation';
+import { type SavedCell } from '@/types';
 const { selectedCell } = useSelectedCell();
 
-const modal: Ref<HTMLDialogElement> = ref();
+const modal: Ref<HTMLDialogElement> = ref() as Ref<HTMLDialogElement>;
 const name = ref('');
 const description = ref('');
 
@@ -39,7 +40,7 @@ function submit(event: Event) {
 }
 
 function saveCell() {
-  let savedCells: SavedCell[] = JSON.parse(localStorage.getItem("savedCells")) || [];
+  let savedCells: SavedCell[] = JSON.parse(localStorage.getItem("savedCells") ?? '[]');
 
   const uuid = self.crypto.randomUUID();
   const cell = JSON.stringify(selectedCell.value);

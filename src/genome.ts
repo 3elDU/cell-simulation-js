@@ -1,5 +1,5 @@
-import config, { Config } from '~/src/config'
-import { randomRange, randomRangeInclusive } from '~/src/rand'
+import config from '@/config'
+import { randomRange, randomRangeInclusive } from '@/rand'
 
 export enum Instruction {
   // do nothing

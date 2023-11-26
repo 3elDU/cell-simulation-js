@@ -2,7 +2,8 @@
   <div class="mb-4">
     <div class="border-l-[0.4rem] border-l-neutral-600 select-none cursor-pointer
       active:bg-neutral-700 transition linear duration-50" @click="openAccordion()">
-      <Icon size="1.3em" :name="opened ? 'ic:baseline-arrow-drop-down' : 'ic:baseline-arrow-right'"></Icon>
+      <IconMdiMenuDown v-if="opened" />
+      <IconMdiMenuRight v-else />
       <span>{{ name }}</span>
     </div>
 
@@ -13,13 +14,14 @@
 </template>
 
 <script setup lang=ts>
-import { forceRender } from '~/src/render';
+import { ref } from 'vue';
 
-const opened = ref(false);
+const { initialState } = defineProps<{
+  name: string
+  initialState: boolean
+}>();
 
-const { name } = defineProps<{
-  name: string | Element
-}>()
+const opened = ref(initialState);
 
 function openAccordion() {
   opened.value = !opened.value;

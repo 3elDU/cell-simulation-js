@@ -1,4 +1,4 @@
-import { randomRange, randomRangeInclusive } from '~/src/rand'
+import { randomRange, randomRangeInclusive } from '@/rand'
 import clamp from './clamp'
 
 export class RGB {

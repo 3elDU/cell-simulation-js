@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import simulation from '~/src/simulation';
+import simulation from '@/simulation';
 
 function saveCell() {
 

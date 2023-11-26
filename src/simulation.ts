@@ -1,13 +1,11 @@
-import Bot from '~/src/bot'
-import { randomRange } from './rand'
-import { ShallowReactive } from 'nuxt/dist/app/compat/capi'
+import Bot from '@/bot'
 
 export class CellSimulation {
   width: number
   height: number
   bots: Array<Bot>
 
-  private intervalID: NodeJS.Timer
+  private intervalID: number | undefined
   private pause: boolean
   public get isPaused(): boolean {
     return this.pause
@@ -31,6 +29,8 @@ export class CellSimulation {
 
   generateMap() {
     this.iterations = 0
+    this.prevIterations = 0
+    this.fps = 0
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         if (Math.random() < 0.2) {
@@ -45,6 +45,8 @@ export class CellSimulation {
   // assumes the map is already generated
   clearMap() {
     this.iterations = 0
+    this.prevIterations = 0
+    this.fps = 0
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
         this.bots[y * this.width + x] = Bot.createEmpty(x, y)

@@ -1,8 +1,8 @@
-import { RGB } from '~/src/color'
-import { CellSimulation } from '~/src/simulation'
-import { Gene, Instruction } from '~/src/genome'
-import { randomRange, randomRangeInclusive } from '~/src/rand'
-import clamp from '~/src/clamp'
+import { RGB } from '@/color'
+import { CellSimulation } from '@/simulation'
+import { Gene, Instruction } from '@/genome'
+import { randomRange, randomRangeInclusive } from '@/rand'
+import clamp from '@/clamp'
 import config from './config'
 import { Direction, applyDirection, randomDirection, rotateLeft, rotateRight } from './direction';
 

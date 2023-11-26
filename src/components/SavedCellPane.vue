@@ -3,20 +3,21 @@
     <div id="container" class="flex flex-row bg-neutral-600 items-center gap-2 h-8"
       :class="collapsed ? 'rounded-md' : 'rounded-t-md'">
 
-      <Icon :name="collapsed ? 'ic:baseline-arrow-right' : 'ic:baseline-arrow-drop-down'" @click="collapsed = !collapsed"
-        class="cursor-pointer">
-      </Icon>
+      <div @click="collapsed = !collapsed" class="cursor-pointer">
+        <IconMdiMenuRight v-if="collapsed" />
+        <IconMdiMenuDown v-else />
+      </div>
 
       <div class="w-6 h-6 rounded" :style="{ backgroundColor: cell.color.toCSS() }"></div>
       <span>{{ savedCell.name }}</span>
 
       <div class="ml-auto mr-1 flex justify-center items-stretch gap-1">
         <button class="bg-transparent border-white text-sm" @click="load()">
-          <Icon name="ic:baseline-file-open"></Icon> <span>Load</span>
+          <IconMdiFileDownload /> <span>Load</span>
         </button>
 
         <button class="bg-transparent border-red-600 text-red-600 text-sm inline-flex items-center" @click="deleteCell()">
-          <Icon name="ic:baseline-delete"></Icon>
+          <IconMdiTrash />
         </button>
       </div>
     </div>
@@ -24,17 +25,17 @@
     <div :style="{ display: collapsed ? 'none' : 'block' }" class="bg-neutral-600 rounded-b-md px-2">
       <div class="flex gap-4">
         <span>
-          <Icon name="ic:baseline-bolt" class="mr-1"></Icon>
+          <IconMdiLightningBolt class="mr-1" />
           <span>{{ cell.energy.toFixed() }}</span>
         </span>
 
         <span>
-          <Icon name="ic:baseline-access-time" class="mr-1"></Icon>
+          <IconMdiClock class="mr-1" />
           <span>{{ cell.age }}</span>
         </span>
 
         <span>
-          <Icon :name="iconFromDirection()"></Icon>
+          <IconMdiArrowRight :style="{ transform: `rotate(${directionAngle}deg)` }" />
         </span>
       </div>
 
@@ -50,9 +51,9 @@
 </template>
 
 <script setup lang="ts">
-import Bot from '~/src/bot';
-import { Direction } from '~/src/direction';
-import { InputMode, SavedCell } from '~/src/types';
+import Bot from '@/bot';
+import { Direction } from '@/direction';
+import { InputMode, type SavedCell } from '@/types';
 const { setIsSelecting } = useIsSelecting();
 const { setSelectedCell } = useSelectedCell();
 const { setInputMode } = useInputMode();
@@ -64,16 +65,16 @@ const { savedCell, reloadHook } = defineProps<{
 
 const collapsed = ref(true);
 
-const cell: Ref<Bot> = ref(Bot.fromJSON(JSON.parse(localStorage.getItem(savedCell.id))));
+const cell: Ref<Bot> = ref(Bot.fromJSON(JSON.parse(localStorage.getItem(savedCell.id) as string)));
 
-function iconFromDirection(): string {
+const directionAngle = computed(() => {
   switch (cell.value.direction) {
-    case Direction.Left: return "ic:baseline-arrow-back";
-    case Direction.Right: return "ic:baseline-arrow-forward";
-    case Direction.Up: return "ic:baseline-arrow-upward";
-    case Direction.Down: return "ic:baseline-arrow-downward";
+    case Direction.Left: return 180;
+    case Direction.Right: return 0;
+    case Direction.Up: return 270;
+    case Direction.Down: return 90;
   }
-}
+})
 
 function load() {
   // clone a cell first
@@ -86,7 +87,7 @@ function load() {
 function deleteCell() {
   localStorage.removeItem(savedCell.id);
 
-  let savedCells: SavedCell[] = JSON.parse(localStorage.getItem("savedCells")) || [];
+  let savedCells: SavedCell[] = JSON.parse(localStorage.getItem("savedCells") ?? '[]') || [];
   savedCells = savedCells.filter(val => val.id != savedCell.id);
 
   localStorage.setItem("savedCells", JSON.stringify(savedCells));

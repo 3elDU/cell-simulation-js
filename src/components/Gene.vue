@@ -6,7 +6,7 @@
 </template>
 
 <script setup lang="ts">
-import { Gene, InstructionInfoList } from '~/src/genome';
+import { Gene, InstructionInfoList } from '@/genome';
 
 const { id, gene, current } = defineProps<{
   id: number,

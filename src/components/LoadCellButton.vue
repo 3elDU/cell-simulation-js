@@ -1,18 +1,19 @@
 <template>
   <button @click="showModal()" title="Load a saved cell">
-    <Icon name="ic:baseline-folder-special"></Icon>
+    <IconMdiFolderSpecial />
   </button>
 
   <dialog ref="modal">
     <p>Saved cells:</p>
-    <div class="absolute top-1 right-2 cursor-pointer" @click="modal.close()">
-      <Icon name="ic:close"></Icon>
+    <div class="absolute top-1 right-2 cursor-pointer" @click="modal?.close()">
+      <IconMdiClose />
     </div>
 
     <div v-if="savedCells.length == 0" class="text-red-400 text-lg">
       <p>There are no saved cells!</p>
       <span class="text-blue-400">
-        <Icon name="ic:info" class="mr-2"></Icon>You can save a cell by selecting one, and clicking a "Save" button,
+        <IconMdiInfo class="mr-2" />
+        You can save a cell by selecting one, and clicking a "Save" button,
         giving it a title,
         and optionally,
         description.
@@ -23,20 +24,20 @@
 </template>
 
 <script setup lang="ts">
-import Bot from '~/src/bot';
-import { type SavedCell } from '~/src/types';
-const { isSelecting } = useIsSelecting();
+import { type SavedCell } from '@/types';
 
-const modal: Ref<HTMLDialogElement> = ref();
+const { isSelecting, setIsSelecting } = useIsSelecting();
+
+const modal: Ref<HTMLDialogElement | undefined> = ref();
 const savedCells: Ref<SavedCell[]> = ref([]);
 
 function showModal() {
   load();
-  modal.value.showModal();
+  modal.value?.showModal();
 }
 
 function load() {
-  savedCells.value = JSON.parse(localStorage.getItem("savedCells")) || [];
+  savedCells.value = JSON.parse(localStorage.getItem("savedCells") ?? "[]") ?? [];
 }
 
 function reloadHook() {
@@ -45,7 +46,7 @@ function reloadHook() {
 
 watch(isSelecting, (selecting) => {
   if (selecting) {
-    modal.value.close();
+    modal.value?.close();
   }
 })
 </script>

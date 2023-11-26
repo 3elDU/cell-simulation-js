@@ -1,20 +1,21 @@
 <template>
   <div class="control-buttons">
     <button @click="toggleSidebar()">
-      <Icon name="ic:menu"></Icon>
+      <IconMdiMenu />
     </button>
 
     <button @click="togglePause()" title="Toggle pause">
-      <Icon :name="pauseIcon"></Icon>
+      <IconMdiPlay v-if="paused" />
+      <IconMdiPause v-else />
     </button>
     <button @click="simulation.generateMap()" title="Regenerate the map">
-      <Icon name="ic:baseline-replay"></Icon>
+      <IconMdiReplay />
     </button>
     <button @click="simulation.clearMap()" title="Clear the map">
-      <Icon name="ic:baseline-clear"></Icon>
+      <IconMdiTrash />
     </button>
     <button @click="step()" title="Single step through the simulation">
-      <Icon name="ic:baseline-fast-forward"></Icon>
+      <IconMdiFastForward />
     </button>
     <LoadCellButton></LoadCellButton>
   </div>
@@ -22,20 +23,16 @@
 </template>
 
 <script setup lang="ts">
-import { forceRender, subscribe } from '~/src/render';
-import simulation from '~/src/simulation';
-const { isOpened, setIsOpened } = useOpenSidebar();
+import { ref } from 'vue';
+import { forceRender } from '@/render';
+import simulation from '@/simulation';
 
-const pauseIcon = ref('ic:baseline-play-arrow');
+const sidebar = useSidebar();
+
+const { paused, togglePause } = usePause();
 
 function toggleSidebar() {
-  setIsOpened(!isOpened.value);
-}
-
-function togglePause() {
-  simulation.togglePause()
-  pauseIcon.value = simulation.isPaused ? "ic:baseline-play-arrow" : "ic:baseline-pause";
-  forceRender();
+  sidebar.setIsOpened(!sidebar.isOpened.value);
 }
 
 function step() {

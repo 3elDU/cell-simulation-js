@@ -24,8 +24,8 @@
 </style>
 
 <script setup lang="ts">
-import simulation from '~/src/simulation';
-import { Gene as GeneType } from '~/src/genome';
+import simulation from '@/simulation';
+import { Gene as GeneType } from '@/genome';
 
 const { genome, current } = defineProps<{
   genome: GeneType[],

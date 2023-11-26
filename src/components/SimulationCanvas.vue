@@ -1,14 +1,17 @@
 <template>
-  <div id="canvas-container" @wheel="handleMouseWheel($event)" @pointerdown="handlePointerDown($event)"
-    @pointerup="handlePointerUp($event)" @pointermove="handlePointerMove($event)" :style="{
+  <div class="flex justify-center items-center w-full bg-neutral-950 touch-none" @wheel="handleMouseWheel($event)"
+    @pointerdown="handlePointerDown($event)" @pointerup="handlePointerUp($event)" @pointermove="handlePointerMove($event)"
+    :style="{
       cursor: movingCanvas ? 'move' : 'default'
     }">
 
-    <canvas ref="canvas" id="canvas" width="64" height="64" @click="handleClick($event)" :style="{
-      width: `${canvasSize}px`,
-      height: `${canvasSize}px`,
-      transform: `translate(${canvasX}px, ${canvasY}px)`,
-    }" :class="isOpened ? 'sidebar-opened' : ''">
+    <canvas ref="canvas" width="64" height="64"
+      class="relative border-2 border-neutral-800 left-0 transition-[left] duration-300 ease-in-out"
+      @click="handleClick($event)" :style="{
+        width: `${canvasSize}px`,
+        height: `${canvasSize}px`,
+        transform: `translate(${canvasX}px, ${canvasY}px)`,
+      }" :class="sidebarOpened ? 'sidebar-opened' : ''">
     </canvas>
   </div>
 
@@ -19,23 +22,48 @@
     */
     !isSelecting
     // Draw outline only when there is a selected sell
-    && selectedCell !== null" class="absolute border-2 rounded-[25%] border-white pointer-events-none"
+    && (selectedCell instanceof Bot)" class="abcdef absolute border-2 rounded-[15%] border-white pointer-events-none"
     :style="{ width: indicatorSize, height: indicatorSize, translate: indicatorPosition }">
 
   </div>
 </template>
+<style scoped>
+canvas {
+  image-rendering: pixelated;
+  border-radius: calc(100% / 100);
+}
+
+#canvas {
+  position: relative;
+  background-color: black;
+  image-rendering: pixelated;
+
+  border: 1.5px solid #222222;
+
+  transition: left 300ms ease-in-out;
+  left: 0px;
+}
+
+@media (min-width: 600px) {
+  .sidebar-opened {
+    left: 150px;
+  }
+}
+</style>
 
 <script setup lang="ts">
-import clamp from '~/src/clamp';
-import { forceRender } from '~/src/render';
-import simulation from '~/src/simulation';
-import { InputMode } from '~/src/types';
-const { isSelecting, setIsSelecting } = useIsSelecting();
-const { inputMode } = useInputMode();
-const { selectedCell, setSelectedCell } = useSelectedCell();
-const { isOpened } = useOpenSidebar();
+import clamp from '@/clamp';
+import { forceRender } from '@/render';
+import simulation from '@/simulation';
+import { InputMode } from '@/types';
+import Bot from '@/bot';
 
-const canvas: Ref<HTMLCanvasElement> = ref();
+const { isSelecting, setIsSelecting } = useIsSelecting();
+const { inputMode, setInputMode } = useInputMode();
+const { selectedCell, setSelectedCell } = useSelectedCell();
+const { isOpened: sidebarOpened } = useSidebar();
+
+const canvas: Ref<HTMLCanvasElement> = ref() as Ref<HTMLCanvasElement>;
 const canvasSize: Ref<number> = ref(8 * 64);
 let ctx: CanvasRenderingContext2D;
 const indicatorSize = ref('0px');
@@ -46,7 +74,7 @@ const canvasX = ref(0);
 const canvasY = ref(0);
 
 onMounted(() => {
-  ctx = canvas.value.getContext('2d')
+  ctx = canvas.value.getContext('2d') as CanvasRenderingContext2D
   addZoom(0)
 
   requestAnimationFrame(render);
@@ -102,7 +130,7 @@ function handleClick(event: MouseEvent) {
   switch (inputMode.value) {
     case InputMode.SelectCell: {
       if (isSelecting.value) {
-        simulation.setCellAt(x, y, selectedCell.value);
+        simulation.setCellAt(x, y, selectedCell.value as Bot);
         setIsSelecting(false);
       } else {
         setSelectedCell(simulation.getCellAt(x, y));
@@ -219,7 +247,7 @@ function render() {
 }
 
 function renderIndicator() {
-  if (selectedCell.value !== null) {
+  if (selectedCell.value instanceof Bot) {
     // calculate indicator position on the screen
     const rect = canvas.value.getBoundingClientRect();
     const scale = rect.width / simulation.width;
@@ -237,34 +265,3 @@ function renderIndicator() {
 }
 </script>
 
-<style scoped>
-#canvas-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  background-color: #101010;
-  touch-action: none;
-}
-
-canvas {
-  position: relative;
-  background-color: black;
-  image-rendering: pixelated;
-
-  border-radius: calc(100% / 100);
-  border: 1.5px solid #222222;
-
-  transition: left 300ms ease-in-out;
-  left: 0px;
-}
-
-@media (min-width: 600px) {
-  .sidebar-opened {
-    left: 150px;
-  }
-}
-</style>
