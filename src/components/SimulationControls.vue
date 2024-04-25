@@ -1,5 +1,7 @@
 <template>
-  <div class="control-buttons">
+  <div
+    class="absolute left-4 top-4 z-30 bg-neutral-200 dark:bg-neutral-950 border rounded-full border-neutral-400 dark:border-neutral-700 flex w-fit gap-1.5 p-1.5"
+  >
     <button @click="toggleSidebar()">
       <IconMdiMenu />
     </button>
@@ -23,9 +25,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { forceRender } from '@/render';
-import simulation from '@/simulation';
+import { ref } from "vue";
+import { forceRender } from "@/simulation/render";
+import simulation from "@/simulation/simulation";
 
 const sidebar = useSidebar();
 
@@ -42,39 +44,18 @@ function step() {
 </script>
 
 <style scoped>
-.control-buttons {
-  position: absolute;
-  top: 1rem;
-  left: 1rem;
-  z-index: 30;
-
-  background-color: black;
-  border: 2px solid #323232;
-  border-radius: 9999px;
-
-  display: flex;
-  width: fit-content;
-  gap: .3rem;
-
-  padding: 0.3rem;
-}
-
-@media (min-width: 900px) {}
-
 button {
-  width: 2rem;
-  height: 2rem;
-
-  background-color: #222222;
-  border: 2px solid #434343;
-  border-radius: 9999px;
-
-  display: flex;
-  align-items: center;
+  @apply w-8 h-8 bg-neutral-300 dark:bg-neutral-700 border rounded-full border-neutral-400 dark:border-neutral-600 flex justify-center items-center;
 }
 
 button:active {
-  background-color: #333333;
-  border-color: white
+  @apply bg-neutral-400 border-neutral-500;
+}
+
+@media (prefers-color-scheme: dark) {
+  button:active {
+    background-color: #333333;
+    border-color: white;
+  }
 }
 </style>

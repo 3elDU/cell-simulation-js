@@ -1,6 +1,11 @@
 <template>
   <div id="cell-genome">
-    <Gene v-for="[i, gene] in genome.entries()" :gene="gene" :current="i === current" :id="i" />
+    <Gene
+      v-for="[i, gene] in genome.entries()"
+      :gene="gene"
+      :current="i === current"
+      :id="i"
+    />
   </div>
 </template>
 
@@ -24,11 +29,11 @@
 </style>
 
 <script setup lang="ts">
-import simulation from '@/simulation';
-import { Gene as GeneType } from '@/genome';
+import simulation from "@/simulation/simulation";
+import { Gene as GeneType } from "@/simulation/genome";
 
 const { genome, current } = defineProps<{
-  genome: GeneType[],
-  current: number,
+  genome: GeneType[];
+  current: number;
 }>();
 </script>

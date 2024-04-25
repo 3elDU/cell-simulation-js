@@ -8,12 +8,11 @@
 </template>
 
 <script setup lang="ts">
-
-const { setSelectedCell } = useSelectedCell();
+const selectedCell = useSelectedCellStore();
 const { setIsSelecting } = useIsSelecting();
 
 function cancelSelection() {
-  setSelectedCell(null);
+  selectedCell.value = null;
   setIsSelecting(false);
 }
 </script>
@@ -27,7 +26,6 @@ function cancelSelection() {
 }
 
 @media (max-width: 600px) {
-
   /*
   On mobile, display the cell selection tooltip on the bottom on the screen,
   otherwise it would be overlayed by simulation controls

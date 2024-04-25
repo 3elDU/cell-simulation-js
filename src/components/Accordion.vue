@@ -1,25 +1,15 @@
-<template>
-  <div class="mb-4">
-    <div class="border-l-[0.4rem] border-l-neutral-600 select-none cursor-pointer
-      active:bg-neutral-700 transition linear duration-50" @click="openAccordion()">
-      <IconMdiMenuDown v-if="opened" />
-      <IconMdiMenuRight v-else />
-      <span>{{ name }}</span>
-    </div>
+<script setup lang="ts">
+import { ref } from "vue";
 
-    <div id="content" class="mt-2" :class="opened ? 'opened' : ''">
-      <slot v-if="opened" />
-    </div>
-  </div>
-</template>
-
-<script setup lang=ts>
-import { ref } from 'vue';
-
-const { initialState } = defineProps<{
-  name: string
-  initialState: boolean
-}>();
+const { name, initialState } = defineProps({
+  name: {
+    type: String,
+  },
+  initialState: {
+    type: Boolean,
+    default: false,
+  },
+});
 
 const opened = ref(initialState);
 
@@ -28,16 +18,51 @@ function openAccordion() {
 }
 </script>
 
+<template>
+  <div class="accordion-container" :open="opened">
+    <div class="accordion-title" @click="openAccordion()">
+      <IconMdiMenuDown v-if="opened" />
+      <IconMdiMenuRight v-else />
+      <span>{{ name }}</span>
+    </div>
+
+    <div class="accordion-content">
+      <slot v-if="opened" />
+    </div>
+  </div>
+</template>
+
 <style scoped>
-#content {
-  position: relative;
-  transition: opacity 200ms ease-in-out, top 200ms ease-in-out;
-  opacity: 0;
-  top: -0.5rem;
+.accordion-container {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-#content.opened {
-  opacity: 1.0;
-  top: 0rem;
+.accordion-title {
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+
+  border-left: 6px solid #aaaaaa;
+
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+
+  transition: background-color ease-in-out 50ms;
+}
+
+.accordion-title:active {
+  background: #aaaaaa;
+}
+
+@media (prefers-color-scheme: dark) {
+  .accordion-title:active {
+    background: #404040;
+  }
+  .accordion-title {
+    border-left-color: #424242;
+  }
 }
 </style>

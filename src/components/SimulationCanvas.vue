@@ -1,31 +1,47 @@
 <template>
-  <div class="flex justify-center items-center w-full bg-neutral-950 touch-none" @wheel="handleMouseWheel($event)"
-    @pointerdown="handlePointerDown($event)" @pointerup="handlePointerUp($event)" @pointermove="handlePointerMove($event)"
+  <div
+    class="flex justify-center items-center w-full bg-neutral-100 dark:bg-neutral-950 touch-none overflow-hidden"
+    @wheel="handleMouseWheel($event)"
+    @pointerdown="handlePointerDown($event)"
+    @pointerup="handlePointerUp($event)"
+    @pointermove="handlePointerMove($event)"
     :style="{
-      cursor: movingCanvas ? 'move' : 'default'
-    }">
-
-    <canvas ref="canvas" width="64" height="64"
-      class="relative border-2 border-neutral-800 left-0 transition-[left] duration-300 ease-in-out"
-      @click="handleClick($event)" :style="{
+      cursor: movingCanvas ? 'move' : 'default',
+    }"
+  >
+    <canvas
+      ref="canvas"
+      width="64"
+      height="64"
+      class="relative border-2 border-neutral-300 dark:border-neutral-800 left-0 transition-[left] duration-300 ease-in-out"
+      @click="handleClick($event)"
+      :style="{
         width: `${canvasSize}px`,
         height: `${canvasSize}px`,
         transform: `translate(${canvasX}px, ${canvasY}px)`,
-      }" :class="sidebarOpened ? 'sidebar-opened' : ''">
+      }"
+      :class="sidebarOpened ? 'sidebar-opened' : ''"
+    >
     </canvas>
   </div>
 
-  <div v-if="
-    /* Do not draw outline when user is selecting where to paste a saved cell
+  <div
+    v-if="
+      /* Do not draw outline when user is selecting where to paste a saved cell
       ( in that case outline would be displayed in where the cell was saved,
       but the actuall cell hasn't been placed into the world yet )
     */
-    !isSelecting
-    // Draw outline only when there is a selected sell
-    && (selectedCell instanceof Bot)" class="abcdef absolute border-2 rounded-[15%] border-white pointer-events-none"
-    :style="{ width: indicatorSize, height: indicatorSize, translate: indicatorPosition }">
-
-  </div>
+      !isSelecting &&
+      // Draw outline only when there is a selected sell
+      selectedCell.value instanceof Bot
+    "
+    class="abcdef absolute border-2 rounded-[15%] border-white pointer-events-none"
+    :style="{
+      width: indicatorSize,
+      height: indicatorSize,
+      translate: indicatorPosition,
+    }"
+  ></div>
 </template>
 <style scoped>
 canvas {
@@ -37,8 +53,6 @@ canvas {
   position: relative;
   background-color: black;
   image-rendering: pixelated;
-
-  border: 1.5px solid #222222;
 
   transition: left 300ms ease-in-out;
   left: 0px;
@@ -52,34 +66,35 @@ canvas {
 </style>
 
 <script setup lang="ts">
-import clamp from '@/clamp';
-import { forceRender } from '@/render';
-import simulation from '@/simulation';
-import { InputMode } from '@/types';
-import Bot from '@/bot';
+import clamp from "@/simulation/clamp";
+import { forceRender } from "@/simulation/render";
+import simulation from "@/simulation/simulation";
+import { InputMode } from "@/simulation/types";
+import Bot from "@/simulation/bot";
+
+const selectedCell = useSelectedCellStore();
 
 const { isSelecting, setIsSelecting } = useIsSelecting();
 const { inputMode, setInputMode } = useInputMode();
-const { selectedCell, setSelectedCell } = useSelectedCell();
 const { isOpened: sidebarOpened } = useSidebar();
 
 const canvas: Ref<HTMLCanvasElement> = ref() as Ref<HTMLCanvasElement>;
 const canvasSize: Ref<number> = ref(8 * 64);
 let ctx: CanvasRenderingContext2D;
-const indicatorSize = ref('0px');
-const indicatorPosition = ref('0 0');
+const indicatorSize = ref("0px");
+const indicatorPosition = ref("0 0");
 
 let movingCanvas = ref(false);
 const canvasX = ref(0);
 const canvasY = ref(0);
 
 onMounted(() => {
-  ctx = canvas.value.getContext('2d') as CanvasRenderingContext2D
-  addZoom(0)
+  ctx = canvas.value.getContext("2d") as CanvasRenderingContext2D;
+  addZoom(0);
 
   requestAnimationFrame(render);
   requestAnimationFrame(renderIndicator);
-})
+});
 
 let zoom = 8;
 const minZoom = 1;
@@ -106,8 +121,12 @@ function moveOrigin(event: MouseEvent, zoomDelta: number) {
   const canvasScale = canvas.value.width / rect.width;
 
   // Translate the canvas to opposite direction from the cursor
-  const dx = (canvasCenterX - event.clientX) * zoomDelta * canvasScale / canvas.value.width;
-  const dy = (canvasCenterY - event.clientY) * zoomDelta * canvasScale / canvas.value.height;
+  const dx =
+    ((canvasCenterX - event.clientX) * zoomDelta * canvasScale) /
+    canvas.value.width;
+  const dy =
+    ((canvasCenterY - event.clientY) * zoomDelta * canvasScale) /
+    canvas.value.height;
 
   canvasX.value += dx;
   canvasY.value += dy;
@@ -121,7 +140,7 @@ function getClickCoordinates(event: MouseEvent) {
   const x = Math.trunc((event.clientX - rect.left) * scaleX);
   const y = Math.trunc((event.clientY - rect.top) * scaleY);
 
-  return { x, y }
+  return { x, y };
 }
 
 function handleClick(event: MouseEvent) {
@@ -133,8 +152,11 @@ function handleClick(event: MouseEvent) {
         simulation.setCellAt(x, y, selectedCell.value as Bot);
         setIsSelecting(false);
       } else {
-        setSelectedCell(simulation.getCellAt(x, y));
-        forceRender();
+        // Make the object reactive
+        const cell = reactive(simulation.getCellAt(x, y));
+        selectedCell.value = cell;
+        // Replace cell in the array with a reference to a cell inside the store
+        simulation.setCellAt(x, y, cell);
       }
     }
   }
@@ -145,7 +167,6 @@ function handleMouseWheel(event: WheelEvent) {
   addZoom(zoomDelta);
   moveOrigin(event, zoomDelta);
 }
-
 
 // Keep a list of active touch points on the screen.
 // This is for pinch to zoom mechanic.
@@ -227,12 +248,14 @@ function render() {
       const pixel = y * simulation.width + x;
 
       const bot = simulation.getCellAt(x, y);
-      let r = 0, g = 0, b = 0;
+      let r = 0,
+        g = 0,
+        b = 0;
 
       if (bot.alive) {
-        r = bot.color.r, g = bot.color.g, b = bot.color.b;
+        (r = bot.color.r), (g = bot.color.g), (b = bot.color.b);
       } else if (!bot.alive && !bot.empty) {
-        r = 100, g = 100, b = 100;
+        (r = 100), (g = 100), (b = 100);
       }
 
       imageData.data[pixel * 4] = r;
@@ -257,11 +280,12 @@ function renderIndicator() {
     const positionX = selectedCell.value.x * scale - extraOutline / 2;
     const positionY = selectedCell.value.y * scale - extraOutline / 2;
 
-    indicatorSize.value = `${scale + extraOutline}px`
-    indicatorPosition.value = `${rect.left + positionX}px ${rect.top + positionY}px`
+    indicatorSize.value = `${scale + extraOutline}px`;
+    indicatorPosition.value = `${rect.left + positionX}px ${
+      rect.top + positionY
+    }px`;
   }
 
   requestAnimationFrame(renderIndicator);
 }
 </script>
-

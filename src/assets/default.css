@@ -3,82 +3,57 @@
 @tailwind utilities;
 
 html {
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-  color: white;
-}
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
 
-svg {
-  display: inline;
+  /** Transition between light and dark mode */
+  @apply transition-colors duration-1000 ease-in-out;
 }
 
 body {
-  margin: 0 !important;
-  background-color: black;
+  margin: 0;
 
-  /* To disable scroll bouncing on Safari */
-  overflow-x: hidden;
-  overflow-y: hidden;
-  overscroll-behavior-y: none;
+  background: white;
+  color: black;
+
+  overscroll-behavior: none none;
 }
 
 span {
   vertical-align: middle;
 }
 
-button {
-  padding-left: 0.4rem;
-  padding-right: 0.4rem;
+.btn-default {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+
   border-radius: 6px;
-  background-color: #111111;
-  border: 2px solid #444444;
+
+  @apply bg-neutral-300;
   color: white;
 
-  transition: all 50ms;
+  transition: all 150ms ease-in-out;
 
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 4px;
-}
+  gap: 0.25rem;
 
-button:focus {
-  outline: none;
-}
-
-button:active {
-  background-color: #343434;
-  border-color: white;
-}
-
-dialog {
-  border: 2px solid #3f3f3f;
-  border-radius: 10px;
-
-  background-color: #222222;
-  color: white;
-
-  padding: 0.7rem;
-
-  min-width: 400px;
-  width: 30%;
-  max-width: 600px;
-}
-
-@media (max-width: 600px) {
-  dialog {
-    min-width: 100vw;
-
-    border: 0;
-    border-top: 2px solid #3f3f3f;
-    border-bottom: 2px solid #3f3f3f;
-    border-radius: 0;
+  &:active {
+    @apply bg-neutral-400;
   }
 }
 
-dialog:focus {
-  outline: none;
-}
+@media (prefers-color-scheme: dark) {
+  body {
+    background: black;
+    color: white;
+  }
 
-dialog::backdrop {
-  background-color: rgba(0, 0, 0, 0.6);
+  .btn-default {
+    @apply bg-neutral-950 text-white;
+    &:active {
+      @apply bg-neutral-700;
+    }
+  }
 }

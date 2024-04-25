@@ -3,41 +3,42 @@
     <IconMdiFolderSpecial />
   </button>
 
-  <dialog ref="modal">
+  <ModalDialog v-model="modal">
     <p>Saved cells:</p>
-    <div class="absolute top-1 right-2 cursor-pointer" @click="modal?.close()">
-      <IconMdiClose />
-    </div>
 
     <div v-if="savedCells.length == 0" class="text-red-400 text-lg">
       <p>There are no saved cells!</p>
       <span class="text-blue-400">
         <IconMdiInfo class="mr-2" />
         You can save a cell by selecting one, and clicking a "Save" button,
-        giving it a title,
-        and optionally,
-        description.
+        giving it a title, and optionally, description.
       </span>
     </div>
-    <SavedCellPane class="mt-2" v-for="cell of savedCells" :saved-cell="cell" :reload-hook="reloadHook"></SavedCellPane>
-  </dialog>
+    <SavedCellPane
+      class="mt-2"
+      v-for="cell of savedCells"
+      :saved-cell="cell"
+      :reload-hook="reloadHook"
+    ></SavedCellPane>
+  </ModalDialog>
 </template>
 
 <script setup lang="ts">
-import { type SavedCell } from '@/types';
+import { type SavedCell } from "@/simulation/types";
 
 const { isSelecting, setIsSelecting } = useIsSelecting();
 
-const modal: Ref<HTMLDialogElement | undefined> = ref();
+const modal = ref(false);
 const savedCells: Ref<SavedCell[]> = ref([]);
 
 function showModal() {
   load();
-  modal.value?.showModal();
+  modal.value = true;
 }
 
 function load() {
-  savedCells.value = JSON.parse(localStorage.getItem("savedCells") ?? "[]") ?? [];
+  savedCells.value =
+    JSON.parse(localStorage.getItem("savedCells") ?? "[]") ?? [];
 }
 
 function reloadHook() {
@@ -46,21 +47,14 @@ function reloadHook() {
 
 watch(isSelecting, (selecting) => {
   if (selecting) {
-    modal.value?.close();
+    modal.value = false;
   }
-})
+});
 </script>
 
 <style scoped>
 button {
-  width: 2rem;
-  height: 2rem;
-
-  background-color: #222222;
-  border: 2px solid #434343;
-  border-radius: 9999px;
-
-  display: flex;
-  align-items: center;
+  @apply w-8 h-8 bg-neutral-300 border rounded-full border-neutral-400 flex justify-center items-center;
+  @apply dark:bg-neutral-700 dark:border-neutral-600;
 }
 </style>

@@ -1,8 +1,7 @@
-const subscribers = [];
+const subscribers: ((force: boolean) => void)[] = [];
 export function subscribe(fn: (force: boolean) => void) {
   subscribers.push(fn);
 }
-
 
 function render(forceRender: boolean) {
   for (let fn of subscribers) {

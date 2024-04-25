@@ -1,26 +1,34 @@
 <template>
-  <span id="gene" :class="current ? 'selected' : null" :style="{ color: textColor, backgroundColor: background }"
-    :title="title">
-    {{ abbreviation }}
-  </span>
+  <button
+    class="gene"
+    :class="current ? 'selected' : null"
+    :style="{ color: textColor, backgroundColor: background }"
+    :title="title"
+    @click="selectCurrent"
+  >
+    <p class="text-[10px]">
+      {{ id }}
+    </p>
+    <p>{{ abbreviation }}</p>
+  </button>
 </template>
 
 <script setup lang="ts">
-import { Gene, InstructionInfoList } from '@/genome';
+import { Gene, InstructionInfoList } from "@/simulation/genome";
 
 const { id, gene, current } = defineProps<{
-  id: number,
-  gene: Gene,
-  current: boolean,
-}>()
+  id: number;
+  gene: Gene;
+  current: boolean;
+}>();
 
 // Different gene groups have different colors
-const background = ref('white');
-const textColor = ref('black');
+const background = ref("white");
+const textColor = ref("black");
 // One-letter abbreviation for the gene
-const abbreviation = ref('-');
+const abbreviation = ref("-");
 // Description for the gene
-const title = ref('');
+const title = ref("");
 
 if (Object.keys(InstructionInfoList).includes(gene.instruction.toString())) {
   background.value = InstructionInfoList[gene.instruction].backgroundColor;
@@ -34,10 +42,19 @@ B1: ${gene.b1}
 B2: ${gene.b2}`;
 }
 
+// Moves instruction pointer in the cell to this instruction
+function selectCurrent() {
+  const selectedCell = useSelectedCellStore();
+  if (selectedCell.value) {
+    selectedCell.value.currentInstruction = id;
+  }
+}
 </script>
 
 <style scoped>
-#gene {
+.gene {
+  box-sizing: border-box;
+
   min-width: 2em;
   aspect-ratio: 1/1;
   border-radius: 5px;
@@ -49,12 +66,14 @@ B2: ${gene.b2}`;
   font-weight: bold;
 
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
+
+  line-height: 10px;
 }
 
 .selected {
-  box-sizing: border-box;
-  border: 3px solid white;
+  border: 2px solid white;
 }
 </style>

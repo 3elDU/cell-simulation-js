@@ -91,3 +91,6 @@ sw.*
 
 # Nuxt production static build
 .output
+
+auto-imports.d.ts
+components.d.ts

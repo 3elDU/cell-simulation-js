@@ -1,28 +1,41 @@
 <template>
   <div>
-    <div id="container" class="flex flex-row bg-neutral-600 items-center gap-2 h-8"
-      :class="collapsed ? 'rounded-md' : 'rounded-t-md'">
-
+    <div
+      class="flex flex-row bg-neutral-300 dark:bg-neutral-600 items-center gap-2 h-8"
+      :class="collapsed ? 'rounded-md' : 'rounded-t-md'"
+    >
       <div @click="collapsed = !collapsed" class="cursor-pointer">
         <IconMdiMenuRight v-if="collapsed" />
         <IconMdiMenuDown v-else />
       </div>
 
-      <div class="w-6 h-6 rounded" :style="{ backgroundColor: cell.color.toCSS() }"></div>
-      <span>{{ savedCell.name }}</span>
+      <div
+        class="w-6 h-6 rounded aspect-square"
+        :style="{ backgroundColor: cell.color.toCSS() }"
+      ></div>
+      <span class="truncate">{{ savedCell.name }}</span>
 
       <div class="ml-auto mr-1 flex justify-center items-stretch gap-1">
-        <button class="bg-transparent border-white text-sm" @click="load()">
+        <button
+          class="border-black dark:border-none dark:bg-white dark:text-black"
+          @click="load()"
+        >
           <IconMdiFileDownload /> <span>Load</span>
         </button>
 
-        <button class="bg-transparent border-red-600 text-red-600 text-sm inline-flex items-center" @click="deleteCell()">
+        <button
+          class="bg-transparent border-red-600 text-red-600 dark:bg-red-600 dark:text-white"
+          @click="deleteCell()"
+        >
           <IconMdiTrash />
         </button>
       </div>
     </div>
 
-    <div :style="{ display: collapsed ? 'none' : 'block' }" class="bg-neutral-600 rounded-b-md px-2">
+    <div
+      :style="{ display: collapsed ? 'none' : 'block' }"
+      class="bg-neutral-300 dark:bg-neutral-600 rounded-b-md px-2"
+    >
       <div class="flex gap-4">
         <span>
           <IconMdiLightningBolt class="mr-1" />
@@ -35,7 +48,9 @@
         </span>
 
         <span>
-          <IconMdiArrowRight :style="{ transform: `rotate(${directionAngle}deg)` }" />
+          <IconMdiArrowRight
+            :style="{ transform: `rotate(${directionAngle}deg)` }"
+          />
         </span>
       </div>
 
@@ -44,42 +59,52 @@
       </p>
 
       <div class="flex justify-center py-2">
-        <Genome :genome="cell.genome" :current="cell.currentInstruction"></Genome>
+        <Genome
+          :genome="cell.genome"
+          :current="cell.currentInstruction"
+        ></Genome>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import Bot from '@/bot';
-import { Direction } from '@/direction';
-import { InputMode, type SavedCell } from '@/types';
+import Bot from "@/simulation/bot";
+import { Direction } from "@/simulation/direction";
+import { InputMode, type SavedCell } from "@/simulation/types";
 const { setIsSelecting } = useIsSelecting();
-const { setSelectedCell } = useSelectedCell();
 const { setInputMode } = useInputMode();
 
+const selectedCell = useSelectedCellStore();
+
 const { savedCell, reloadHook } = defineProps<{
-  savedCell: SavedCell,
-  reloadHook: () => void,
+  savedCell: SavedCell;
+  reloadHook: () => void;
 }>();
 
 const collapsed = ref(true);
 
-const cell: Ref<Bot> = ref(Bot.fromJSON(JSON.parse(localStorage.getItem(savedCell.id) as string)));
+const cell: Ref<Bot> = ref(
+  Bot.fromJSON(JSON.parse(localStorage.getItem(savedCell.id) as string))
+);
 
 const directionAngle = computed(() => {
   switch (cell.value.direction) {
-    case Direction.Left: return 180;
-    case Direction.Right: return 0;
-    case Direction.Up: return 270;
-    case Direction.Down: return 90;
+    case Direction.Left:
+      return 180;
+    case Direction.Right:
+      return 0;
+    case Direction.Up:
+      return 270;
+    case Direction.Down:
+      return 90;
   }
-})
+});
 
 function load() {
   // clone a cell first
   const cloned = Bot.fromJSON(JSON.parse(JSON.stringify(cell.value)));
-  setSelectedCell(cloned);
+  selectedCell.value = cloned;
   setIsSelecting(true);
   setInputMode(InputMode.SelectCell);
 }
@@ -87,12 +112,27 @@ function load() {
 function deleteCell() {
   localStorage.removeItem(savedCell.id);
 
-  let savedCells: SavedCell[] = JSON.parse(localStorage.getItem("savedCells") ?? '[]') || [];
-  savedCells = savedCells.filter(val => val.id != savedCell.id);
+  let savedCells: SavedCell[] =
+    JSON.parse(localStorage.getItem("savedCells") ?? "[]") || [];
+  savedCells = savedCells.filter((val) => val.id != savedCell.id);
 
   localStorage.setItem("savedCells", JSON.stringify(savedCells));
   reloadHook();
 }
 </script>
 
-<style scoped></style>
+<style scoped>
+button {
+  font-size: 0.875rem;
+
+  padding-left: 4px;
+  padding-right: 4px;
+
+  display: flex;
+  gap: 2px;
+  align-items: center;
+
+  border-width: 1px;
+  border-radius: 4px;
+}
+</style>
