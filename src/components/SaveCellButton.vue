@@ -48,31 +48,55 @@ function saveCell() {
     <span>Save cell</span>
   </button>
 
-  <ModalDialog v-model="modal">
-    <p>Save a cell</p>
-
+  <ModalDialog v-model="modal" id="save-cell-dialog">
     <form @submit="submit($event)">
-      <input
-        class="w-full mb-2"
-        type="text"
-        name="name"
-        placeholder="Cell name"
-        required
-        v-model="name"
-      />
-      <br />
-      <textarea
-        class="w-full h-max max-h-64"
-        name="description"
-        placeholder="Description"
-        v-model="description"
-      />
-      <button type="submit" class="ml-auto">Save</button>
+      <p>Save a cell</p>
+
+      <fieldset>
+        <input
+          type="text"
+          name="name"
+          placeholder="Cell name"
+          required
+          v-model="name"
+        />
+        <br />
+        <textarea
+          name="description"
+          placeholder="Description"
+          v-model="description"
+        />
+      </fieldset>
+
+      <button type="submit" id="save-cell">Save</button>
     </form>
   </ModalDialog>
 </template>
 
 <style scoped>
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+p {
+  font-size: 125%;
+}
+
+fieldset > :first-child {
+  margin-bottom: 0.5rem;
+}
+
+fieldset > * {
+  width: 100%;
+}
+
+textarea {
+  min-height: 30px;
+  max-height: 16rem;
+}
+
 input,
 textarea {
   background-color: #dfdfdf;
@@ -83,11 +107,21 @@ textarea {
   padding-right: 4px;
 }
 
-@media (prefers-color-sceme: dark) {
+@media (prefers-color-scheme: dark) {
   input,
   textarea {
     background: #111111;
-    border: 2px solid #444444;
+    border: 1px solid #444444;
   }
+}
+
+#save-cell {
+  margin-left: auto;
+
+  background: cornflowerblue;
+  color: white;
+
+  padding: 0.3rem 1rem;
+  border-radius: 8px;
 }
 </style>

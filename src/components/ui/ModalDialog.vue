@@ -17,10 +17,21 @@ watch(open, (open) => {
     dialog.value.close();
   }
 });
+
+function stopEventPropagation(event: Event) {
+  // Stop "keydown" / "keyup" event propagation, so that global keyboard shortcuts don't interfere with inputs inside the modal.
+  event.stopPropagation();
+}
 </script>
 
 <template>
-  <dialog ref="dialog" class="relative">
+  <dialog
+    ref="dialog"
+    class="relative"
+    @close="open = false"
+    @keydown="stopEventPropagation"
+    @keyup="stopEventPropagation"
+  >
     <button @click="open = false" class="absolute top-2 right-2">
       <IconMdiClose />
     </button>
@@ -59,11 +70,15 @@ dialog {
 @media (max-width: 600px) {
   dialog {
     min-width: 100vw;
-
-    border: 0;
-    border-top: 2px solid #3f3f3f;
-    border-bottom: 2px solid #3f3f3f;
     border-radius: 0;
+    border: 0;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    dialog {
+      border-top: 1px solid #3f3f3f;
+      border-bottom: 1px solid #3f3f3f;
+    }
   }
 }
 

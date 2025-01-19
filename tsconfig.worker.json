@@ -1,0 +1,12 @@
+{
+  "include": [
+    "./src/worker/**/*"
+  ],
+  "compilerOptions": {
+    "lib": ["WebWorker", "ES2020"],
+    "types": [],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

@@ -8,19 +8,16 @@
     "auto-imports.d.ts",
   ],
   "exclude": [
-    "src/**/__tests__/*"
+    "src/**/__tests__/*",
+    "src/worker/**/*"
   ],
   "compilerOptions": {
-    "types": [
-      "unplugin-icons/types/vue"
-    ],
+    "types": ["unplugin-icons/types/vue"],
     "allowJs": true,
     "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ]
+      "@/*": ["./src/*"],
     }
   }
 }

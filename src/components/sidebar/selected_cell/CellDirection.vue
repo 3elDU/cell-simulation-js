@@ -1,23 +1,21 @@
 <script setup lang="ts">
 import type Bot from "@/simulation/bot";
 import { Direction, rotateLeft, rotateRight } from "@/simulation/direction";
-import { forceRender } from "@/simulation/render";
+import { storeToRefs } from "pinia";
 
-const props = defineProps<{
-  cell: Bot;
-}>();
+const selectedCell = useSelectedCellStore();
 
 function rotateCellLeft() {
-  props.cell.direction = rotateLeft(props.cell.direction);
-  forceRender();
+  selectedCell.value.direction = rotateLeft(selectedCell.value.direction);
+  selectedCell.updateInWorker();
 }
 function rotateCellRight() {
-  props.cell.direction = rotateRight(props.cell.direction);
-  forceRender();
+  selectedCell.value.direction = rotateRight(selectedCell.value.direction);
+  selectedCell.updateInWorker();
 }
 
 const cellRotation = computed(() => {
-  switch (props.cell.direction) {
+  switch (selectedCell.value.direction) {
     case Direction.Right:
       return "0deg";
     case Direction.Down:
@@ -52,7 +50,7 @@ const cellRotation = computed(() => {
 
     <div
       class="w-[30%] h-[30%] rounded-md"
-      :style="{ backgroundColor: cell.color.toCSS() }"
+      :style="{ backgroundColor: selectedCell.value.color.toCSS() }"
     ></div>
 
     <div

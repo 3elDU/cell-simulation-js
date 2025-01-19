@@ -16,37 +16,39 @@
 <script setup lang="ts">
 import { Gene, InstructionInfoList } from "@/simulation/genome";
 
-const { id, gene, current } = defineProps<{
+const props = defineProps<{
   id: number;
   gene: Gene;
   current: boolean;
 }>();
 
 // Different gene groups have different colors
-const background = ref("white");
-const textColor = ref("black");
+const background = computed(
+  () => InstructionInfoList[props.gene.instruction].backgroundColor
+);
+const textColor = computed(
+  () => InstructionInfoList[props.gene.instruction].color
+);
 // One-letter abbreviation for the gene
-const abbreviation = ref("-");
+const abbreviation = computed(
+  () => InstructionInfoList[props.gene.instruction].abbreviation
+);
 // Description for the gene
-const title = ref("");
+const title = computed(
+  () => `${props.id}: ${InstructionInfoList[props.gene.instruction].name}
 
-if (Object.keys(InstructionInfoList).includes(gene.instruction.toString())) {
-  background.value = InstructionInfoList[gene.instruction].backgroundColor;
-  textColor.value = InstructionInfoList[gene.instruction].color;
-  abbreviation.value = InstructionInfoList[gene.instruction].abbreviation;
-  title.value = `${id}: ${InstructionInfoList[gene.instruction].name}
-
-Option: ${gene.opt}
-Energy: ${gene.e}
-B1: ${gene.b1}
-B2: ${gene.b2}`;
-}
+Option: ${props.gene.opt}
+Energy: ${props.gene.e}
+B1: ${props.gene.b1}
+B2: ${props.gene.b2}`
+);
 
 // Moves instruction pointer in the cell to this instruction
 function selectCurrent() {
   const selectedCell = useSelectedCellStore();
-  if (selectedCell.value) {
-    selectedCell.value.currentInstruction = id;
+  if (selectedCell) {
+    selectedCell.value.currentInstruction = props.id;
+    selectedCell.updateInWorker();
   }
 }
 </script>
@@ -63,7 +65,7 @@ function selectCurrent() {
   color: white;
 
   font-family: monospace;
-  font-weight: bold;
+  font-weight: 600;
 
   display: flex;
   flex-direction: column;

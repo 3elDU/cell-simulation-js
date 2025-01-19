@@ -33,7 +33,6 @@
 </template>
 
 <script setup lang="ts">
-import { InputMode } from "@/simulation/types";
 const { inputMode, setInputMode } = useInputMode();
 </script>
 

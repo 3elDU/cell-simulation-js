@@ -1,9 +1,9 @@
 <template>
-  <div class="flex flex-col gap-2" v-if="selectedCell !== null">
-    <CellControls :cell="selectedCell" />
+  <div class="flex flex-col gap-2">
+    <CellControls />
 
     <div class="flex gap-2">
-      <CellDirection :cell="selectedCell" />
+      <CellDirection />
       <div class="flex flex-col">
         <div>
           <IconMdiCrosshairsGps class="inline-block" />

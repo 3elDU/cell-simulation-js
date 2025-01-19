@@ -71,21 +71,22 @@
 <script setup lang="ts">
 import Bot from "@/simulation/bot";
 import { Direction } from "@/simulation/direction";
-import { InputMode, type SavedCell } from "@/simulation/types";
+import { type SavedCell } from "@/simulation/types";
 const { setIsSelecting } = useIsSelecting();
 const { setInputMode } = useInputMode();
 
 const selectedCell = useSelectedCellStore();
 
-const { savedCell, reloadHook } = defineProps<{
+const { savedCell } = defineProps<{
   savedCell: SavedCell;
-  reloadHook: () => void;
 }>();
+
+const emit = defineEmits(["delete"]);
 
 const collapsed = ref(true);
 
 const cell: Ref<Bot> = ref(
-  Bot.fromJSON(JSON.parse(localStorage.getItem(savedCell.id) as string))
+  Bot.fromJSON(JSON.parse(localStorage.getItem(savedCell.id)!))
 );
 
 const directionAngle = computed(() => {
@@ -103,7 +104,7 @@ const directionAngle = computed(() => {
 
 function load() {
   // clone a cell first
-  const cloned = Bot.fromJSON(JSON.parse(JSON.stringify(cell.value)));
+  const cloned = Bot.fromJSON(cell.value);
   selectedCell.value = cloned;
   setIsSelecting(true);
   setInputMode(InputMode.SelectCell);
@@ -117,7 +118,7 @@ function deleteCell() {
   savedCells = savedCells.filter((val) => val.id != savedCell.id);
 
   localStorage.setItem("savedCells", JSON.stringify(savedCells));
-  reloadHook();
+  emit("delete");
 }
 </script>
 

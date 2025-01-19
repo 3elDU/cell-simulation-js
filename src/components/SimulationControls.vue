@@ -6,14 +6,14 @@
       <IconMdiMenu />
     </button>
 
-    <button @click="togglePause()" title="Toggle pause">
-      <IconMdiPlay v-if="paused" />
+    <button @click="simulation.togglePause()" title="Toggle pause">
+      <IconMdiPlay v-if="simulation.isPaused" />
       <IconMdiPause v-else />
     </button>
-    <button @click="simulation.generateMap()" title="Regenerate the map">
+    <button @click="sendToWorker({ type: 'reset' })" title="Regenerate the map">
       <IconMdiReplay />
     </button>
-    <button @click="simulation.clearMap()" title="Clear the map">
+    <button @click="sendToWorker({ type: 'clear' })" title="Clear the map">
       <IconMdiTrash />
     </button>
     <button @click="step()" title="Single step through the simulation">
@@ -25,21 +25,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import { forceRender } from "@/simulation/render";
-import simulation from "@/simulation/simulation";
+import { sendToWorker } from "@/ipc";
 
 const sidebar = useSidebar();
-
-const { paused, togglePause } = usePause();
+const simulation = useSimulationStore();
 
 function toggleSidebar() {
   sidebar.setIsOpened(!sidebar.isOpened.value);
 }
 
 function step() {
-  simulation.update();
-  forceRender();
+  sendToWorker({ type: "forward" });
 }
 </script>
 

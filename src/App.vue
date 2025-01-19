@@ -4,43 +4,37 @@
     <SidebarComponent />
     <SimulationCanvas />
 
-    <div
-      class="absolute right-3 bottom-3 flex flex-col gap-2 justify-end items-end"
-    >
+    <div class="absolute right-3 bottom-3 flex gap-2 justify-end items-end">
       <PlaceCellTooltip v-if="isSelecting"></PlaceCellTooltip>
       <InputModeSelector></InputModeSelector>
     </div>
   </div>
 </template>
 
-<script setup>
-import { forceRender, subscribe } from "@/simulation/render";
-import simulation from "@/simulation/simulation";
-import { InputMode } from "./simulation/types";
+<script setup lang="ts">
+import { sendToWorker } from "./ipc";
 
-const { togglePause } = usePause();
 const { setInputMode } = useInputMode();
-const { isSelecting, setIsSelecting } = useIsSelecting();
+const { isSelecting } = useIsSelecting();
+const simulation = useSimulationStore();
 
-let keysPressed = [];
+const keysPressed: string[] = [];
 
-const keyDownListener = (event) => {
+function onKeyDown(event: KeyboardEvent) {
   if (keysPressed.includes(event.code)) {
     return;
   }
-
   keysPressed.push(event.code);
 
   switch (event.code) {
     case "Space":
-      togglePause();
+      simulation.togglePause();
       break;
-    case "KeyR":
-      simulation.generateMap();
+    case !event.ctrlKey && "KeyR":
+      sendToWorker({ type: "reset" });
       break;
     case "KeyS":
-      simulation.update();
-      forceRender();
+      sendToWorker({ type: "forward" });
       break;
     case "Digit1":
       setInputMode(InputMode.SelectCell);
@@ -51,22 +45,21 @@ const keyDownListener = (event) => {
     default:
       return;
   }
+}
 
-  event.preventDefault();
-};
-const keyUpListener = (event) => {
+function onKeyUp(event: KeyboardEvent) {
   if (keysPressed.includes(event.code)) {
     keysPressed.splice(keysPressed.indexOf(event.code), 1);
   }
-};
+}
 
 onMounted(() => {
-  window.addEventListener("keydown", keyDownListener);
-  window.addEventListener("keyup", keyUpListener);
+  window.addEventListener("keydown", onKeyDown);
+  window.addEventListener("keyup", onKeyUp);
 });
 
 onUnmounted(() => {
-  window.removeEventListener("keydown", keyDownListener);
-  window.removeEventListener("keyup", keyUpListener);
+  window.removeEventListener("keydown", onKeyDown);
+  window.removeEventListener("keyup", onKeyUp);
 });
 </script>

@@ -18,7 +18,7 @@
       class="mt-2"
       v-for="cell of savedCells"
       :saved-cell="cell"
-      :reload-hook="reloadHook"
+      @delete="load"
     ></SavedCellPane>
   </ModalDialog>
 </template>
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { type SavedCell } from "@/simulation/types";
 
-const { isSelecting, setIsSelecting } = useIsSelecting();
+const { isSelecting } = useIsSelecting();
 
 const modal = ref(false);
 const savedCells: Ref<SavedCell[]> = ref([]);
@@ -39,10 +39,6 @@ function showModal() {
 function load() {
   savedCells.value =
     JSON.parse(localStorage.getItem("savedCells") ?? "[]") ?? [];
-}
-
-function reloadHook() {
-  load();
 }
 
 watch(isSelecting, (selecting) => {

@@ -1,15 +1,15 @@
 export interface Config {
-  mutationPercent: number
-  genomeLength: number
-  startEnergy: number
-  reproductionRequiredEnergy: number
-  cellMaxAge: number
-  photosynthesisEnergy: number
-  attackRequiredEnergy: number
-  attackEnergy: number
-  movementCost: number
-  turnCost: number
-  noopCost: number
+  mutationPercent: number;
+  genomeLength: number;
+  startEnergy: number;
+  reproductionRequiredEnergy: number;
+  cellMaxAge: number;
+  photosynthesisEnergy: number;
+  attackRequiredEnergy: number;
+  attackEnergy: number;
+  movementCost: number;
+  turnCost: number;
+  noopCost: number;
 }
 
 export default {
@@ -23,5 +23,5 @@ export default {
   attackEnergy: 4,
   movementCost: 1,
   turnCost: 0.5,
-  noopCost: 0.1
-}
+  noopCost: 0.1,
+} satisfies Config;

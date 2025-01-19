@@ -10,10 +10,11 @@
     }"
   >
     <canvas
+      id="canvas"
       ref="canvas"
       width="64"
       height="64"
-      class="relative border-2 border-neutral-300 dark:border-neutral-800 left-0 transition-[left] duration-300 ease-in-out"
+      class="dark:border-neutral-800"
       @click="handleClick($event)"
       :style="{
         width: `${canvasSize}px`,
@@ -27,15 +28,16 @@
 
   <div
     v-if="
-      /* Do not draw outline when user is selecting where to paste a saved cell
-      ( in that case outline would be displayed in where the cell was saved,
-      but the actuall cell hasn't been placed into the world yet )
-    */
+      /*
+        Do not draw outline when user is selecting where to paste a saved cell
+        ( in that case outline would be displayed in where the cell was saved,
+        but the actuall cell hasn't been placed into the world yet )
+      */
       !isSelecting &&
       // Draw outline only when there is a selected sell
-      selectedCell.value instanceof Bot
+      selectedCell.selected
     "
-    class="abcdef absolute border-2 rounded-[15%] border-white pointer-events-none"
+    class="absolute border-2 rounded-[15%] border-white pointer-events-none"
     :style="{
       width: indicatorSize,
       height: indicatorSize,
@@ -43,13 +45,12 @@
     }"
   ></div>
 </template>
-<style scoped>
-canvas {
-  image-rendering: pixelated;
-  border-radius: calc(100% / 100);
-}
 
+<style scoped>
 #canvas {
+  image-rendering: pixelated;
+  border-radius: 1%;
+
   position: relative;
   background-color: black;
   image-rendering: pixelated;
@@ -59,28 +60,38 @@ canvas {
 }
 
 @media (min-width: 600px) {
-  .sidebar-opened {
+  #canvas.sidebar-opened {
     left: 150px;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  #canvas {
+    box-shadow: 0 0 12px rgb(128, 128, 128);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  #canvas {
+    border-width: 2px;
+    border-style: solid;
   }
 }
 </style>
 
 <script setup lang="ts">
 import clamp from "@/simulation/clamp";
-import { forceRender } from "@/simulation/render";
-import simulation from "@/simulation/simulation";
-import { InputMode } from "@/simulation/types";
-import Bot from "@/simulation/bot";
+import { sendToWorker } from "@/ipc";
+import { subscribe } from "@/ipc/render";
 
+const simulation = useSimulationStore();
 const selectedCell = useSelectedCellStore();
-
 const { isSelecting, setIsSelecting } = useIsSelecting();
-const { inputMode, setInputMode } = useInputMode();
+const { inputMode } = useInputMode();
 const { isOpened: sidebarOpened } = useSidebar();
 
 const canvas: Ref<HTMLCanvasElement> = ref() as Ref<HTMLCanvasElement>;
 const canvasSize: Ref<number> = ref(8 * 64);
-let ctx: CanvasRenderingContext2D;
+let ctx: ImageBitmapRenderingContext;
 const indicatorSize = ref("0px");
 const indicatorPosition = ref("0 0");
 
@@ -89,10 +100,13 @@ const canvasX = ref(0);
 const canvasY = ref(0);
 
 onMounted(() => {
-  ctx = canvas.value.getContext("2d") as CanvasRenderingContext2D;
+  ctx = canvas.value.getContext("bitmaprenderer")!;
   addZoom(0);
 
-  requestAnimationFrame(render);
+  subscribe((image) => {
+    ctx.transferFromImageBitmap(image);
+  });
+
   requestAnimationFrame(renderIndicator);
 });
 
@@ -143,20 +157,25 @@ function getClickCoordinates(event: MouseEvent) {
   return { x, y };
 }
 
-function handleClick(event: MouseEvent) {
+async function handleClick(event: MouseEvent) {
   const { x, y } = getClickCoordinates(event);
 
   switch (inputMode.value) {
     case InputMode.SelectCell: {
       if (isSelecting.value) {
-        simulation.setCellAt(x, y, selectedCell.value as Bot);
+        sendToWorker({
+          type: "setcell",
+          x,
+          y,
+          cell: toRaw(selectedCell.value),
+        });
         setIsSelecting(false);
       } else {
-        // Make the object reactive
-        const cell = reactive(simulation.getCellAt(x, y));
-        selectedCell.value = cell;
-        // Replace cell in the array with a reference to a cell inside the store
-        simulation.setCellAt(x, y, cell);
+        sendToWorker({
+          type: "selectcell",
+          x,
+          y,
+        });
       }
     }
   }
@@ -241,36 +260,8 @@ function handlePointerMove(event: PointerEvent) {
   event.preventDefault();
 }
 
-const imageData = new ImageData(simulation.width, simulation.height);
-function render() {
-  for (let x = 0; x < simulation.width; x++) {
-    for (let y = 0; y < simulation.height; y++) {
-      const pixel = y * simulation.width + x;
-
-      const bot = simulation.getCellAt(x, y);
-      let r = 0,
-        g = 0,
-        b = 0;
-
-      if (bot.alive) {
-        (r = bot.color.r), (g = bot.color.g), (b = bot.color.b);
-      } else if (!bot.alive && !bot.empty) {
-        (r = 100), (g = 100), (b = 100);
-      }
-
-      imageData.data[pixel * 4] = r;
-      imageData.data[pixel * 4 + 1] = g;
-      imageData.data[pixel * 4 + 2] = b;
-      imageData.data[pixel * 4 + 3] = 255;
-    }
-  }
-
-  ctx.putImageData(imageData, 0, 0);
-  requestAnimationFrame(render);
-}
-
 function renderIndicator() {
-  if (selectedCell.value instanceof Bot) {
+  if (selectedCell.selected) {
     // calculate indicator position on the screen
     const rect = canvas.value.getBoundingClientRect();
     const scale = rect.width / simulation.width;

@@ -1,8 +1,16 @@
 <template>
   <div id="select-cell-tooltip">
-    <button @click="cancelSelection()">Cancel</button>
-    <div class="bg-[#111111] border-2 border-[#444444] rounded-md px-2">
-      <IconMdiInfo class="mr-1" /><span>Click where to place a cell</span>
+    <button
+      @click="cancelSelection()"
+      class="bg-red-600 text-white font-semibold rounded-md px-2"
+    >
+      Cancel
+    </button>
+    <div
+      class="bg-neutral-50 dark:bg-[#111111] border-2 border-neutral-400 dark:border-[#444444] rounded-md px-2 flex gap-2 items-center"
+    >
+      <IconMdiInfo class="mr-1" />
+      <span>Click where to place a cell</span>
     </div>
   </div>
 </template>
@@ -12,7 +20,7 @@ const selectedCell = useSelectedCellStore();
 const { setIsSelecting } = useIsSelecting();
 
 function cancelSelection() {
-  selectedCell.value = null;
+  selectedCell.selected = false;
   setIsSelecting(false);
 }
 </script>

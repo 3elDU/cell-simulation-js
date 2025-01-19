@@ -1,8 +1,7 @@
 import { RGB } from "@/simulation/color";
-import { CellSimulation } from "@/simulation/simulation";
+import { type CellSimulation } from "@/simulation/simulation";
 import { Gene, Instruction } from "@/simulation/genome";
-import { randomRange, randomRangeInclusive } from "@/simulation/rand";
-import clamp from "@/simulation/clamp";
+import { randomRange } from "@/simulation/rand";
 import config from "./config";
 import {
   Direction,

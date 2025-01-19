@@ -1,7 +1,4 @@
 <script setup lang="ts">
-import Bot from "@/simulation/bot";
-import simulation from "@/simulation/simulation";
-
 const selectedCell = useSelectedCellStore();
 const { isOpened } = useSidebar();
 
@@ -38,10 +35,7 @@ watch(isOpened, (opened) => {
         <SimulationStatistics />
       </Accordion>
 
-      <Accordion
-        v-if="selectedCell.value instanceof Bot && !selectedCell.value.empty"
-        name="Selected cell"
-      >
+      <Accordion v-if="selectedCell.selected" name="Selected cell">
         <SelectedCellInfo />
       </Accordion>
     </div>
