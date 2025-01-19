@@ -1,5 +1,6 @@
 {
   "name": "cell-simulation",
+  "type": "module",
   "private": true,
   "scripts": {
     "build": "vite build",
@@ -9,21 +10,21 @@
   },
   "devDependencies": {
     "@iconify-json/mdi": "^1.1.55",
-    "@tsconfig/node18": "^18.2.2",
-    "@types/node": "^18",
-    "@vitejs/plugin-vue": "^4.4.1",
-    "@vue/tsconfig": "^0.4.0",
+    "@types/node": "^22.10.7",
+    "@vitejs/plugin-vue": "^5.2.1",
+    "@vue/tsconfig": "^0.7.0",
     "autoprefixer": "^10.4.16",
     "postcss": "^8.4.31",
     "tailwindcss": "^3.3.5",
     "typescript": "^5.2.2",
-    "unplugin-auto-import": "^0.17.1",
-    "unplugin-icons": "^0.17.4",
-    "unplugin-vue-components": "^0.25.2",
-    "vite": "^4.5.0"
+    "unplugin-auto-import": "^19.0.0",
+    "unplugin-icons": "^22.0.0",
+    "unplugin-vue-components": "^28.0.0",
+    "vite": "^6.0.7"
   },
   "dependencies": {
-    "@vueuse/core": "^10.6.1",
+    "@tsconfig/node22": "^22.0.0",
+    "@vueuse/core": "^12.4.0",
     "pinia": "^2.1.7",
     "vue": "^3.3.8"
   }
