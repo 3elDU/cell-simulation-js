@@ -13,3 +13,12 @@ You can inspect each cell, see it's genome, the current instruction, and other p
 # Technical details
 
 Simulating such behavior, and rendering everything is a CPU-heavy task. With a recent commit, the simulation is being updated and rendered inside a Web Worker. That keeps the main thread free to process inputs, draw the UI and such.
+
+# History
+
+There were two predecessors to this implementation:
+
+- https://github.com/3elDU/cell-simulation - Written in C, the first attempt. Quickly got frustrated with implementing the UI and abandoned it. Has the best performance.
+- https://github.com/3elDU/cell-simulation-rs - Written in Rust. Semi-mainained. Worse performance than C implementation, but still (roughly) 2x faster compared to the current one.
+
+I realized that HTML+CSS+Vue are the most flexible for implementing the UI and general features, so this implementation is by far the most updated and complete.
