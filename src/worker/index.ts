@@ -1,17 +1,17 @@
+import Bot from "@/simulation/bot";
 import { CellSimulation } from "@/simulation/simulation";
 import type {
   MessageFromMainThread,
   MessageFromWorker,
   UpdateMessage,
 } from "./ipc";
-import Bot from "@/simulation/bot";
 import Renderer from "./render";
 
 let simulation = new CellSimulation(64, 64);
 const renderer = new Renderer(64, 64);
 
 const sendInterval = 50;
-const interruptInterval = 150;
+const interruptInterval = 200;
 let previousSend = performance.now();
 let previousInterrupt = performance.now();
 

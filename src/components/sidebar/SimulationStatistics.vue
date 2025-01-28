@@ -3,6 +3,19 @@ const simulation = useSimulationStore();
 </script>
 
 <template>
-  Iterations: {{ simulation.iterations }} <br />
-  FPS: {{ simulation.fps }}
+  <section>
+    <strong>Iterations</strong>
+    <p>{{ simulation.iterations }}</p>
+  </section>
+  <section>
+    <strong>FPS</strong>
+    <section>{{ simulation.fps }}</section>
+  </section>
 </template>
+
+<style scoped>
+section {
+  display: flex;
+  justify-content: space-between;
+}
+</style>

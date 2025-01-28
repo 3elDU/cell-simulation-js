@@ -1,0 +1,109 @@
+:root {
+  /* Color definitions */
+  --body-background-rgb: 255, 255, 255;
+  --body-foreground-rgb: 0, 0, 0;
+  --background-lowest-rgb: 244, 244, 244;
+  --background-low-rgb: 228, 228, 228;
+  --background-middle-rgb: 212, 212, 212;
+  --background-high-rgb: 196, 196, 196;
+  --background-highest-rgb: 176, 176, 176;
+  --primary-hsl: 210, 74%, 53%;
+  --primary-active-hsl: 210, 74%, 43%;
+  --on-primary-rgb: 255, 255, 255;
+  --negative-hsl: 0, 74%, 52%;
+  --negative-active-hsl: 0, 74%, 42%;
+  --on-negative-rgb: 255, 255, 255;
+  --positive-hsl: 120, 70%, 50%;
+  --positive-active-hsl: 120, 62%, 40%;
+  --on-positive-rgb: 255, 255, 255;
+
+  --black: rgb(0, 0, 0);
+  --white: rgb(255, 255, 255);
+  --body-background: rgb(var(--body-background-rgb));
+  --body-foreground: rgb(var(--body-foreground-rgb));
+  --background-lowest: rgb(var(--background-lowest-rgb));
+  --background-low: rgb(var(--background-low-rgb));
+  --background-middle: rgb(var(--background-middle-rgb));
+  --background-high: rgb(var(--background-high-rgb));
+  --background-highest: rgb(var(--background-highest-rgb));
+  --primary: hsl(var(--primary-hsl));
+  --primary-active: hsl(var(--primary-active-hsl));
+  --on-primary: rgb(var(--on-primary-rgb));
+  --negative: hsl(var(--negative-hsl));
+  --negative-active: hsl(var(--negative-active-hsl));
+  --on-negative: rgb(var(--on-negative-rgb));
+  --positive: hsl(var(--positive-hsl));
+  --positive-active: hsl(var(--positive-active-hsl));
+  --on-positive: rgb(var(--on-positive-rgb));
+
+  /* Glassmorphism */
+  --pane-transparency: 0.75;
+  --frosted-pane-transparency: 0.85;
+  --pane-background: rgba(var(--background-low-rgb), var(--pane-transparency));
+  --frosted-pane-background: rgba(
+    var(--background-low-rgb),
+    var(--frosted-pane-transparency)
+  );
+  --pane-blur: 24px;
+  --pane-shadow: 0px 0px 6px var(--background-highest);
+  --slight-shadow: 0 0 4px rgba(0, 0, 0, 0.25);
+
+  /* Border radius */
+  --rounded-sm: 0.25rem;
+  --rounded-md: 0.5rem;
+  --rounded-lg: 0.75rem;
+  --rounded-xl: 1.5rem;
+  --rounded-full: 9999px;
+
+  /* Spacing */
+  --space-tiny: 0.125rem;
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 0.75rem;
+  --space-lg: 1rem;
+  --space-xl: 1.25rem;
+
+  /* Z index */
+  --z-bar: 5;
+  --z-overlay: 10;
+  --z-modal: 20;
+
+  /* Timings */
+  --transition-ultrafast: 75ms;
+  --transition-fast: 150ms;
+  --transition-medium: 300ms;
+  --transition-slow: 500ms;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --body-background-rgb: 0, 0, 0;
+    --body-foreground-rgb: 255, 255, 255;
+    --background-lowest-rgb: 31, 31, 31;
+    --background-low-rgb: 42, 42, 42;
+    --background-middle-rgb: 52, 52, 52;
+    --background-high-rgb: 64, 64, 64;
+    --background-highest-rgb: 79, 79, 79;
+    --pane-background: rgba(
+      var(--background-high-rgb),
+      var(--pane-transparency)
+    );
+    --pane-shadow: 0px 0px 4px var(--background-lowest);
+  }
+}
+
+@media (prefers-reduced-motion) {
+  :root {
+    --transition-ultrafast: 0ms;
+    --transition-fast: 0ms;
+    --transition-medium: 0ms;
+    --transition-slow: 0ms;
+  }
+}
+
+@media (prefers-reduced-transparency) {
+  :root {
+    --pane-transparency: 0;
+    --pane-blur: 0;
+  }
+}

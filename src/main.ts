@@ -1,7 +1,8 @@
-import { createApp } from "vue";
-import { createPinia } from "pinia";
+import "./styles/index.css";
+
 import App from "@/App.vue";
-import "./assets/default.css";
+import { createPinia } from "pinia";
+import { createApp } from "vue";
 import { worker } from "./ipc";
 
 const pinia = createPinia();

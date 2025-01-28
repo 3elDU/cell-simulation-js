@@ -1,0 +1,57 @@
+@layer reset, theme, base, components;
+
+@import "modern-normalize/modern-normalize.css" layer(reset);
+@import "./theme.css" layer(theme);
+@import "./components.css" layer(components);
+
+@layer reset {
+  /* Inherit text and background colors */
+  button {
+    color: inherit;
+    background-color: inherit;
+  }
+
+  /* Align SVG elements better relative to text */
+  svg {
+    vertical-align: text-bottom;
+  }
+
+  * {
+    /* Remove the default margin and padding from everything */
+    margin: 0;
+    padding: 0;
+    /* And the default border */
+    border: none;
+  }
+}
+
+@layer base {
+  html,
+  body,
+  #app {
+    width: 100%;
+    height: 100%;
+
+    overscroll-behavior: none none;
+    overflow: hidden;
+
+    background: var(--body-background);
+    color: var(--body-foreground);
+  }
+
+  #app {
+    display: flex;
+  }
+
+  /* Add outline to all focused elements */
+  * {
+    outline-style: solid;
+    outline-color: transparent;
+    outline-width: 0;
+    transition: outline-color var(--transition-fast) ease-in-out;
+    &:focus {
+      outline-width: 1px;
+      outline-color: var(--primary);
+    }
+  }
+}

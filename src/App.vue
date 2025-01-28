@@ -1,16 +1,3 @@
-<template>
-  <div class="h-screen flex flex-row">
-    <SimulationControls />
-    <SidebarComponent />
-    <SimulationCanvas />
-
-    <div class="absolute right-3 bottom-3 flex gap-2 justify-end items-end">
-      <PlaceCellTooltip v-if="isSelecting"></PlaceCellTooltip>
-      <InputModeSelector></InputModeSelector>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { sendToWorker } from "./ipc";
 
@@ -25,6 +12,8 @@ function onKeyDown(event: KeyboardEvent) {
     return;
   }
   keysPressed.push(event.code);
+
+  let preventDefault = true;
 
   switch (event.code) {
     case "Space":
@@ -43,7 +32,12 @@ function onKeyDown(event: KeyboardEvent) {
       setInputMode(InputMode.MoveCanvas);
       break;
     default:
+      preventDefault = false;
       return;
+  }
+
+  if (preventDefault) {
+    event.preventDefault();
   }
 }
 
@@ -51,6 +45,8 @@ function onKeyUp(event: KeyboardEvent) {
   if (keysPressed.includes(event.code)) {
     keysPressed.splice(keysPressed.indexOf(event.code), 1);
   }
+
+  event.preventDefault();
 }
 
 onMounted(() => {
@@ -63,3 +59,30 @@ onUnmounted(() => {
   window.removeEventListener("keyup", onKeyUp);
 });
 </script>
+
+<template>
+  <SimulationControls />
+  <SidebarComponent />
+  <SimulationCanvas />
+
+  <div id="overlay-container">
+    <PlaceCellTooltip v-if="isSelecting"></PlaceCellTooltip>
+    <InputModeSelector></InputModeSelector>
+  </div>
+</template>
+
+<style scoped>
+#overlay-container {
+  position: absolute;
+
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  padding: var(--space-md);
+
+  display: flex;
+  gap: var(--space-lg);
+  justify-content: end;
+  align-items: end;
+}
+</style>

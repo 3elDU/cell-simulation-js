@@ -1,87 +1,7 @@
-<template>
-  <div
-    class="flex justify-center items-center w-full bg-neutral-100 dark:bg-neutral-950 touch-none overflow-hidden"
-    @wheel="handleMouseWheel($event)"
-    @pointerdown="handlePointerDown($event)"
-    @pointerup="handlePointerUp($event)"
-    @pointermove="handlePointerMove($event)"
-    :style="{
-      cursor: movingCanvas ? 'move' : 'default',
-    }"
-  >
-    <canvas
-      id="canvas"
-      ref="canvas"
-      width="64"
-      height="64"
-      class="dark:border-neutral-800"
-      @click="handleClick($event)"
-      :style="{
-        width: `${canvasSize}px`,
-        height: `${canvasSize}px`,
-        transform: `translate(${canvasX}px, ${canvasY}px)`,
-      }"
-      :class="sidebarOpened ? 'sidebar-opened' : ''"
-    >
-    </canvas>
-  </div>
-
-  <div
-    v-if="
-      /*
-        Do not draw outline when user is selecting where to paste a saved cell
-        ( in that case outline would be displayed in where the cell was saved,
-        but the actuall cell hasn't been placed into the world yet )
-      */
-      !isSelecting &&
-      // Draw outline only when there is a selected sell
-      selectedCell.selected
-    "
-    class="absolute border-2 rounded-[15%] border-white pointer-events-none"
-    :style="{
-      width: indicatorSize,
-      height: indicatorSize,
-      translate: indicatorPosition,
-    }"
-  ></div>
-</template>
-
-<style scoped>
-#canvas {
-  image-rendering: pixelated;
-  border-radius: 1%;
-
-  position: relative;
-  background-color: black;
-  image-rendering: pixelated;
-
-  transition: left 300ms ease-in-out;
-  left: 0px;
-}
-
-@media (min-width: 600px) {
-  #canvas.sidebar-opened {
-    left: 150px;
-  }
-}
-
-@media (prefers-color-scheme: light) {
-  #canvas {
-    box-shadow: 0 0 12px rgb(128, 128, 128);
-  }
-}
-@media (prefers-color-scheme: dark) {
-  #canvas {
-    border-width: 2px;
-    border-style: solid;
-  }
-}
-</style>
-
 <script setup lang="ts">
-import clamp from "@/simulation/clamp";
 import { sendToWorker } from "@/ipc";
 import { subscribe } from "@/ipc/render";
+import clamp from "@/simulation/clamp";
 
 const simulation = useSimulationStore();
 const selectedCell = useSelectedCellStore();
@@ -280,3 +200,102 @@ function renderIndicator() {
   requestAnimationFrame(renderIndicator);
 }
 </script>
+
+<template>
+  <div
+    id="canvas-container"
+    @wheel="handleMouseWheel($event)"
+    @pointerdown="handlePointerDown($event)"
+    @pointerup="handlePointerUp($event)"
+    @pointermove="handlePointerMove($event)"
+    :style="{
+      cursor: movingCanvas ? 'move' : 'default',
+    }"
+  >
+    <canvas
+      id="canvas"
+      ref="canvas"
+      width="64"
+      height="64"
+      @click="handleClick($event)"
+      :style="{
+        width: `${canvasSize}px`,
+        height: `${canvasSize}px`,
+        transform: `translate(${canvasX}px, ${canvasY}px)`,
+      }"
+      :class="{
+        'sidebar-opened': sidebarOpened,
+      }"
+    >
+    </canvas>
+  </div>
+
+  <div
+    v-if="
+      /*
+        Do not draw outline when user is selecting where to paste a saved cell
+        ( in that case outline would be displayed in where the cell was saved,
+        but the actuall cell hasn't been placed into the world yet )
+      */
+      !isSelecting &&
+      // Draw outline only when there is a selected sell
+      selectedCell.selected
+    "
+    id="selected-cell-indicator"
+    :style="{
+      width: indicatorSize,
+      height: indicatorSize,
+      translate: indicatorPosition,
+    }"
+  ></div>
+</template>
+
+<style scoped>
+#canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 100%;
+  touch-action: none;
+  overflow: hidden;
+}
+
+#canvas {
+  image-rendering: pixelated;
+  border-radius: 1%;
+
+  position: relative;
+  background-color: black;
+  image-rendering: pixelated;
+
+  transition: left 300ms ease-in-out;
+  left: 0px;
+}
+
+@media (min-width: 600px) {
+  #canvas.sidebar-opened {
+    left: 150px;
+  }
+}
+
+@media (prefers-color-scheme: light) {
+  #canvas {
+    box-shadow: 0 0 var(--space-md) rgb(128, 128, 128);
+  }
+}
+@media (prefers-color-scheme: dark) {
+  #canvas {
+    border: var(--space-tiny) solid var(--background-middle);
+  }
+}
+
+#selected-cell-indicator {
+  position: absolute;
+
+  border-radius: 25%;
+  border: var(--space-tiny) solid white;
+
+  pointer-events: none;
+}
+</style>

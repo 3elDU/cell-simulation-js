@@ -1,0 +1,43 @@
+@layer components {
+  :root {
+    --button-background: var(--primary);
+    --button-foreground: var(--on-primary);
+    --button-hover-background: var(--body-background);
+    --button-hover-foreground: var(--body-foreground);
+    --button-active-background: var(--primary-active);
+    --button-active-foreground: var(--on-primary);
+
+    --bar-background: var(--white);
+    --bar-foreground: var(--black);
+
+    --sidebar-width: 320px;
+    --modal-dialog-margin: auto;
+    --modal-dialog-width: 30%;
+    --modal-dialog-min-width: 480px;
+    --modal-dialog-max-width: 640px;
+    --modal-dialog-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
+    --modal-dialog-border-radius: var(--rounded-lg);
+
+    --input-field-background: var(--background-low);
+    --input-field-foreground: var(--body-foreground);
+    --input-field-border-radius: var(--rounded-md);
+    --input-field-padding: var(--space-sm);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bar-background: var(--black);
+      --bar-foreground: var(--white);
+    }
+  }
+
+  @media (max-width: 640px) {
+    :root {
+      --modal-dialog-margin: auto 0 0 0;
+      --modal-dialog-width: 100%;
+      --modal-dialog-min-width: initial;
+      --modal-dialog-shadow: none;
+      --modal-dialog-border-radius: 0;
+    }
+  }
+}

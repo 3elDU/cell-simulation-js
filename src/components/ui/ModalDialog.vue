@@ -1,4 +1,8 @@
 <script setup lang="ts">
+defineProps<{
+  title: string;
+}>();
+
 defineSlots<{
   default(): unknown;
 }>();
@@ -7,14 +11,10 @@ const open = defineModel<boolean>({ default: false });
 const dialog: Ref<HTMLDialogElement | undefined> = ref();
 
 watch(open, (open) => {
-  if (dialog.value === undefined) {
-    return;
-  }
-
   if (open) {
-    dialog.value.showModal();
+    dialog.value!.showModal();
   } else {
-    dialog.value.close();
+    dialog.value!.close();
   }
 });
 
@@ -25,68 +25,87 @@ function stopEventPropagation(event: Event) {
 </script>
 
 <template>
-  <dialog
-    ref="dialog"
-    class="relative"
-    @close="open = false"
-    @keydown="stopEventPropagation"
-    @keyup="stopEventPropagation"
-  >
-    <button @click="open = false" class="absolute top-2 right-2">
-      <IconMdiClose />
-    </button>
-
-    <slot />
-  </dialog>
+  <Teleport to="#modal-dialog-container">
+    <dialog
+      ref="dialog"
+      class="modal-dialog"
+      @close="open = false"
+      @keydown="stopEventPropagation"
+      @keyup="stopEventPropagation"
+    >
+      <header class="dialog-header">
+        <h1>{{ title }}</h1>
+        <button @click="open = false" title="Close modal dialog">
+          <IconMdiClose />
+        </button>
+      </header>
+      <section class="dialog-content" v-if="open">
+        <slot></slot>
+      </section>
+    </dialog>
+  </Teleport>
 </template>
 
 <style scoped>
-dialog {
-  border-radius: 10px;
+.modal-dialog {
+  margin: var(--modal-dialog-margin);
 
-  background-color: #efefef;
-  color: black;
-
-  padding: 0.7rem;
-
-  min-width: 400px;
-  width: 30%;
-  max-width: 600px;
-
-  min-height: 100px;
-
-  box-shadow: 0px 0px 24px rgba(0, 0, 0, 0.6);
-}
-
-@media (prefers-color-scheme: dark) {
-  dialog {
-    border: 1px solid #3f3f3f;
-    background: #222222;
-    color: white;
-    box-shadow: none;
-  }
-}
-
-@media (max-width: 600px) {
-  dialog {
-    min-width: 100vw;
-    border-radius: 0;
-    border: 0;
+  color: var(--body-foreground);
+  background: var(--background-middle);
+  box-shadow: var(--modal-dialog-shadow);
+  &::backdrop {
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(var(--pane-blur));
   }
 
-  @media (prefers-color-scheme: dark) {
-    dialog {
-      border-top: 1px solid #3f3f3f;
-      border-bottom: 1px solid #3f3f3f;
+  border-radius: var(--modal-dialog-border-radius);
+
+  width: var(--modal-dialog-width);
+  min-width: var(--modal-dialog-min-width);
+  max-width: var(--modal-dialog-max-width);
+}
+
+.dialog-header {
+  position: sticky;
+  top: 0;
+
+  background: var(--background-high);
+  z-index: calc(var(--z-modal) + 1);
+
+  width: 100%;
+  height: calc(var(--space-lg) * 3);
+
+  padding-left: var(--space-lg);
+  padding-right: var(--space-lg);
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  & > h1 {
+    font-size: 20px;
+    font-weight: 500;
+  }
+  & > button {
+    padding: var(--space-xs);
+    border-radius: var(--rounded-full);
+    cursor: pointer;
+
+    background: var(--background-low);
+
+    transition: background var(--transition-fast) ease-in-out;
+
+    &:hover {
+      background: var(--background-lowest);
     }
   }
 }
 
-dialog:focus {
-  outline: none;
+.dialog-content {
+  padding: var(--space-md);
 }
 
-dialog::backdrop {
-  background: rgba(0, 0, 0, 0.5);
+dialog:focus {
+  outline: none;
 }
 </style>
