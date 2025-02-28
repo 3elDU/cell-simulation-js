@@ -5,13 +5,12 @@ import {
   supportedLanguages,
   type SupportedLanguageCode,
 } from "@/i18n";
-import "./button.css";
 
 const { language: selectedLanguage, setLanguage } = useLanguage();
 </script>
 
 <template>
-  <div class="footer-button">
+  <FooterButton element="div">
     <IconMdiGlobe />
     <select
       id="language-select"
@@ -30,7 +29,7 @@ const { language: selectedLanguage, setLanguage } = useLanguage();
         {{ languageNames[language] }}
       </option>
     </select>
-  </div>
+  </FooterButton>
 </template>
 
 <style scoped>
