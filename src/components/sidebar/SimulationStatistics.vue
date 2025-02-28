@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
+
 const simulation = useSimulationStore();
 </script>
 
 <template>
   <section>
-    <strong>Iterations</strong>
+    <strong>{{ m("sidebar.iterations") }}</strong>
     <p>{{ simulation.iterations }}</p>
   </section>
   <section>

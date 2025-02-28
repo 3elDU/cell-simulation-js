@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
 import config from "@/simulation/config";
 
 const cell = useSelectedCellStore();
@@ -23,17 +24,17 @@ function kill() {
       id="cell-is-dead"
     >
       <IconMdiInfo />
-      <p>Selected cell is dead</p>
+      <p>{{ m("selectedCell.isDead") }}</p>
     </RoundedButton>
 
     <RoundedButton v-if="!cell.value.alive" @click="revive()" id="revive">
       <IconMdiUndo />
-      <span>Revive</span>
+      <span>{{ m("selectedCell.revive") }}</span>
     </RoundedButton>
 
     <RoundedButton v-if="cell.value.alive" @click="kill()" id="kill">
       <IconMdiDelete />
-      <span>Kill</span>
+      <span>{{ m("selectedCell.kill") }}</span>
     </RoundedButton>
 
     <SaveCellButton :cell="cell.value" />

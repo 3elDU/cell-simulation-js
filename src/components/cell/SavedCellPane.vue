@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
 import Bot from "@/simulation/bot";
 import { type SavedCell } from "@/simulation/types";
 const { setIsSelecting } = useIsSelecting();
@@ -13,7 +14,7 @@ const { savedCell } = defineProps<{
 const emit = defineEmits(["delete"]);
 
 const cell: Ref<Bot> = ref(
-  Bot.fromJSON(JSON.parse(localStorage.getItem(savedCell.id)!)),
+  Bot.fromJSON(JSON.parse(localStorage.getItem(savedCell.id)!))
 );
 
 function load() {
@@ -54,12 +55,12 @@ function deleteCell() {
       <div class="cell-actions">
         <RoundedButton @click="load()" class="load-cell">
           <IconMdiFileDownload />
-          <span>Load</span>
+          <span>{{ m("savedCells.loadCell") }}</span>
         </RoundedButton>
 
         <RoundedButton @click="deleteCell()" class="delete-cell">
           <IconMdiTrash />
-          <span>Delete</span>
+          <span>{{ m("savedCells.deleteCell") }}</span>
         </RoundedButton>
       </div>
 

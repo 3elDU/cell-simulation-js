@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
 import config from "@/simulation/config";
 import { storeToRefs } from "pinia";
 
@@ -21,6 +22,7 @@ const lifetimeBarNegative = computed(
     <div id="position">
       <CellDirection />
       <div>
+        <strong>{{ m("selectedCell.coordinates") }}</strong>
         <p><strong>X</strong>: {{ selectedCell.x }}</p>
         <p><strong>Y</strong>: {{ selectedCell.y }}</p>
       </div>
@@ -33,11 +35,11 @@ const lifetimeBarNegative = computed(
         :min="0"
         :max="config.reproductionRequiredEnergy"
         :background-filled-color="energyBarNegative ? 'negative' : undefined"
-        label="Cell energy"
+        :label="m('selectedCell.energy')"
       >
         <template #label="{ value, max }">
           <IconMdiLightningBolt />
-          Energy: {{ value.toFixed(2) }} / {{ max }}
+          {{ m("selectedCell.energy") }}: {{ value.toFixed(2) }} / {{ max }}
         </template>
       </Bar>
       <Bar
@@ -47,11 +49,11 @@ const lifetimeBarNegative = computed(
         :max="config.cellMaxAge"
         :background-filled-color="lifetimeBarNegative ? 'negative' : undefined"
         :text-color="lifetimeBarNegative ? 'white' : undefined"
-        label="Cell age"
+        :label="m('selectedCell.age')"
       >
         <template #label="{ value, max }">
           <IconMdiHourglass />
-          Age: {{ value }} / {{ max }}
+          {{ m("selectedCell.age") }}: {{ value }} / {{ max }}
         </template>
       </Bar>
     </section>

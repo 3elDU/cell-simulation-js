@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
+
 const selectedCell = useSelectedCellStore();
 const { isOpened } = useSidebar();
 
@@ -34,13 +36,21 @@ watch(isOpened, (opened) => {
     <div id="sidebar-controls-blur" aria-hidden></div>
     <div id="sidebar">
       <div id="sidebar-content">
-        <Accordion name="Simulation statistics" :initialState="true">
+        <Accordion :name="m('sidebar.statistics')" :initialState="true">
           <SimulationStatistics />
         </Accordion>
 
-        <Accordion v-if="selectedCell.selected" name="Selected cell">
+        <Accordion
+          v-if="selectedCell.selected"
+          :name="m('sidebar.selectedCell')"
+        >
           <SelectedCellInfo />
         </Accordion>
+
+        <div id="sidebar-footer">
+          <Globe />
+          <GitHub />
+        </div>
       </div>
     </div>
   </div>
@@ -69,7 +79,7 @@ watch(isOpened, (opened) => {
 
   padding: var(--space-md);
   /** Account for the controls */
-  padding-top: calc(var(--space-md) * 6);
+  padding-top: calc(var(--space-md) * 7);
 }
 #sidebar-controls-blur {
   position: absolute;
@@ -77,7 +87,7 @@ watch(isOpened, (opened) => {
   left: 0;
 
   width: 100%;
-  height: calc(var(--space-md) * 6);
+  height: calc(var(--space-md) * 7);
 
   z-index: calc(var(--z-bar) + 1);
   backdrop-filter: blur(3rem);
@@ -89,6 +99,13 @@ watch(isOpened, (opened) => {
   display: flex;
   flex-direction: column;
   gap: var(--space-lg);
+}
+
+#sidebar-footer {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
 }
 
 @media (min-width: 640px) {

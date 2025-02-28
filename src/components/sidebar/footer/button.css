@@ -1,0 +1,12 @@
+.footer-button {
+  padding: var(--space-md);
+  border-radius: var(--space-md);
+  aspect-ratio: 1/1;
+
+  transition: background var(--transition-fast) ease-in-out;
+  background: var(--background-middle);
+  color: var(--body-foreground);
+  &:hover {
+    background: var(--background-highest);
+  }
+}

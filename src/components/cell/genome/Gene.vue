@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
 import { Gene, InstructionInfoList } from "@/simulation/genome";
 
 const props = defineProps<{
@@ -10,23 +11,24 @@ const props = defineProps<{
 
 // Different gene groups have different colors
 const background = computed(
-  () => InstructionInfoList[props.gene.instruction].backgroundColor,
+  () => InstructionInfoList[props.gene.instruction].backgroundColor
 );
 const textColor = computed(
-  () => InstructionInfoList[props.gene.instruction].color,
+  () => InstructionInfoList[props.gene.instruction].color
 );
 // One-letter abbreviation for the gene
 const abbreviation = computed(
-  () => InstructionInfoList[props.gene.instruction].abbreviation,
+  () => InstructionInfoList[props.gene.instruction].abbreviation
 );
 // Description for the gene
 const title = computed(
-  () => `${props.id}: ${InstructionInfoList[props.gene.instruction].name}
+  // () => `${props.id}: ${InstructionInfoList[props.gene.instruction].name}
+  () => `${props.id}: ${m(`genome.${props.gene.instruction}`)}
 
-Option: ${props.gene.opt}
-Energy: ${props.gene.e}
-B1: ${props.gene.b1}
-B2: ${props.gene.b2}`,
+${m("genome.option")}: ${props.gene.opt}
+${m("genome.energy")}: ${props.gene.e}
+${m("genome.branch1")}: ${props.gene.b1}
+${m("genome.branch2")}: ${props.gene.b2}`
 );
 
 // Moves instruction pointer in the cell to this instruction
@@ -75,8 +77,7 @@ function selectCurrent() {
   font-size: 0.8rem;
   line-height: 1;
 
-  transition:
-    box-shadow var(--transition-ultrafast) ease-in-out,
+  transition: box-shadow var(--transition-ultrafast) ease-in-out,
     border-color var(--transition-ultrafast) ease-in-out;
 
   & .index {

@@ -2,13 +2,17 @@
   <div id="place-cell-tooltip">
     <p>
       <IconMdiInfo id="icon" />
-      Click where to place a cell
+      {{ m("overlay.placeMessage") }}
     </p>
-    <RoundedButton @click="cancelSelection()"> Cancel </RoundedButton>
+    <RoundedButton @click="cancelSelection()">
+      {{ m("overlay.cancelSelection") }}
+    </RoundedButton>
   </div>
 </template>
 
 <script setup lang="ts">
+import m from "@/i18n/message";
+
 const selectedCell = useSelectedCellStore();
 const { setIsSelecting } = useIsSelecting();
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
 import { type SavedCell } from "@/simulation/types";
 
 const { isSelecting } = useIsSelecting();
@@ -24,11 +25,11 @@ watch(isSelecting, (selecting) => {
 </script>
 
 <template>
-  <RoundedButton @click="showModal()" title="Load a saved cell">
+  <RoundedButton @click="showModal()" :title="m('controls.loadcell')">
     <IconMdiFolderSpecial />
   </RoundedButton>
 
-  <ModalDialog v-model="modal" title="Saved cells">
+  <ModalDialog v-model="modal" :title="m('savedCells.modalTitle')">
     <div class="saved-cells-container">
       <RoundedButton
         v-if="savedCells.length === 0"
@@ -36,11 +37,10 @@ watch(isSelecting, (selecting) => {
         id="no-saved-cells"
       >
         <IconMdiInfo />
-        <p>There are no saved cells.</p>
+        <p>{{ m("savedCells.noSavedCells") }}</p>
       </RoundedButton>
       <p v-if="savedCells.length === 0">
-        You can save a cell by selecting one, and clicking a "Save" button,
-        giving it a title, and optionally, description.
+        {{ m("savedCells.noSavedCellsInfoMessage") }}
       </p>
       <SavedCellPane
         v-for="cell of savedCells"

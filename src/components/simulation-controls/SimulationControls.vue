@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
 import { sendToWorker } from "@/ipc";
 
 const sidebar = useSidebar();
@@ -15,27 +16,30 @@ function step() {
 
 <template>
   <div id="simulation-controls">
-    <RoundedButton @click="toggleSidebar()">
+    <RoundedButton @click="toggleSidebar()" :title="m('controls.button')">
       <IconMdiMenu />
     </RoundedButton>
 
-    <RoundedButton @click="simulation.togglePause()" title="Toggle pause">
+    <RoundedButton
+      @click="simulation.togglePause()"
+      :title="simulation.isPaused ? m('controls.play') : m('controls.pause')"
+    >
       <IconMdiPlay v-if="simulation.isPaused" />
       <IconMdiPause v-else />
     </RoundedButton>
     <RoundedButton
       @click="sendToWorker({ type: 'reset' })"
-      title="Regenerate the map"
+      :title="m('controls.reset')"
     >
       <IconMdiReplay />
     </RoundedButton>
     <RoundedButton
       @click="sendToWorker({ type: 'clear' })"
-      title="Clear the map"
+      :title="m('controls.clear')"
     >
       <IconMdiTrash />
     </RoundedButton>
-    <RoundedButton @click="step()" title="Single step through the simulation">
+    <RoundedButton @click="step()" :title="m('controls.step')">
       <IconMdiFastForward />
     </RoundedButton>
     <LoadCellButton></LoadCellButton>

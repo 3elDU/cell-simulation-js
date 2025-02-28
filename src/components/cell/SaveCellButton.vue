@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import m from "@/i18n/message";
 import Bot from "@/simulation/bot";
 import { type SavedCell } from "@/simulation/types";
 
@@ -23,7 +24,7 @@ function submit(event: Event) {
 
 function saveCell() {
   let savedCells: SavedCell[] = JSON.parse(
-    localStorage.getItem("savedCells") ?? "[]",
+    localStorage.getItem("savedCells") ?? "[]"
   );
 
   const uuid = self.crypto.randomUUID();
@@ -42,14 +43,24 @@ function saveCell() {
 <template>
   <RoundedButton @click="showModal">
     <IconMdiContentSave />
-    <span>Save cell</span>
+    <span>{{ m("selectedCell.save") }}</span>
   </RoundedButton>
 
-  <ModalDialog v-model="modal" title="Save a cell">
+  <ModalDialog v-model="modal" :title="m('saveCellDialog.title')">
     <form @submit="submit($event)">
-      <TextInput type="text" required label="Name" v-model="name" autofocus />
+      <TextInput
+        type="text"
+        required
+        :label="m('saveCellDialog.name')"
+        v-model="name"
+        autofocus
+      />
 
-      <TextInput multiline label="Description" v-model="description" />
+      <TextInput
+        multiline
+        :label="m('saveCellDialog.description')"
+        v-model="description"
+      />
 
       <RoundedButton
         type="submit"
@@ -58,7 +69,7 @@ function saveCell() {
         size="medium"
       >
         <IconMdiContentSave />
-        Save
+        {{ m("saveCellDialog.button") }}
       </RoundedButton>
     </form>
   </ModalDialog>

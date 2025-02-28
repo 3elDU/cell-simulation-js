@@ -3,14 +3,14 @@
     <RoundedButton
       @click="setInputMode(InputMode.SelectCell)"
       :data-active="inputMode == InputMode.SelectCell"
-      title="Select"
+      :title="m('overlay.select')"
     >
       <IconMdiCursorDefault />
     </RoundedButton>
     <RoundedButton
       @click="setInputMode(InputMode.MoveCanvas)"
       :data-active="inputMode == InputMode.MoveCanvas"
-      title="Pan"
+      :title="m('overlay.pan')"
     >
       <IconMdiPan />
     </RoundedButton>
@@ -18,6 +18,8 @@
 </template>
 
 <script setup lang="ts">
+import m from "@/i18n/message";
+
 const { inputMode, setInputMode } = useInputMode();
 </script>
 
