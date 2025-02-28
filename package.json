@@ -23,7 +23,7 @@
     "@tsconfig/node22": "^22.0.0",
     "@vueuse/core": "^12.4.0",
     "modern-normalize": "^3.0.1",
-    "pinia": "^2.1.7",
+    "pinia": "^3.0.1",
     "vue": "^3.3.8"
   }
 }
