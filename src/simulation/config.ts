@@ -1,3 +1,5 @@
+import { sendToWorker } from "@/ipc";
+
 export interface Config {
   mutationPercent: number;
   genomeLength: number;
@@ -12,7 +14,7 @@ export interface Config {
   noopCost: number;
 }
 
-export default {
+let config: Config = {
   mutationPercent: 50,
   genomeLength: 32,
   startEnergy: 5.0,
@@ -24,4 +26,19 @@ export default {
   movementCost: 1,
   turnCost: 0.5,
   noopCost: 0.1,
-} satisfies Config;
+};
+export default config;
+
+export function updateConfig(newConfig: Partial<Config>) {
+  Object.assign(config, newConfig);
+  if (
+    // @ts-expect-error Check if we're running inside in the main thread
+    typeof WorkerGlobalScope === "undefined"
+  ) {
+    // Send the updated configuration to the worker automatically
+    sendToWorker({
+      type: "updateconfig",
+      config,
+    });
+  }
+}

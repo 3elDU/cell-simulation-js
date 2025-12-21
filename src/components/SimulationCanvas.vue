@@ -215,8 +215,6 @@ function renderIndicator() {
     <canvas
       id="canvas"
       ref="canvas"
-      width="64"
-      height="64"
       @click="handleClick($event)"
       :style="{
         width: `${canvasSize}px`,

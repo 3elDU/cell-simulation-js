@@ -1,6 +1,6 @@
 import useLanguage from "@/composables/language";
 import { type Message, type MessageRegistry } from ".";
-import simulationConfig from "./messages/config";
+import config from "./messages/config";
 import controls from "./messages/controls";
 import genome from "./messages/genome";
 import overlay from "./messages/overlay";
@@ -8,9 +8,10 @@ import saveCellDialog from "./messages/saveCellDialog";
 import savedCells from "./messages/savedCells";
 import selectedCell from "./messages/selectedCell";
 import sidebar from "./messages/sidebar";
+import ui from "./messages/ui";
 
 const modules = {
-  simulationConfig,
+  config,
   sidebar,
   controls,
   savedCells,
@@ -18,6 +19,7 @@ const modules = {
   genome,
   saveCellDialog,
   overlay,
+  ui,
 };
 type Modules = typeof modules;
 type Namespace = keyof Modules;

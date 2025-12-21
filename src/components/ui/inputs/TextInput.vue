@@ -41,12 +41,11 @@ defineOptions({
       max-height: 10rem;
       max-width: 100%;
 
-      background: var(--input-field-background);
+      background: var(--input-background);
       color: var(--body-foreground);
-      border-radius: var(--input-field-border-radius);
-      padding: var(--input-field-padding);
-
-      box-shadow: var(--slight-shadow);
+      border-radius: var(--input-border-radius);
+      padding: var(--input-padding);
+      box-shadow: var(--input-shadow);
 
       &:focus {
         outline: 1px solid var(--primary);
@@ -60,7 +59,7 @@ defineOptions({
 
   @media (prefers-color-scheme: dark) {
     .input > :is(input, textarea) {
-      border: 1px solid var(--background-high);
+      border: var(--input-border);
     }
   }
 }

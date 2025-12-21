@@ -3,7 +3,14 @@
  */
 
 import type Bot from "@/simulation/bot";
+import { Config } from "@/simulation/config";
 
+export interface InitMessage {
+  type: "init";
+  width: number;
+  height: number;
+  config: Config;
+}
 export interface PauseMessage {
   type: "pause";
 }
@@ -32,15 +39,27 @@ export interface SelectCellMessage {
   x: number;
   y: number;
 }
+export interface UpdateConfigurationMessage {
+  type: "updateconfig";
+  config: Config;
+}
+export interface ResizeMessage {
+  type: "resize";
+  width: number;
+  height: number;
+}
 
 export type MessageFromMainThread =
+  | InitMessage
   | PauseMessage
   | ForwardMessage
   | ClearMessage
   | ResetMessage
   | SetCellMessage
   | RequestCellMessage
-  | SelectCellMessage;
+  | SelectCellMessage
+  | UpdateConfigurationMessage
+  | ResizeMessage;
 
 export interface SimulationInfo {
   width: number;
@@ -54,7 +73,7 @@ export interface UpdateMessage {
   type: "update";
   simulation: SimulationInfo;
   image: ImageBitmap;
-  selectedCell: Bot | null;
+  selectedCell?: Bot;
 }
 export interface GetCellMessage {
   type: "getcell";

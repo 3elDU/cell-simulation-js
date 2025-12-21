@@ -23,7 +23,7 @@ function initWorker() {
 // Handle messages from the worker
 function onMessage(msg: MessageEvent<MessageFromWorker>) {
   if (msg.data.type === "update") {
-    if (msg.data.selectedCell === null || msg.data.selectedCell.empty) {
+    if (msg.data.selectedCell === undefined || msg.data.selectedCell.empty) {
       selectedCellStore.selected = false;
     } else {
       const cell = Bot.fromJSON(msg.data.selectedCell);

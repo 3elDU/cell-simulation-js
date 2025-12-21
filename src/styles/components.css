@@ -18,16 +18,28 @@
     --modal-dialog-shadow: 0 0 24px rgba(0, 0, 0, 0.5);
     --modal-dialog-border-radius: var(--rounded-lg);
 
-    --input-field-background: var(--background-low);
-    --input-field-foreground: var(--body-foreground);
-    --input-field-border-radius: var(--rounded-md);
-    --input-field-padding: var(--space-sm);
+    --input-background: rgba(
+      var(--background-lowest-rgb),
+      var(--pane-transparency)
+    );
+    --input-internal-border-background: rgba(
+      var(--background-high-rgb),
+      var(--pane-transparency)
+    );
+    --input-foreground: var(--body-foreground);
+    --input-border-radius: var(--rounded-md);
+    --input-height: 2rem;
+    --input-padding: var(--space-sm);
+    --input-shadow: var(--slight-shadow);
+    --input-border: none;
   }
 
   @media (prefers-color-scheme: dark) {
     :root {
       --bar-background: var(--black);
       --bar-foreground: var(--white);
+
+      --input-border: 1px solid var(--background-high);
     }
   }
 

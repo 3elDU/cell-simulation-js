@@ -1,6 +1,21 @@
 import type { MessageRegistry } from "..";
 
 export default {
+  mapSize: {
+    en: "Map size",
+    ru: "Размеры поля",
+    uk: "Розміри поля",
+  },
+  mapResizeAction: {
+    en: "Resize",
+    ru: "Изменить размер",
+    uk: "Змінити розмір",
+  },
+  mapSizeCells: {
+    en: "cells",
+    ru: "клеток",
+    uk: "клітин",
+  },
   mutationPercentName: {
     en: "Mutation percent",
     ru: "Процент мутации",

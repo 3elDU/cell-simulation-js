@@ -1,12 +1,11 @@
 import Bot from "@/simulation/bot";
+import Map2D from "./map";
 
 export class CellSimulation {
-  width: number;
-  height: number;
-  bots: Array<Bot>;
+  map: Map2D;
 
   // Keep reference to the selected cell
-  selectedCell: Bot | null;
+  selectedCell?: Bot;
 
   private pause: boolean;
   public get isPaused(): boolean {
@@ -25,12 +24,12 @@ export class CellSimulation {
     this.iterations = 0;
     this.prevIterations = 0;
     this.fps = 0;
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
+    for (let y = 0; y < this.map.height; y++) {
+      for (let x = 0; x < this.map.width; x++) {
         if (Math.random() < 0.2) {
-          this.bots[y * this.width + x] = Bot.generateRandom(x, y);
+          this.map.set(x, y, Bot.generateRandom(x, y));
         } else {
-          this.bots[y * this.width + x] = Bot.createEmpty(x, y);
+          this.map.set(x, y, Bot.createEmpty(x, y));
         }
       }
     }
@@ -41,20 +40,18 @@ export class CellSimulation {
     this.iterations = 0;
     this.prevIterations = 0;
     this.fps = 0;
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
-        this.bots[y * this.width + x] = Bot.createEmpty(x, y);
+    for (let y = 0; y < this.map.height; y++) {
+      for (let x = 0; x < this.map.width; x++) {
+        this.map.set(x, y, Bot.createEmpty(x, y));
       }
     }
   }
 
   getCellAt(x: number, y: number): Bot {
-    return this.bots[y * this.width + x];
+    return this.map.get(x, y);
   }
   setCellAt(x: number, y: number, cell: Bot) {
-    cell.x = x;
-    cell.y = y;
-    this.bots[y * this.width + x] = cell;
+    this.map.set(x, y, cell);
     // If setting cell at selected cell's coordinates, update reference to selected cell.
     if (
       this.selectedCell &&
@@ -70,12 +67,7 @@ export class CellSimulation {
   }
 
   constructor(width: number, height: number) {
-    this.width = width;
-    this.height = height;
-
-    this.selectedCell = null;
-
-    this.bots = new Array<Bot>(this.width * this.height);
+    this.map = new Map2D(width, height);
     this.generateMap();
 
     this.pause = true;
@@ -90,10 +82,12 @@ export class CellSimulation {
   }
 
   update() {
-    for (let y = 0; y < this.height; y++) {
-      for (let x = 0; x < this.width; x++) {
+    for (let y = 0; y < this.map.height; y++) {
+      for (let x = 0; x < this.map.width; x++) {
         const bot = this.getCellAt(x, y);
-        bot.update(this);
+        if (bot.alive) {
+          bot.update(this);
+        }
       }
     }
 

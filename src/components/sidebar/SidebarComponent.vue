@@ -47,6 +47,10 @@ watch(isOpened, (opened) => {
           <SelectedCellInfo />
         </Accordion>
 
+        <Accordion :name="m('sidebar.configuration')">
+          <SimulationParameters />
+        </Accordion>
+
         <div id="sidebar-footer">
           <Globe />
           <GitHub />

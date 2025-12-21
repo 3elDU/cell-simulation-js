@@ -1,7 +1,7 @@
 import { RGB } from "@/simulation/color";
-import { type CellSimulation } from "@/simulation/simulation";
 import { Gene, Instruction } from "@/simulation/genome";
 import { randomRange } from "@/simulation/rand";
+import { type CellSimulation } from "@/simulation/simulation";
 import config from "./config";
 import {
   Direction,
@@ -104,19 +104,19 @@ export default class Bot {
     );
 
     if (facingX < 0) {
-      facingX = ctx.width - 1;
-    } else if (facingX >= ctx.width) {
+      facingX = ctx.map.width - 1;
+    } else if (facingX >= ctx.map.width) {
       facingX = 0;
     }
 
     if (facingY < 0) {
-      facingY = ctx.height - 1;
-    } else if (facingY >= ctx.height) {
+      facingY = ctx.map.height - 1;
+    } else if (facingY >= ctx.map.height) {
       facingY = 0;
     }
 
     // store the reference to bot in front to avoid code repetition
-    const botInFront = ctx.bots[facingY * ctx.width + facingX];
+    const botInFront = ctx.map.get(facingX, facingY);
 
     switch (currentInstruction.instruction) {
       case Instruction.Noop:
@@ -132,10 +132,7 @@ export default class Bot {
 
       case Instruction.MoveForwards:
         if (botInFront.empty) {
-          ctx.bots[this.y * ctx.width + this.x] = Bot.createEmpty(
-            this.x,
-            this.y
-          );
+          ctx.map.set(this.x, this.y, Bot.createEmpty(this.x, this.y));
           this.x = facingX;
           this.y = facingY;
         }
@@ -177,10 +174,7 @@ export default class Bot {
         }
 
         this.energy += botInFront.energy;
-        ctx.bots[facingY * ctx.width + facingX] = Bot.createEmpty(
-          facingX,
-          facingY
-        );
+        ctx.map.set(facingX, facingY, Bot.createEmpty(facingX, facingY));
         break;
 
       case Instruction.CheckEnergy:
@@ -304,7 +298,7 @@ export default class Bot {
           }
         }
 
-        ctx.bots[facingY * ctx.width + facingX] = child;
+        ctx.map.set(facingX, facingY, child);
         break;
     }
 

@@ -1,4 +1,5 @@
 import Bot from "@/simulation/bot";
+import { updateConfig } from "@/simulation/config";
 import { CellSimulation } from "@/simulation/simulation";
 import type {
   MessageFromMainThread,
@@ -8,7 +9,7 @@ import type {
 import Renderer from "./render";
 
 let simulation = new CellSimulation(64, 64);
-const renderer = new Renderer(64, 64);
+const renderer = new Renderer(simulation);
 
 const sendInterval = 50;
 const interruptInterval = 200;
@@ -49,8 +50,8 @@ function send() {
     {
       type: "update",
       simulation: {
-        width: simulation.width,
-        height: simulation.height,
+        width: simulation.map.width,
+        height: simulation.map.height,
         fps: simulation.fps,
         isPaused: simulation.isPaused,
         iterations: simulation.iterations,
@@ -67,6 +68,10 @@ addEventListener("message", (message) => {
   let msg: MessageFromMainThread = message.data;
 
   switch (msg.type) {
+    case "init":
+      simulation = new CellSimulation(msg.width, msg.height);
+      updateConfig(msg.config);
+      break;
     case "pause":
       simulation.togglePause();
       if (!simulation.isPaused) {
@@ -91,8 +96,15 @@ addEventListener("message", (message) => {
         type: "getcell",
         cell: simulation.getCellAt(msg.x, msg.y),
       } satisfies MessageFromWorker);
+      break;
     case "selectcell":
       simulation.selectCell(msg.x, msg.y);
+      break;
+    case "updateconfig":
+      updateConfig(msg.config);
+      break;
+    case "resize":
+      simulation.map.resizeTo(msg.width, msg.height);
   }
 
   // Send simulation back to the main thread after handling the message
