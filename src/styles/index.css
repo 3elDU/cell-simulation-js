@@ -1,8 +1,6 @@
-@layer reset, theme, base, components;
+@layer reset, base;
 
 @import "modern-normalize/modern-normalize.css" layer(reset);
-@import "./theme.css" layer(theme);
-@import "./components.css" layer(components);
 
 @layer reset {
   /* Inherit text and background colors */
