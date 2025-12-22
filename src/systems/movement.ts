@@ -1,15 +1,11 @@
 import type { System } from "@/system";
 import { BaseSystem } from "./base";
-import type { UIDescription } from "@/ui";
 import type { Cell } from "@/cell";
 import type { World } from "@/world";
 import { getMovement } from "@/components/movement";
 import { gridSet, type Position } from "@/grid";
 
-export class MovementSystem
-  extends BaseSystem
-  implements System, UIDescription
-{
+export class MovementSystem extends BaseSystem implements System {
   id = "movement";
   title = "Movement";
   description = "Allows cell to move in any direction";

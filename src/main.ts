@@ -1,13 +1,13 @@
 import "./styles/index.css";
 import { Pane } from "tweakpane";
 import { doTick, newWorld } from "./world";
-import { ConstantMoveSystem } from "./systems/constant-move";
 import type { Cell } from "./cell";
 import { gridSet } from "./grid";
-import { MovementSystem } from "./systems/movement";
-import type { System } from "./system";
+import { systemRegistry } from "./systems/registry";
+import { SystemsPane } from "./panes/systems";
 
 const world = newWorld(32, 32);
+console.debug("world object:", world);
 const cell: Cell = {
   components: {},
   id: 42,
@@ -15,9 +15,6 @@ const cell: Cell = {
 };
 world.cells.set(cell.id, cell);
 gridSet(world.grid, cell.position, cell.id);
-
-world.systems.push(new ConstantMoveSystem());
-world.systems.push(new MovementSystem());
 
 const container = document.getElementById("panes-container") as HTMLElement;
 
@@ -32,22 +29,25 @@ const fCell = pane.addFolder({ title: "Cell" });
 fCell.addBinding(cell.position, "x");
 fCell.addBinding(cell.position, "y");
 
-const systemsPane = new Pane({ title: "Systems", container });
-
-for (const system of world.systems) {
-  const folder = systemsPane.addFolder({ title: system.title });
-  folder.addBinding(system, "enabled");
-
-  for (const item of system.config ?? []) {
-    folder.addBinding(system, item.prop as keyof System, item);
-  }
+// Add all systems to the world, initially disabled
+for (const def of systemRegistry.list()) {
+  const system = def.create();
+  system.enabled = false;
+  world.systems.push(system);
 }
+
+// Run onInit on all systems
+for (const system of world.systems) {
+  system.onInit?.(world);
+}
+
+const toggleSystemsPane = new SystemsPane(container, world);
 
 document.getElementById("tick-btn")?.addEventListener("click", () => {
   doTick(world);
   pane.refresh();
   fCell.refresh();
-  systemsPane.refresh();
+  toggleSystemsPane.refresh();
 
   console.log(world);
 });

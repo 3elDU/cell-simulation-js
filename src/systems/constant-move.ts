@@ -1,14 +1,10 @@
 import type { System } from "@/system";
-import type { UIDescription } from "@/ui";
 import { BaseSystem } from "./base";
 import type { Cell } from "@/cell";
 import type { World } from "@/world";
 import { setMovement, type MovementDirection } from "@/components/movement";
 
-export class ConstantMoveSystem
-  extends BaseSystem
-  implements System, UIDescription
-{
+export class ConstantMoveSystem extends BaseSystem implements System {
   id = "sys-constant-move";
   title = "Constant Move";
   description = "Moves every cell in a given direction, every tick";
