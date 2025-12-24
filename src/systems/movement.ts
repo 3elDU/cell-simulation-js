@@ -1,4 +1,4 @@
-import type { System } from "@/system";
+import type { System } from "@/systems";
 import { BaseSystem } from "./base";
 import type { Cell } from "@/cell";
 import type { World } from "@/world";

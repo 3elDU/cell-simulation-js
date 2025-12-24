@@ -1,5 +1,5 @@
 import { Registry, type Definition } from "@/registry";
-import { type System } from "@/system";
+import { type System } from "@/systems";
 import { MovementSystem } from "./movement";
 import { LightSystem } from "./light";
 import { ConstantMoveSystem } from "./constant-move";

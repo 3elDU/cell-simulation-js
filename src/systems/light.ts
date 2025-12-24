@@ -1,4 +1,4 @@
-import type { System } from "@/system";
+import type { System } from "@/systems";
 import { BaseSystem } from "./base";
 import type { World } from "@/world";
 import { gridSet, type GridLayer } from "@/grid";
@@ -18,8 +18,8 @@ export class LightSystem extends BaseSystem implements System {
    * Computes luminance
    */
   luminanceForPosition(x: number, y: number, world: World): number {
-    // Compute a gradient with light being at max strength at y=0,
-    // and mininum strength at y=world height
+    // Compute a gradient with light being at max strength at y=world height,
+    // and mininum strength at y=0
     return (y / world.height) * 255;
   }
 

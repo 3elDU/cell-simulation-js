@@ -1,0 +1,46 @@
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+.stack {
+  width: 100%;
+  height: 100%;
+  position: relative;
+
+  & > * {
+    position: absolute;
+    inset: 0;
+  }
+}
+
+main[data-initialized="false"] > #canvas-container {
+  display: none;
+}
+
+#canvas-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  & > #canvas {
+    border: 1px solid var(--ctp-surface0);
+  }
+}
+
+#panes-container {
+  width: 100%;
+  display: flex;
+  align-items: start;
+  flex-wrap: wrap;
+
+  padding: 8px;
+  gap: 8px;
+
+  pointer-events: none;
+
+  & > * {
+    pointer-events: all;
+  }
+}

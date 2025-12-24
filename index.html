@@ -7,8 +7,12 @@
     <title>Cell simulation</title>
   </head>
   <body>
-    <button id="tick-btn">Tick</button>
-    <div id="panes-container"></div>
+    <main id="main" class="stack" data-initialized="false">
+      <div id="canvas-container">
+        <canvas id="canvas"></canvas>
+      </div>
+      <div id="panes-container"></div>
+    </main>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

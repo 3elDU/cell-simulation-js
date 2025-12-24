@@ -1,6 +1,6 @@
-import type { Cell } from "./cell";
-import type { ConfigSchema, UIDescription } from "./ui";
-import type { World } from "./world";
+import type { Cell } from "../cell";
+import type { ConfigSchema, UIDescription } from "../ui";
+import type { World } from "../world";
 
 export interface System extends UIDescription {
   id: string;
