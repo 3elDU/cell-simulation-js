@@ -13,8 +13,8 @@ export class LightnessRenderer implements Renderer {
     const lightness = gridGet<Uint8Array>(world.layers.light!, { x, y }) ?? 0;
 
     return {
-      r: lightness * 255,
-      g: lightness * 255,
+      r: lightness,
+      g: lightness,
       b: 0,
     };
   }

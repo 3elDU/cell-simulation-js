@@ -21,8 +21,9 @@ export function drawColor(
   y: number,
   color: RgbColor | RgbaColor
 ) {
-  img.data[y * img.width + x + 0] = color.r;
-  img.data[y * img.width + x + 1] = color.g;
-  img.data[y * img.width + x + 2] = color.b;
-  img.data[y * img.width + x + 3] = "a" in color ? color.a : 255;
+  const pixel = (y * img.width + x) * 4;
+  img.data[pixel + 0] = color.r;
+  img.data[pixel + 1] = color.g;
+  img.data[pixel + 2] = color.b;
+  img.data[pixel + 3] = "a" in color ? color.a : 255;
 }
