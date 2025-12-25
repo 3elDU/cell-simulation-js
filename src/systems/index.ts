@@ -14,7 +14,19 @@ export interface System extends UIDescription {
    */
   dependsOn?: string[];
 
+  /**
+   * Called when a system is first registered into the World
+   */
   onInit?(world: World): void;
+
+  /**
+   * Called on every world tick
+   */
   onTick?(world: World): void;
+
+  /**
+   * Called on every world tick, for every cell that is
+   * currently present on the map.
+   */
   onCellTick?(world: World, cell: Cell): void;
 }

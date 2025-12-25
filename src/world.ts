@@ -1,6 +1,5 @@
 import type { Cell } from "./cell";
-import type { GridLayer } from "./grid";
-import type { Renderer } from "./renderers";
+import { gridEvery, type GridLayer } from "./grid";
 import type { System } from "./systems";
 import { systemRegistry } from "./systems/registry";
 
@@ -10,6 +9,9 @@ import { systemRegistry } from "./systems/registry";
  * What produces the behavior are systems.
  */
 export interface World {
+  /**
+   * Current iteration
+   */
   tick: number;
 
   width: number;
@@ -25,10 +27,14 @@ export interface World {
    * they are no longer present on the field
    */
   cells: Map<number, Cell>;
+
+  /**
+   * Layers allow storing arbitrary information associated with each tile
+   */
   layers: Record<string, GridLayer<any>>;
 
   /**
-   * Systems contain the behavior of the simulation
+   * Systems contain all behavior of the simulation
    */
   systems: System[];
 }
@@ -67,7 +73,7 @@ export function newWorld(width: number, height: number): World {
 }
 
 /**
- * Runs a complete iteration on the given world
+ * Runs a complete iteration on the given world, calling all enabled systems
  */
 export function doTick(world: World) {
   for (const system of world.systems) {
@@ -77,13 +83,27 @@ export function doTick(world: World) {
 
   for (const id of world.grid.data) {
     if (id == -1) continue;
+    const cell = world.cells.get(id)!;
+
+    // Ensure every cell can be processed only once;
+    if (cell.components.internal?.processed === true) {
+      continue;
+    }
 
     for (const system of world.systems) {
       if (!system.enabled) continue;
 
       system.onCellTick?.(world, world.cells.get(id)!);
+
+      cell.components.internal = { processed: true };
     }
   }
+
+  // Clear internal components
+  gridEvery(
+    world.grid,
+    (_x, _y, id) => delete world.cells.get(id)!.components.internal
+  );
 
   world.tick++;
 }

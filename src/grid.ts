@@ -1,4 +1,8 @@
 /**
+ * Definitions for the {@link GridLayer} type and utility functions for it.
+ */
+
+/**
  * A utility interface to store a position of something.
  *
  * Cannot be used as a key directly
@@ -19,8 +23,8 @@ type TypedArray =
   | Float64Array;
 
 /**
- * A grid layer packs some values T inside a one-dimensional array that can be
- * treated like a grid.
+ * A grid layer packs numbers inside a one-dimensional array that can be
+ * treated like a two-dimensional grid.
  */
 export interface GridLayer<T extends TypedArray> {
   width: number;
@@ -38,7 +42,7 @@ export interface GridLayer<T extends TypedArray> {
 }
 
 /**
- * A helper to set a value at the given position inside a grid layer
+ * Sets a value at the given position inside a grid layer
  */
 export function gridSet<T extends TypedArray>(
   grid: GridLayer<T>,
@@ -56,4 +60,20 @@ export function gridGet<T extends TypedArray>(
   position: Position
 ): number | undefined {
   return grid.data[position.y * grid.width + position.x];
+}
+
+/**
+ * Calls the callback function for every non-negative and non-null element in the grid
+ */
+export function gridEvery<T extends TypedArray>(
+  grid: GridLayer<T>,
+  callback: (x: number, y: number, value: number) => void
+) {
+  for (let x = 0; x < grid.width; x++) {
+    for (let y = 0; y < grid.height; y++) {
+      const val = grid.data[y * grid.width + x];
+
+      if (val && val !== -1) callback(x, y, val);
+    }
+  }
 }

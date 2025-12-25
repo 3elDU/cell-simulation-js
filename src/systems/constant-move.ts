@@ -2,12 +2,14 @@ import type { System } from "@/systems";
 import { BaseSystem } from "./base";
 import type { Cell } from "@/cell";
 import type { World } from "@/world";
-import { setMovement, type MovementDirection } from "@/components/movement";
+import { type MovementDirection } from "@/components/movement";
+import { setComponent } from "@/components";
 
 export class ConstantMoveSystem extends BaseSystem implements System {
   id = "sys-constant-move";
   title = "Constant Move";
-  description = "Moves every cell in a given direction, every tick";
+  description = `Moves every cell in a given direction,
+every tick.`;
 
   direction: MovementDirection = "up";
 
@@ -30,6 +32,8 @@ export class ConstantMoveSystem extends BaseSystem implements System {
   }
 
   onCellTick(world: World, cell: Cell): void {
-    setMovement(cell, this.direction);
+    setComponent(cell, "movement", {
+      dir: this.direction,
+    });
   }
 }

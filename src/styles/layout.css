@@ -25,7 +25,7 @@ main[data-initialized="false"] > #canvas-container {
   align-items: center;
 
   & > #canvas {
-    border: 1px solid var(--ctp-surface0);
+    image-rendering: pixelated;
   }
 }
 

@@ -3,6 +3,8 @@ import { type System } from "@/systems";
 import { MovementSystem } from "./movement";
 import { LightSystem } from "./light";
 import { ConstantMoveSystem } from "./constant-move";
+import { CellGenerator } from "./cell-generator";
+import { SensorsSystem } from "./sensors";
 
 export const systemRegistry = new Registry<System>();
 
@@ -21,3 +23,5 @@ const d = (constructor: new () => System): Definition<System> => {
 systemRegistry.register(d(MovementSystem));
 systemRegistry.register(d(LightSystem));
 systemRegistry.register(d(ConstantMoveSystem));
+systemRegistry.register(d(CellGenerator));
+systemRegistry.register(d(SensorsSystem));

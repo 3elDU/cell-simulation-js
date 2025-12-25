@@ -1,20 +1,24 @@
 import type { System } from "@/systems";
 import { BaseSystem } from "./base";
-import type { Cell } from "@/cell";
+import { getCell, type Cell } from "@/cell";
 import type { World } from "@/world";
-import { getMovement } from "@/components/movement";
 import { gridSet, type Position } from "@/grid";
+import { getComponent } from "@/components";
 
 export class MovementSystem extends BaseSystem implements System {
   id = "movement";
   title = "Movement";
   description = "Allows cell to move in any direction";
 
+  canMoveTo(world: World, to: Position): boolean {
+    return getCell(world, to.x, to.y) === undefined;
+  }
+
   onCellTick(world: World, cell: Cell): void {
-    const movement = getMovement(cell);
+    const movement = getComponent(cell, "movement");
     if (!movement) return;
 
-    const position = cell.position;
+    const position = structuredClone(cell.position);
 
     let vector: Position;
     switch (movement.dir) {
@@ -53,12 +57,20 @@ export class MovementSystem extends BaseSystem implements System {
       position.y = world.height - 1;
     }
 
+    // Abort early if the space is occupied by another cell
+    if (!this.canMoveTo(world, position)) {
+      return;
+    }
+
     // Set previous cell location to empty space
     gridSet(world.grid, { x: prevX, y: prevY }, -1);
     // Move set to current location
     gridSet(world.grid, position, cell.id);
 
-    // Clear component
+    // Update position
+    cell.position = position;
+
+    // Clear movement direction
     delete cell.components.movement;
   }
 }
