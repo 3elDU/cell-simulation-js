@@ -5,6 +5,8 @@ import { LightSystem } from "./light";
 import { ConstantMoveSystem } from "./constant-move";
 import { CellGenerator } from "./cell-generator";
 import { SensorsSystem } from "./sensors";
+import { TemperatureSystem } from "./temperature";
+import { GenomeSystem } from "./genome";
 
 export const systemRegistry = new Registry<System>();
 
@@ -25,3 +27,5 @@ systemRegistry.register(d(LightSystem));
 systemRegistry.register(d(ConstantMoveSystem));
 systemRegistry.register(d(CellGenerator));
 systemRegistry.register(d(SensorsSystem));
+systemRegistry.register(d(TemperatureSystem));
+systemRegistry.register(d(GenomeSystem));

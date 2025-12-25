@@ -2,7 +2,7 @@ import type { Cell } from "@/cell";
 import type { World } from "@/world";
 import type { System } from ".";
 import { BaseSystem } from "./base";
-import { setComponent } from "@/components";
+import { getComponent, setComponent } from "@/components";
 import { gridGet } from "@/grid";
 import type { ConfigSchema } from "@/ui";
 
@@ -12,11 +12,14 @@ export class SensorsSystem extends BaseSystem implements System {
   description = `Exposes information from the
 environment to cells`;
 
+  after = ["light", "temperature"];
+
   noise = 0.15;
 
   static options = {
     None: "none",
     Light: "light",
+    Temperature: "temperature",
   };
 
   sensorA = "light";
@@ -67,12 +70,13 @@ environment to cells`;
         value = (gridGet(world.layers.light, cell.position) ?? 0) / 255;
         break;
 
+      case "temperature":
+        value = getComponent(cell, "temperature")?.temp ?? 0;
+
       case "none":
       default:
         value = 0;
     }
-
-    console.log("sensors", type, value);
 
     return Math.min(Math.max(value + Math.random() * this.noise, 0), 1.0);
   }

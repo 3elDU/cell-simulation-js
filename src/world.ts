@@ -1,6 +1,6 @@
 import type { Cell } from "./cell";
 import { gridEvery, type GridLayer } from "./grid";
-import type { System } from "./systems";
+import { sortSystems, type System } from "./systems";
 import { systemRegistry } from "./systems/registry";
 
 /**
@@ -63,6 +63,8 @@ export function newWorld(width: number, height: number): World {
     system.enabled = false;
     world.systems.push(system);
   }
+
+  sortSystems(world.systems);
 
   // Run onInit on all systems
   for (const system of world.systems) {

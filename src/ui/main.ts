@@ -31,8 +31,8 @@ export class UIController {
     });
 
     const params = {
-      width: 128,
-      height: 64,
+      width: Math.floor(Math.random() * 256 + 32),
+      height: Math.floor(Math.random() * 256 + 32),
     };
 
     pane.addBinding(params, "width", {
@@ -79,8 +79,9 @@ export class UIController {
     elements.canvas.height = this.world!.height;
 
     this.panzoom = Panzoom(elements.canvas.parentElement!, {
-      minScale: 4,
+      minScale: 1,
       maxScale: 16,
+      startScale: 2,
       step: 0.1,
       focal: { x: 0.5, y: 0.5 },
     });

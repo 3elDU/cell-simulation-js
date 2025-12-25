@@ -63,6 +63,20 @@ export function gridGet<T extends TypedArray>(
 }
 
 /**
+ * Returns value of item at specified position or a fallback value, if the
+ * grid does not exist or position is out of bounds.
+ */
+export function gridMaybeGet<T extends TypedArray>(
+  grid: GridLayer<T> | undefined,
+  position: Position,
+  fallback: number = 0
+): number {
+  if (!grid) return fallback;
+
+  return gridGet(grid, position) ?? fallback;
+}
+
+/**
  * Calls the callback function for every non-negative and non-null element in the grid
  */
 export function gridEvery<T extends TypedArray>(

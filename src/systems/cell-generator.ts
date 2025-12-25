@@ -3,6 +3,8 @@ import type { System } from ".";
 import { BaseSystem } from "./base";
 import type { World } from "@/world";
 import { addCell } from "@/cell";
+import { setComponent } from "@/components";
+import { randomCommand } from "@/components/genome";
 
 export class CellGenerator extends BaseSystem implements System, UIActionable {
   id = "cell-generator";
@@ -15,6 +17,7 @@ Generates cells and automatically
 disables itself.`;
 
   generationChance = 0.25;
+  genomeLength = 24;
 
   config: ConfigSchema = [
     {
@@ -22,6 +25,11 @@ disables itself.`;
       min: 0,
       max: 1,
       step: 0.01,
+    },
+    {
+      prop: "genomeLength",
+      min: 1,
+      step: 1,
     },
   ];
 
@@ -47,7 +55,24 @@ disables itself.`;
 
         if (!hasCell) continue;
 
-        addCell(this.world, x, y);
+        const cell = addCell(this.world, x, y);
+
+        setComponent(cell, "genome", {
+          ip: 0,
+          // This is very much a PoC at this point
+          // Sensor weights should be generated with normal distribution
+          genome: Array.from({ length: this.genomeLength }, () => ({
+            base: Math.random() * 0.6 - 0.3,
+            command: randomCommand(),
+            skip: Math.floor(Math.random() * 4),
+            sensors: {
+              a: Math.random() * 2 - 1,
+              b: Math.random() * 2 - 1,
+              c: Math.random() * 2 - 1,
+              d: Math.random() * 2 - 1,
+            },
+          })),
+        });
       }
     }
   }
