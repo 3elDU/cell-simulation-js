@@ -6,7 +6,7 @@
     "build": "vite build",
     "dev": "vite",
     "preview": "vite preview",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc -b --noEmit"
   },
   "devDependencies": {
     "@tweakpane/core": "^2.0.5",

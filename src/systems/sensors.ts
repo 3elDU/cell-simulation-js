@@ -2,52 +2,24 @@ import type { Cell } from "@/cell";
 import type { World } from "@/world";
 import type { System } from ".";
 import { BaseSystem } from "./base";
-import { getComponent, setComponent } from "@/components";
-import { gridGet } from "@/grid";
+import { setComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
+import type { Sensor } from "@/sensors";
+import { sensorsRegistry } from "@/sensors/registry";
+import type { Sensors } from "@/components/sensors";
 
 export class SensorsSystem extends BaseSystem implements System {
   id = "sensors";
   title = "Sensors";
   description = `Exposes information from the
 environment to cells`;
+  enabled = true;
 
   after = ["light", "temperature"];
 
   noise = 0.15;
 
-  static options = {
-    None: "none",
-    Light: "light",
-    Temperature: "temperature",
-  };
-
-  sensorA = "light";
-  sensorB = "none";
-  sensorC = "none";
-  sensorD = "none";
-
   config: ConfigSchema = [
-    {
-      prop: "sensorA",
-      label: "Sensor A",
-      options: SensorsSystem.options,
-    },
-    {
-      prop: "sensorB",
-      label: "Sensor B",
-      options: SensorsSystem.options,
-    },
-    {
-      prop: "sensorC",
-      label: "Sensor C",
-      options: SensorsSystem.options,
-    },
-    {
-      prop: "sensorD",
-      label: "Sensor D",
-      options: SensorsSystem.options,
-    },
     {
       prop: "noise",
       label: "Noise",
@@ -57,36 +29,29 @@ environment to cells`;
     },
   ];
 
-  valueForSensorType(
-    world: World,
-    cell: Cell,
-    type: string
-  ): number | undefined {
-    let value: number;
-    switch (type) {
-      case "light":
-        if (!world.layers.light) return undefined;
+  /**
+   * One instance of every registered sensor. Every cell reads all of them;
+   * which ones a cell actually cares about is decided by its genome, not here.
+   */
+  sensors: Sensor[] = [];
 
-        value = (gridGet(world.layers.light, cell.position) ?? 0) / 255;
-        break;
-
-      case "temperature":
-        value = getComponent(cell, "temperature")?.temp ?? 0;
-
-      case "none":
-      default:
-        value = 0;
-    }
-
-    return Math.min(Math.max(value + Math.random() * this.noise, 0), 1.0);
+  onInit(): void {
+    this.sensors = Array.from(sensorsRegistry.list(), (def) => def.create());
   }
 
   onCellTick(world: World, cell: Cell): void {
-    setComponent(cell, "sensors", {
-      a: this.valueForSensorType(world, cell, this.sensorA) ?? 0,
-      b: this.valueForSensorType(world, cell, this.sensorB) ?? 0,
-      c: this.valueForSensorType(world, cell, this.sensorC) ?? 0,
-      d: this.valueForSensorType(world, cell, this.sensorD) ?? 0,
-    });
+    const readings: Sensors = {};
+
+    for (const sensor of this.sensors) {
+      const value = sensor.computeValue(cell, world);
+      if (value === undefined) continue;
+
+      // Noise is symmetric — the old one-sided version quietly biased every
+      // reading upwards, which selection would have exploited.
+      const noisy = value + (Math.random() * 2 - 1) * this.noise;
+      readings[sensor.id as keyof Sensors] = Math.min(Math.max(noisy, 0), 1);
+    }
+
+    setComponent(cell, "sensors", readings);
   }
 }

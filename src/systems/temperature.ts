@@ -15,6 +15,7 @@ of the cell.
 Environmental factors can be
 configured to influence the
 temperature.`;
+  enabled = true;
 
   crowdingFactor = 0.7;
   sunFactor = 0.3;
@@ -47,7 +48,8 @@ temperature.`;
     ]
       .map(
         ([dx, dy]) =>
-          gridGet(world.grid, { x: base.x + dx!, y: base.y + dy! }) ?? -1 !== -1
+          gridGet(world.grid, { x: base.x + dx!, y: base.y + dy! }) ??
+          -1 !== -1,
       )
       .filter((exists) => exists === true).length;
   }

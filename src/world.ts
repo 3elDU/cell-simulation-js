@@ -60,7 +60,6 @@ export function newWorld(width: number, height: number): World {
   // Add all systems to the world, initially disabled
   for (const def of systemRegistry.list()) {
     const system = def.create();
-    system.enabled = false;
     world.systems.push(system);
   }
 
@@ -104,7 +103,7 @@ export function doTick(world: World) {
   // Clear internal components
   gridEvery(
     world.grid,
-    (_x, _y, id) => delete world.cells.get(id)!.components.internal
+    (_x, _y, id) => delete world.cells.get(id)!.components.internal,
   );
 
   world.tick++;

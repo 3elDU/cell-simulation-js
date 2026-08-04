@@ -1,124 +1,145 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Guidance for Claude Code working in this repo. This document is about **what the project is
+trying to be** — read the code for how it currently does it.
 
-## What this is
+## The idea
 
-A cellular automata simulation: cells are independent agents driven by a genome (a sequence of
-instructions/commands like "Photosynthesis", "Walk", "Attack"). Cells accumulate energy and
-reproduce with a chance of mutation; natural selection does the rest. The UI lets you inspect and
-control individual cells (kill/revive, change direction/instruction, save for later).
+An artificial life sandbox. A 2D grid, cells with 8 neighbors, a genome, mutation, and natural
+selection — but the point isn't any one simulation. The point is **being able to run many
+different simulations quickly**.
 
-There were two earlier, faster (C and Rust) prototypes; this TypeScript+Canvas version was chosen
-because HTML/CSS/TS proved most flexible for the UI. The `rework` branch is an active rewrite —
-some things referenced in README.md (e.g. running the simulation in a Web Worker) are not
-currently implemented; trust the code over the README for current state.
+This is the fourth iteration (after C, Rust, and Vue versions). The earlier ones were faster but
+rigid: behavior was hardcoded, and answering "what if photosynthesis were cheaper?" or "what if
+there were no light gradient?" meant editing code and recompiling. That friction is the thing
+this rewrite exists to kill.
 
-## Commands
+So the guiding goals, in order:
+
+1. **Everything is a knob.** Temperature, light, mutation rate, energy costs, evolution
+   pressure — if a number shapes the world, it should be tweakable live from the UI, mid-run,
+   without a reload.
+2. **Everything is toggleable.** Behavior lives in independent systems that can be switched off
+   individually. Turning off "light" should leave a coherent world, not a crash. Composability
+   over completeness.
+3. **Adding a rule should be cheap.** A new behavior should be one new file plus one registry
+   line, with its config panel appearing for free. If adding a system requires touching UI code,
+   the abstraction has failed.
+4. **Observability.** You should be able to click any cell and see exactly why it did what it
+   did. A simulation you can't inspect is a screensaver.
+
+Performance matters less than any of the above. TypeScript + Canvas was chosen precisely because
+the UI is the hard part, and the UI is what makes the sandbox useful.
+
+## Architectural philosophy
+
+A small ECS, chosen for the modularity goals above rather than for its own sake:
+
+- **World** — state only: the grid of cells, extra grid layers (light, temperature, ...), the
+  tick counter. It doesn't decide anything.
+- **Systems** — behavior only, no state of their own beyond config. Each system does one thing.
+  They run in a soft order (a system can declare it wants to run *after* another) so that e.g.
+  sensor readings exist before anything reacts to them.
+- **Components** — data bags hung off cells. Systems communicate through them: one system writes
+  an intent, another reads it and acts. A system should rarely mutate a cell "directly" when it
+  could instead write a component another system owns. This is what keeps rules composable — and
+  what makes "turn off the movement system" produce a world where cells *want* to move but
+  can't, rather than a broken one.
+- **Renderers** — drawing only, mirroring the system structure, individually toggleable.
+- **Sensors** — one reading each, a number in 0..1, computed from the world or the cell. A sensor
+  returns nothing when its dependency is missing, rather than faking a zero.
+- **Actions** — one thing a cell can do. Actions write intent into components; the system that
+  owns that component is what actually carries it out.
+- **Registries** — how systems, renderers, sensors and actions announce themselves. The UI is
+  generated from them, so nothing hardcodes a list of features.
+
+The consequence to protect: **the UI never knows about specific systems.** Each system/renderer
+describes its own tunables, and the panel builder is generic. Adding a knob means adding it to a
+system's config, never touching UI code.
+
+Layout: `src/systems/`, `src/components/`, `src/renderers/`, `src/sensors/`, `src/actions/`,
+`src/ui/`, plus `world.ts`, `grid.ts`, `cell.ts`, `registry.ts`. `src/systems/genome.ts` is the
+canonical example of a system that reads config, reads one component, and writes another.
+
+## The genome: policy, not program
+
+The genome used to be a linear program — a hardcoded enum of commands walked by an instruction
+pointer, inherited from the earlier prototypes. It isn't anymore. There is no instruction
+pointer, no opcode enum, and no notion of a cell "being at" a position in its genome.
+
+A genome is a **flat list of genes, each one a vote for an action**. A gene holds the id of the
+action it votes for, a base weight, and the ids of the sensors it listens to. Every tick:
+
+1. Each gene is scored: its base weight plus the readings of the sensors it listens to,
+   centered so a sensor can push a gene down as easily as up.
+2. Scores are summed **per action**, so several genes can back the same action for different
+   reasons ("move left when dark", "move left when crowded").
+3. One action wins and is performed — either the highest scorer, or a weighted random draw, a
+   config knob. Actions no gene voted for can't be chosen at all.
+
+Genes are a variable-length list, not one entry per action. A cell only carries genes for the
+few actions it cares about, and **which** actions those are is itself evolved. That's what makes
+"how does a cell choose between dozens of actions?" a non-problem: a photosynthesizer simply has
+no attack gene. It also makes genome length an evolvable trait — more genes means a broader
+repertoire and louder, more confident votes, which is a cost worth charging for later.
+
+Why this shape and not an opcode set:
+
+- Disabling a system removes its actions from the registry; genes naming them go inert instead of
+  hitting a dead opcode. Genomes survive being toggled around.
+- A new system's actions are evolvable immediately, with no change to the genome format.
+- Weights evolve smoothly — a small mutation is a small behavior change, which selection can
+  actually climb. Discrete opcodes evolve in jumps.
+- Behavior is polygenic: a trait built from many small contributions rather than one gene, which
+  is what lets it drift gradually rather than flip.
+- Every tick each cell records the action it chose and the score every action reached, purely so
+  a human can open the inspector and ask why.
+
+Sensor readings are unweighted on purpose: a gene lists *which* sensors it listens to, not how
+much each matters. Keeping the genome that simple is worth more than the extra expressiveness.
+
+The known cost is **memory**: scoring genes against current readings is memoryless, so a cell
+can't do A for a while and then B. This is a deliberate deferral, not an oversight — it gets
+solved later with hormone mechanics, where "adjust hormone" is just another registered action and
+"own hormone level" is just another sensor. Sequence and internal state emerge from the same
+machinery rather than needing control flow bolted back on. Don't reintroduce an instruction
+pointer to solve it.
+
+## Not built yet
+
+Deliberately absent, in rough order of intent — don't treat any of these as oversights:
+
+- **Mutation and reproduction.** The genome shape is designed for it: nudge a base weight,
+  duplicate a gene so the copy can drift, add a gene for a random registered action, delete one,
+  or retarget one at a different action. Each operator wants its own rate knob. New genes should
+  start near zero — a gene that fires hard from birth gets selected away before it can drift into
+  anything useful.
+- **Energy and death**, without which none of the above is selection, just drift.
+- **Hormones and signals.** Components for both existed and were deleted rather than left
+  unused; they come back when there's something to use them for.
+- **An automatic tick loop.** Ticks are advanced by hand from the UI today.
+
+## Working in this repo
 
 ```sh
-npm run dev        # start Vite dev server
-npm run build      # production build (outputs to dist/)
-npm run preview    # preview a production build
-npm run typecheck  # tsc --noEmit, project references (tsconfig.app.json + tsconfig.node.json)
+npm run dev        # Vite dev server
+npm run build      # production build
+npm run typecheck  # always run after changes
 ```
 
-There is no test suite and no linter configured. Always run `npm run typecheck` after making
-changes.
+No tests, no linter. `@/*` maps to `src/*`. 2-space indent, LF (see `.editorconfig`).
 
-Path alias: `@/*` maps to `src/*` (configured in both `tsconfig.app.json` and `vite.config.ts`).
+`typecheck` must stay `tsc -b --noEmit` — the root tsconfig is references-only, so a plain
+`tsc --noEmit` compiles nothing and passes no matter what is broken.
 
-## Architecture
+The current branch is an active rewrite; README.md describes some things (Web Worker, per-cell
+kill/revive, reproduction, energy/death) that don't exist yet. Trust the code.
 
-The simulation is a small ECS-like system: **World** holds state, **Systems** hold behavior,
-**Cells** are entities made of **Components**. Rendering is a separate concern driven by
-**Renderers**.
+Deploys to GitHub Pages from `main` via `.github/workflows/deploy.yml`. There is no other CI.
 
-### World / tick loop (`src/world.ts`)
+## Non-goals
 
-`World` holds `tick`, `width`/`height`, a `grid` (flat `Int32Array` of cell IDs, -1 = empty),
-a `cells: Map<number, Cell>`, arbitrary `layers` (other `GridLayer`s, e.g. light/temperature), and
-the ordered list of `systems`.
-
-`newWorld()` instantiates one instance of every system registered in `systemRegistry`, disabled by
-default, sorts them, and calls `onInit` on each.
-
-`doTick()` runs each tick in two phases:
-1. Call `system.onTick(world)` on every enabled system (world-level effects, e.g. spawning cells,
-   diffusing a layer).
-2. Walk the grid once; for every occupied cell, call `system.onCellTick(world, cell)` on every
-   enabled system, in system order. A cell is marked `processed` via an internal component so it's
-   only visited once per tick even if the grid iteration would otherwise revisit it; this flag is
-   cleared at the end of the tick.
-
-### Systems (`src/systems/`)
-
-A `System` (`src/systems/base.ts` for `BaseSystem`, interface in `src/systems/index.ts`) has an
-`id`, `enabled`, optional `onInit`/`onTick`/`onCellTick`, and an optional `after: string[]` listing
-system IDs it should run after (soft ordering, not a hard dependency — see `sortSystems`). Systems
-also implement `UIDescription` (`title`/`description`) and can expose `config: ConfigSchema` for
-tunable parameters and `actions` (buttons), both rendered automatically into the Tweakpane UI.
-
-New systems must be registered in `src/systems/registry.ts` (`systemRegistry.register(...)`) to be
-picked up by `newWorld()`.
-
-Existing systems: `movement`, `light`, `constant-move`, `cell-generator`, `sensors`,
-`temperature`, `genome`. Read `src/systems/genome.ts` for the canonical example: it reads/writes
-components via `getComponent`/`setComponent`, exposes `config`, and declares `after: ["sensors"]`
-since gene activation depends on sensor readings.
-
-### Components (`src/cell.ts`, `src/components/`)
-
-`Cell` is just `{ id, position, components: Record<string, Record<string, any>> }` — a loose bag
-of components keyed by string. `src/components/index.ts` defines the authoritative `Components`
-type map (id -> shape) and the type-safe `getComponent`/`setComponent` helpers; **always** go
-through these instead of touching `cell.components` directly, so component IDs stay type-checked.
-Adding a new component type means adding it to the `Components` map here.
-
-Convention: systems generally *read* one component (e.g. `genome`, `sensors`) and *write* another
-(e.g. `movement`) rather than mutating cell state directly — this keeps behavior composable and
-order-dependent via `after`.
-
-### Grid layers (`src/grid.ts`)
-
-`GridLayer<T>` wraps a flat typed array as a 2D grid (`gridGet`/`gridSet`/`gridMaybeGet`/
-`gridEvery`). `World.grid` is the main cell-ID grid; `World.layers` holds additional named layers
-(e.g. light intensity, temperature) that systems can read/write.
-
-### Renderers (`src/renderers/`)
-
-Parallel structure to systems: a `Renderer` (`src/renderers/index.ts`) has `id`, `enabled`,
-optional `config`, and a `render(ctx, world)` method (may be async). Renderers are registered in
-`src/renderers/registry.ts`. Existing renderers: `light` (`LightnessRenderer`), `cell`
-(`CellRenderer`). `UIController.render()` (`src/ui/main.ts`) runs all enabled renderers in
-registration/sort order each frame, awaiting any that return a promise.
-
-### Registry pattern (`src/registry.ts`)
-
-Both systems and renderers reuse the generic `Registry<T>`: a map of `id -> Definition<T>` where
-`Definition` carries `title`/`description`/`id` plus a `create()` factory. This is what lets the UI
-auto-generate panes for "every registered system/renderer" without hardcoding a list.
-
-### UI layer (`src/ui/`, `src/ui.ts`)
-
-Built with [Tweakpane](https://tweakpane.github.io/docs/). `src/ui.ts` defines the shared
-`UIDescription`/`UIActionable`/`ConfigSchema` contracts that both systems and renderers implement,
-so the pane-building code (`src/ui/systems.ts`, `src/ui/renderers.ts`) is generic: it iterates
-`world.systems` / the renderer registry and calls `folder.addBinding`/`addButton` per entry,
-including per-item `config` bindings and `actions`. **To expose a new tunable on a system or
-renderer, just add it to that class's `config` array — no UI code needs to change.**
-
-`src/ui/main.ts` (`UIController`) owns the top-level flow: builds the "New World" pane, creates the
-world on demand, wires up Panzoom on the canvas, and drives the manual tick/render loop (`tick()` /
-`render()`, triggered by the "Do Tick" button — there is no automatic animation loop currently).
-`src/ui/elements.ts` centralizes DOM lookups (`main`, `canvas`, `panes-container` from
-`index.html`). `src/ui/selected-cell.ts` handles the pane for inspecting/controlling a clicked
-cell.
-
-## Conventions
-
-- 2-space indent, LF line endings (see `.editorconfig`).
-- No `any`-ban: `noImplicitAny` is disabled in `tsconfig.app.json`, but prefer explicit types for
-  new public APIs (registries, component shapes) since they're consumed generically elsewhere.
-- Deploys to GitHub Pages automatically from `main` via `.github/workflows/deploy.yml` (builds with
-  Node 22, uploads `dist/`) — don't assume any other CI/deploy path exists.
+- Replicate a complex neural network. 
+- Performance over flexibility. Flexibility and simpler code should always be prioritized.
+- Strict biological accuracy. While some aspects of the simulation replicate real
+  biological processes, those are abstractions - not realistic simulations.

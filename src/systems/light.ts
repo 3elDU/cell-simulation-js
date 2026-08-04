@@ -13,6 +13,7 @@ export class LightSystem extends BaseSystem implements System {
   id = "light";
   title = "Light";
   description = "Manages the light layer";
+  enabled = true;
 
   /**
    * Computes luminance

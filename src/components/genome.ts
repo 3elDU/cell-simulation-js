@@ -1,25 +1,20 @@
-export type Command = "noop" | "left" | "right" | "move";
-
-const commands: Command[] = ["noop", "left", "right", "move"];
-/**
- * Generate a random command from all available commands
- */
-export function randomCommand(): Command {
-  return commands[Math.floor(Math.random() * commands.length)]!;
-}
+import type { Sensors } from "./sensors";
 
 /**
- * Represents a single undivisible instruction of a cell.
+ * A single vote for an action.
  *
- * Whether to actually run an instruction is determined by combining base weight,
- * sensor weights, and computing a probability. Sum of weights >0 means the instruction
- * is more likely to execute, <0 means the instruction is less likely to fire.
- *
- * Sensor values are also considered for allowing more complex behavioral
- * patterns, where the cell can decide what to do depending on its environment.
+ * A gene combines its base weight with the sensors it listens to into a score.
+ * Every tick all genes are scored, scores for the same action add up, and one
+ * action wins — so a genome is a policy, not a program. Several genes may push
+ * the same action for different reasons ("move when dark", "move when hot").
  */
 export interface Gene {
-  command: Command;
+  /**
+   * Stores the action id, not the reference.
+   *
+   * This is intentional. If action is disabled globaly, gene becomes a no-op.
+   */
+  action: string;
 
   /**
    * Base weight for execution probability.
@@ -29,37 +24,23 @@ export interface Gene {
   base: number;
 
   /**
-   * How much each sensor influences execution of this command.
+   * Which sensors this gene listens to, by id.
    *
-   * Each value is a float in range from -1 to 1.
+   * A gene may listen to none (making it react only to its base weight),
+   * one, or several. Sensors it doesn't list simply don't affect it.
    */
-  sensors: {
-    a: number;
-    b: number;
-    c: number;
-    d: number;
-  };
-
-  /**
-   * How many instructions to skip, if this instruction is not fired.
-   * 0 is also a legit value, which means this same instruction will
-   * be executed in the next iteration.
-   */
-  skip: number;
+  sensors: (keyof Sensors)[];
 }
 
 export interface Genome {
-  /**
-   * Instruction pointer
-   */
-  ip: number;
   genome: Gene[];
 
   /**
-   * Current instruction to execute.
-   * This will be handled by a system that implements this command.
+   * Action chosen on the last tick, and the score every action reached.
    *
-   * Will be undefined when instruction is skipped
+   * Written by the genome system purely so a cell can be inspected — a
+   * simulation you can't ask "why did it do that?" isn't much use.
    */
-  cur?: Command;
+  lastAction?: string;
+  scores?: Record<string, number>;
 }

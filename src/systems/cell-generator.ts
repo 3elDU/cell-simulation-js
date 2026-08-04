@@ -4,7 +4,9 @@ import { BaseSystem } from "./base";
 import type { World } from "@/world";
 import { addCell } from "@/cell";
 import { setComponent } from "@/components";
-import { randomCommand } from "@/components/genome";
+import { actionRegistry } from "@/actions/registry";
+import { sensorsRegistry } from "@/sensors/registry";
+import type { Sensors } from "@/components/sensors";
 
 export class CellGenerator extends BaseSystem implements System, UIActionable {
   id = "cell-generator";
@@ -17,7 +19,9 @@ Generates cells and automatically
 disables itself.`;
 
   generationChance = 0.25;
-  genomeLength = 24;
+  genomeMinLength = 2;
+  genomeMaxLength = 10;
+  sensorChance = 0.5;
 
   config: ConfigSchema = [
     {
@@ -27,9 +31,21 @@ disables itself.`;
       step: 0.01,
     },
     {
-      prop: "genomeLength",
+      prop: "genomeMinLength",
       min: 1,
       step: 1,
+    },
+    {
+      prop: "genomeMaxLength",
+      min: 1,
+      step: 1,
+    },
+    {
+      prop: "sensorChance",
+      label: "Sensor Chance",
+      min: 0,
+      max: 1,
+      step: 0.01,
     },
   ];
 
@@ -49,6 +65,15 @@ disables itself.`;
   generate() {
     if (!this.world) return;
 
+    // Genomes are drawn from whatever is registered right now, so a new
+    // action or sensor becomes evolvable without touching this system.
+    const actionIds = Array.from(actionRegistry.list(), (def) => def.id);
+    const sensorIds = Array.from(
+      sensorsRegistry.list(),
+      (def) => def.id as keyof Sensors,
+    );
+    if (actionIds.length === 0) return;
+
     for (let x = 0; x < this.world.width; x++) {
       for (let y = 0; y < this.world.height; y++) {
         const hasCell = Math.random() < this.generationChance;
@@ -57,20 +82,19 @@ disables itself.`;
 
         const cell = addCell(this.world, x, y);
 
+        const genomeLength = Math.floor(
+          Math.random() * (this.genomeMaxLength - this.genomeMinLength + 1) +
+            this.genomeMinLength,
+        );
+
         setComponent(cell, "genome", {
-          ip: 0,
-          // This is very much a PoC at this point
-          // Sensor weights should be generated with normal distribution
-          genome: Array.from({ length: this.genomeLength }, () => ({
+          genome: Array.from({ length: genomeLength }, () => ({
+            // Base weights start near zero so no gene is born decisive —
+            // a gene that fires hard from tick one gets selected away before
+            // it ever has a chance to drift into something useful.
             base: Math.random() * 0.6 - 0.3,
-            command: randomCommand(),
-            skip: Math.floor(Math.random() * 4),
-            sensors: {
-              a: Math.random() * 2 - 1,
-              b: Math.random() * 2 - 1,
-              c: Math.random() * 2 - 1,
-              d: Math.random() * 2 - 1,
-            },
+            action: actionIds[Math.floor(Math.random() * actionIds.length)]!,
+            sensors: sensorIds.filter(() => Math.random() < this.sensorChance),
           })),
         });
       }
