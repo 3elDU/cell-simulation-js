@@ -7,6 +7,8 @@ import { CellGenerator } from "./cell-generator";
 import { SensorsSystem } from "./sensors";
 import { TemperatureSystem } from "./temperature";
 import { GenomeSystem } from "./genome";
+import { MineralsSystem } from "./minerals";
+import { OrganicsSystem } from "./organics";
 
 export const systemRegistry = new Registry<System>();
 
@@ -29,3 +31,5 @@ systemRegistry.register(d(CellGenerator));
 systemRegistry.register(d(SensorsSystem));
 systemRegistry.register(d(TemperatureSystem));
 systemRegistry.register(d(GenomeSystem));
+systemRegistry.register(d(MineralsSystem));
+systemRegistry.register(d(OrganicsSystem));

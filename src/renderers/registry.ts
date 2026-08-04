@@ -1,7 +1,7 @@
 import { Registry, type Definition } from "@/registry";
 import { type Renderer } from ".";
-import { LightnessRenderer } from "./light";
 import { CellRenderer } from "./cell";
+import { layerRenderer } from "./layer";
 
 export const renderRegistry = new Registry<Renderer>();
 
@@ -17,5 +17,11 @@ const d = (constructor: new () => Renderer): Definition<Renderer> => {
   };
 };
 
-renderRegistry.register(d(LightnessRenderer));
+renderRegistry.register(layerRenderer("light", "Light", { r: 1, g: 1, b: 0 }));
+renderRegistry.register(
+  layerRenderer("minerals", "Minerals", { r: 0.2, g: 0.7, b: 1 }),
+);
+renderRegistry.register(
+  layerRenderer("organics", "Organics", { r: 0.7, g: 0.35, b: 0.1 }),
+);
 renderRegistry.register(d(CellRenderer));
