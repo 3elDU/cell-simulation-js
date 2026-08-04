@@ -1,8 +1,8 @@
 import { Registry, type Definition } from "@/registry";
 import type { Sensor } from ".";
-import { LightSensor } from "./light";
 import { TemperatureSensor } from "./temperature";
 import { EnergySensor } from "./energy";
+import { LayerSensor, layerSensor } from "./layer";
 
 export const sensorsRegistry = new Registry<Sensor>();
 
@@ -17,12 +17,16 @@ const d = (ctor: new () => Sensor): Definition<Sensor> => {
   };
 };
 
-sensorsRegistry.register(d(LightSensor));
+sensorsRegistry.register(layerSensor("light", "Light"));
+sensorsRegistry.register(layerSensor("minerals", "Minerals"));
+sensorsRegistry.register(layerSensor("organics", "Organics"));
 sensorsRegistry.register(d(TemperatureSensor));
 sensorsRegistry.register(d(EnergySensor));
 
 export type SensorsMap = {
-  light: LightSensor;
+  light: LayerSensor;
+  minerals: LayerSensor;
+  organics: LayerSensor;
   temperature: TemperatureSensor;
   energy: EnergySensor;
 };

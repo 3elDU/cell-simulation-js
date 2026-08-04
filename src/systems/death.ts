@@ -2,9 +2,8 @@ import type { World } from "@/world";
 import type { System } from ".";
 import { BaseSystem } from "./base";
 import { getComponent } from "@/components";
-import { gridEvery, gridSet, type GridLayer } from "@/grid";
+import { gridEvery, gridSet, LAYER_MAX, type GridLayer } from "@/grid";
 import type { ConfigSchema } from "@/ui";
-import { LAYER_MAX } from "./minerals";
 
 /**
  * Clears the tiles of cells marked for death and leaves their corpses in the

@@ -15,7 +15,9 @@ export class SensorsSystem extends BaseSystem implements System {
 environment to cells`;
   enabled = true;
 
-  after = ["light", "temperature"];
+  // Readings should describe the world as it is this tick, so every system
+  // that writes a layer sensors can read runs first.
+  after = ["light", "temperature", "minerals", "organics"];
 
   noise = 0.15;
 

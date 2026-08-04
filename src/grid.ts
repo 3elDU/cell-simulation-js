@@ -3,6 +3,15 @@
  */
 
 /**
+ * Highest value a resource layer holds.
+ *
+ * Shared rather than repeated, because layers hand values to each other —
+ * organics rots into minerals — and a mismatched cap would silently destroy
+ * energy at the handoff.
+ */
+export const LAYER_MAX = 255;
+
+/**
  * A utility interface to store a position of something.
  *
  * Cannot be used as a key directly

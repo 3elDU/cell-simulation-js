@@ -1,14 +1,8 @@
 import type { System } from ".";
 import { BaseSystem } from "./base";
 import type { World } from "@/world";
-import { gridGet, gridSet, type GridLayer } from "@/grid";
+import { gridGet, gridSet, LAYER_MAX, type GridLayer } from "@/grid";
 import type { ConfigSchema, UIAction, UIActionable } from "@/ui";
-
-/**
- * Highest value any layer tile holds. Shared with the layer renderers, which
- * map this to full brightness.
- */
-export const LAYER_MAX = 255;
 
 export type VentTiming = "independent" | "jittered" | "synchronized";
 

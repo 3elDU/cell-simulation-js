@@ -3,6 +3,7 @@ import type { Action } from ".";
 import { MoveAction } from "./move";
 import { IdleAction } from "./idle";
 import { DieAction } from "./die";
+import { HarvestAction } from "./harvest";
 import type { MovementDirection } from "@/components/movement";
 
 export const actionRegistry = new Registry<Action>();
@@ -26,6 +27,39 @@ actionRegistry.register({
   description: "Spend the tick doing nothing",
   create: () => new IdleAction(),
 });
+
+const harvest = (
+  id: string,
+  title: string,
+  description: string,
+  layer: string,
+  rate: number,
+  cost: number,
+) =>
+  actionRegistry.register({
+    id,
+    title,
+    description,
+    create: () => new HarvestAction(id, layer, rate, cost),
+  });
+
+harvest(
+  "photosynthesize",
+  "Photosynthesize",
+  "Draw energy from the light layer",
+  "light",
+  2,
+  0.1,
+);
+
+harvest(
+  "chemosynthesize",
+  "Chemosynthesize",
+  "Draw energy from the minerals layer",
+  "minerals",
+  2,
+  0.1,
+);
 
 actionRegistry.register({
   id: "die",

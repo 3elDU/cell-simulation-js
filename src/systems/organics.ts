@@ -1,9 +1,8 @@
 import type { System } from ".";
 import { BaseSystem } from "./base";
 import type { World } from "@/world";
-import { type GridLayer } from "@/grid";
+import { LAYER_MAX, type GridLayer } from "@/grid";
 import type { ConfigSchema, UIAction, UIActionable } from "@/ui";
-import { LAYER_MAX } from "./minerals";
 
 /**
  * Rots the organics layer down into minerals.

@@ -27,7 +27,9 @@ hoard too much and it bursts.`;
   enabled = true;
 
   // Charges for the action the genome picked this tick, so it has to know it.
-  after = ["genome"];
+  // After feeding too, so a cell that just ate gets to spend what it earned
+  // rather than starving with a full tile underneath it.
+  after = ["genome", "feeding"];
 
   /**
    * Given to a cell the first tick it is seen with no energy component. Cells
