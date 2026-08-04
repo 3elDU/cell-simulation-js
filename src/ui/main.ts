@@ -26,7 +26,7 @@ export class UIController {
    * so it goes as fast as ticking and rendering allow. `tps` is the measured
    * rate, which is what actually tells you whether the limit is doing anything.
    */
-  runParams = { running: false, maxTps: 30, tps: 0 };
+  runParams = { running: false, maxTps: 0, tps: 0 };
   /** Guards against overlapping ticks, see {@link UIController.tick} */
   ticking = false;
 
@@ -44,8 +44,8 @@ export class UIController {
     });
 
     const params = {
-      width: Math.floor(Math.random() * 256 + 32),
-      height: Math.floor(Math.random() * 256 + 32),
+      width: Math.floor(Math.random() * 184 + 72),
+      height: Math.floor(Math.random() * 184 + 72),
     };
 
     pane.addBinding(params, "width", {
@@ -156,7 +156,7 @@ export class UIController {
     this.panzoom = Panzoom(elements.canvas.parentElement!, {
       minScale: 1,
       maxScale: 16,
-      startScale: 2,
+      startScale: 4,
       step: 0.1,
       focal: { x: 0.5, y: 0.5 },
     });

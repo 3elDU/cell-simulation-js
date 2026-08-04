@@ -60,6 +60,7 @@ disables itself.`;
 
   onInit(world: World): void {
     this.world = world;
+    this.generate();
   }
 
   generate() {
