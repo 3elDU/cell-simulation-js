@@ -2,6 +2,7 @@ import { Registry } from "@/registry";
 import type { Action } from ".";
 import { MoveAction } from "./move";
 import { IdleAction } from "./idle";
+import { DieAction } from "./die";
 import type { MovementDirection } from "@/components/movement";
 
 export const actionRegistry = new Registry<Action>();
@@ -24,4 +25,11 @@ actionRegistry.register({
   title: "Idle",
   description: "Spend the tick doing nothing",
   create: () => new IdleAction(),
+});
+
+actionRegistry.register({
+  id: "die",
+  title: "Die",
+  description: "Give up and leave a corpse",
+  create: () => new DieAction(),
 });

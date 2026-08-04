@@ -40,6 +40,22 @@ export interface World {
 }
 
 /**
+ * Finds a system by id, but only if it is switched on.
+ *
+ * Meant for the "returns nothing when its dependency is missing" pattern —
+ * a sensor reading a system's config should go quiet when that system is off,
+ * not report a number derived from settings nothing is applying.
+ */
+export function getEnabledSystem<T extends System>(
+  world: World,
+  id: string,
+): T | undefined {
+  const system = world.systems.find((system) => system.id === id);
+
+  return system?.enabled ? (system as T) : undefined;
+}
+
+/**
  * Creates a new world object with no systems, layers or cells, and an empty grid.
  */
 export function newWorld(width: number, height: number): World {

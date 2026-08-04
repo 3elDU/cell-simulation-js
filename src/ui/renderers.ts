@@ -39,7 +39,8 @@ export class RenderersPane extends Pane {
 
       // Add per-renderer config
       for (const binding of instance.config ?? []) {
-        folder.addBinding(instance, binding.prop as keyof Renderer, binding);
+        const target = (binding.object ?? instance) as Record<string, unknown>;
+        folder.addBinding(target, binding.prop, binding);
       }
     }
   }

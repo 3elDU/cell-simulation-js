@@ -8,6 +8,7 @@ import type { Action } from ".";
  */
 export class IdleAction implements Action {
   id = "idle";
+  cost = 0;
 
   perform(): void {}
 }

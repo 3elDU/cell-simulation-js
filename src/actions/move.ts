@@ -11,6 +11,7 @@ import type { MovementDirection } from "@/components/movement";
  */
 export class MoveAction implements Action {
   id: string;
+  cost = 1;
   dir: MovementDirection;
 
   constructor(dir: MovementDirection) {

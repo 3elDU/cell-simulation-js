@@ -39,6 +39,14 @@ export function extractActions(obj: object): UIAction[] {
 
 export type ConfigItem = {
   prop: string;
+
+  /**
+   * Object the knob reads and writes, when it isn't the system or renderer
+   * itself. Lets a system expose a knob per entry of a map it builds at
+   * runtime — per-action energy costs, say — without declaring a field for
+   * each one up front.
+   */
+  object?: object;
 } & BindingParams;
 
 export type ConfigSchema = ConfigItem[];

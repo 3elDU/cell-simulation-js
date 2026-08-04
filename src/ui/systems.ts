@@ -1,4 +1,3 @@
-import type { System } from "@/systems";
 import { extractActions } from "@/ui";
 import type { World } from "@/world";
 import { Pane } from "tweakpane";
@@ -23,7 +22,8 @@ export class SystemsPane extends Pane {
 
       // Add per-system configuration
       for (const binding of system.config ?? []) {
-        folder.addBinding(system, binding.prop as keyof System, binding);
+        const target = (binding.object ?? system) as Record<string, unknown>;
+        folder.addBinding(target, binding.prop, binding);
       }
 
       // Add action buttons

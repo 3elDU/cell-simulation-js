@@ -9,6 +9,8 @@ import { TemperatureSystem } from "./temperature";
 import { GenomeSystem } from "./genome";
 import { MineralsSystem } from "./minerals";
 import { OrganicsSystem } from "./organics";
+import { EnergySystem } from "./energy";
+import { DeathSystem } from "./death";
 
 export const systemRegistry = new Registry<System>();
 
@@ -33,3 +35,5 @@ systemRegistry.register(d(TemperatureSystem));
 systemRegistry.register(d(GenomeSystem));
 systemRegistry.register(d(MineralsSystem));
 systemRegistry.register(d(OrganicsSystem));
+systemRegistry.register(d(EnergySystem));
+systemRegistry.register(d(DeathSystem));

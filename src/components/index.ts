@@ -3,6 +3,8 @@ import type { Movement } from "./movement";
 import type { Sensors } from "./sensors";
 import type { Temperature } from "./temperature";
 import type { Genome } from "./genome";
+import type { Energy } from "./energy";
+import type { Death } from "./death";
 
 // Registry of all components in the system
 type Components = {
@@ -10,6 +12,8 @@ type Components = {
   sensors: Sensors;
   temperature: Temperature;
   genome: Genome;
+  energy: Energy;
+  death: Death;
 };
 
 /**
