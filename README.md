@@ -1,24 +1,39 @@
 # Cell simulation
 
-![A screenshot showing the overall UI](./screenshot.png)
-
 This is a cellular automata that simulates the evolution of cells.
 
-Each cell is an independent agent with its own set of commands (genome) that dictates it's
-behavior. For examples, there's commands such as "Photosynthesis", "Walk", "Attack".<br>
-After the cell has saved a certain amount of energy, it can make a copy of itself. With a small chance, it's child can have one of it's commands mutated. Now everything is left to natural selection. Cells with unoptimized set of instructions will die quickly, while cells that were lucky, will quickly reproduce and fill the map.
+Each cell is an independent agent with its own set of instructions (genome) that dictates
+its behavior. Whether an instruction fires depends on a base probability plus weights on
+four "sensor" inputs, so behavior can react to the cell's environment rather than being
+purely random.
 
-You can inspect each cell, see it's genome, the current instruction, and other parameters such as energy and direction. You can control the cell: kill it, revive it, change it's direction or the current instruction. You can also save the cell for later.
+> **Note:** this branch (`rework`) is a from-scratch rewrite of the simulation, replacing an
+> earlier Vue-based version. It's an early work in progress: reproduction, mutation, cell
+> energy/death, and per-cell controls (kill/revive/edit) are not implemented yet. See
+> "Current state" below for what's actually there today, and `CLAUDE.md` for the full
+> architecture breakdown.
 
-# Technical details
+## Current state
 
-Simulating such behavior, and rendering everything is a CPU-heavy task. With a recent commit, the simulation is being updated and rendered inside a Web Worker. That keeps the main thread free to process inputs, draw the UI and such.
+- Vanilla TypeScript + Canvas 2D, no UI framework. Panels are built with
+  [Tweakpane](https://tweakpane.github.io/docs/).
+- Architected as a small ECS: a `World` holds grid-based state, `System`s contain all
+  behavior (movement, light, sensors, temperature, genome execution, ...), and cells are
+  bags of `Component`s that systems read and write.
+- Ticks are advanced manually, one at a time, via a "Do Tick" button — there's no running
+  animation loop yet, and no Web Worker (everything runs on the main thread).
+- Clicking a cell shows its raw state (position, genome, instruction pointer) in an
+  inspector panel.
+- Systems and renderers are individually toggle-able and configurable live from the UI,
+  auto-generated from their registries — no manual UI wiring needed to add a new one.
 
-# History
+## History
 
 There were two predecessors to this implementation:
 
 - https://github.com/3elDU/cell-simulation - Written in C, the first attempt. Quickly got frustrated with implementing the UI and abandoned it. Has the best performance.
-- https://github.com/3elDU/cell-simulation-rs - Written in Rust. Semi-mainained. Worse performance than C implementation, but still (roughly) 2x faster compared to the current one.
+- https://github.com/3elDU/cell-simulation-rs - Written in Rust. Semi-maintained. Worse performance than the C implementation, but still (roughly) 2x faster compared to this one.
 
-I realized that HTML+CSS+Vue are the most flexible for implementing the UI and general features, so this implementation is by far the most updated and complete.
+The project was then rebuilt in Vue, and has since been rewritten again from scratch (this
+branch) in plain TypeScript with a Canvas-based renderer and an explicit systems/components
+architecture, aiming for something simpler to extend than the Vue version.
