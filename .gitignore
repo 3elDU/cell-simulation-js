@@ -94,6 +94,3 @@ sw.*
 
 auto-imports.d.ts
 components.d.ts
-
-# TypeScript incremental build info
-*.tsbuildinfo

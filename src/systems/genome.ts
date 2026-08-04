@@ -6,7 +6,6 @@ import { getComponent, setComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
 import type { Gene } from "@/components/genome";
 import type { Sensors } from "@/components/sensors";
-import { random } from "@/random";
 
 export class GenomeSystem extends BaseSystem implements System {
   id = "genome";
@@ -51,10 +50,10 @@ advances the instruction pointer`;
     }
 
     // Add gaussian noise
-    activation += (random() + random() - 1) * this.noiseSigma;
+    activation += (Math.random() + Math.random() - 1) * this.noiseSigma;
 
     const prob = this.sigmoid(activation * this.gain);
-    return random() < prob;
+    return Math.random() < prob;
   }
 
   onCellTick(world: World, cell: Cell): void {
