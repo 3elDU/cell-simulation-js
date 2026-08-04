@@ -1,0 +1,16 @@
+{
+  "extends": "@tsconfig/node22/tsconfig.json",
+  "include": ["tests/**/*", "src/**/*"],
+  "exclude": ["src/main.ts", "src/ui", "src/ui.ts", "src/renderers"],
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "noImplicitAny": false,
+    "types": ["node"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}

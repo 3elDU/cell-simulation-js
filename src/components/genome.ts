@@ -1,3 +1,5 @@
+import { random } from "@/random";
+
 export type Command = "noop" | "left" | "right" | "move";
 
 const commands: Command[] = ["noop", "left", "right", "move"];
@@ -5,7 +7,7 @@ const commands: Command[] = ["noop", "left", "right", "move"];
  * Generate a random command from all available commands
  */
 export function randomCommand(): Command {
-  return commands[Math.floor(Math.random() * commands.length)]!;
+  return commands[Math.floor(random() * commands.length)]!;
 }
 
 /**

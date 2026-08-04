@@ -4,6 +4,7 @@ import type { System } from ".";
 import { BaseSystem } from "./base";
 import { getComponent, setComponent } from "@/components";
 import { gridGet } from "@/grid";
+import { random } from "@/random";
 import type { ConfigSchema } from "@/ui";
 
 export class SensorsSystem extends BaseSystem implements System {
@@ -78,7 +79,7 @@ environment to cells`;
         value = 0;
     }
 
-    return Math.min(Math.max(value + Math.random() * this.noise, 0), 1.0);
+    return Math.min(Math.max(value + random() * this.noise, 0), 1.0);
   }
 
   onCellTick(world: World, cell: Cell): void {
