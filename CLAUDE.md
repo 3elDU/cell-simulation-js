@@ -58,12 +58,20 @@ The consequence to protect: **the UI never knows about specific systems.** Each 
 describes its own tunables, and the panel builder is generic. Adding a knob means adding it to a
 system's config, never touching UI code.
 
-Two patterns follow from that and are worth reaching for before writing a new file:
+Three patterns follow from that and are worth reaching for before writing a new file:
 
 - **Parameterize, then register several times.** A renderer that draws "the light layer" wants to
   be a renderer that draws *a named layer*, registered once per layer. Same for sensors reading a
   layer, moves in a direction, and harvests from a resource. When a second near-identical file
-  starts to look necessary, the first one probably wanted an argument.
+  starts to look necessary, the first one probably wanted an argument. The argument should be
+  *data* — a name, a direction, a color. If it would have to be a branch on behavior, two files
+  are better than one class full of `if (this.layer === ...)`.
+- **Look for the abstraction that already exists.** Before parameterizing on a closure, check
+  whether something in another registry already has the shape you need. `SensorRenderer` colors
+  cells by a *sensor id* rather than by a hand-written read function, because "one number in
+  0..1, or nothing when a dependency is missing" is the sensor contract exactly. Every sensor
+  becomes drawable for free, and the canvas can't disagree with the inspector about what a cell
+  feels.
 - **Knobs can be generated from a registry.** A system that needs one number per action or per
   layer builds that map in `onInit` and emits a `ConfigItem` per entry, pointing at the map with
   `ConfigItem.object`. `src/systems/energy.ts` (a cost per action) and `src/systems/feeding.ts`
@@ -156,11 +164,22 @@ safely, and cells that don't split burst.
 purely a sink. A world with feeding switched off runs down and dies, which is correct behavior
 rather than a bug.
 
-**Death is an action like any other.** Starvation, overload, voluntary death and anything added
-later all write the same death component through `kill()`. The death system sweeps at the *start*
-of a tick, so a cell marked partway through tick N is still on the grid for the rest of it —
-removing cells mid-iteration would yank them out from under every system ordered after the
-killer.
+**Death is an action like any other.** Starvation, overload, old age, voluntary death and anything
+added later all write the same death component through `kill()`, and the first cause to write it
+wins. The death system sweeps at the *start* of a tick, so a cell marked partway through tick N is
+still on the grid for the rest of it — removing cells mid-iteration would yank them out from under
+every system ordered after the killer.
+
+**Lethal pressure is a ramp, not a threshold.** Both overload and old age use the same shape: a
+safe stretch where the chance is zero, a curved ramp, and certainty at the far end. A hard cutoff
+makes every cell that reaches it die on the same tick, which turns population into a sawtooth and
+makes the knob feel like a switch. A rising chance spreads deaths out, leaves room for luck, and
+gives selection a gradient to climb. `energy.overloadChance` and `age.mortalityChance` are the two
+instances; a third would be the moment to extract it.
+
+**Age exists to make reproduction mandatory.** Without it, a cell that finds a bright tile and
+idles is immortal, so a lineage can win by never splitting and the genome stops being under
+pressure. Age means persistence is only available through children.
 
 ## Not built yet
 

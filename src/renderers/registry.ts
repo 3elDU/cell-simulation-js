@@ -2,7 +2,7 @@ import { Registry, type Definition } from "@/registry";
 import { type Renderer } from ".";
 import { CellRenderer } from "./cell";
 import { layerRenderer } from "./layer";
-import { EnergyRenderer } from "./energy";
+import { sensorRenderer } from "./sensor";
 
 export const renderRegistry = new Registry<Renderer>();
 
@@ -26,4 +26,19 @@ renderRegistry.register(
   layerRenderer("organics", "Organics", { r: 0.7, g: 0.35, b: 0.1 }),
 );
 renderRegistry.register(d(CellRenderer));
-renderRegistry.register(d(EnergyRenderer));
+renderRegistry.register(
+  sensorRenderer(
+    "energy",
+    "Cell Energy",
+    { r: 0.15, g: 0.15, b: 0.25 },
+    { r: 1, g: 0.2, b: 0.1 },
+  ),
+);
+renderRegistry.register(
+  sensorRenderer(
+    "age",
+    "Cell Age",
+    { r: 0.1, g: 0.7, b: 0.35 },
+    { r: 0.85, g: 0.85, b: 0.9 },
+  ),
+);
