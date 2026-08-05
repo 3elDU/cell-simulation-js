@@ -95,3 +95,4 @@ sw.*
 auto-imports.d.ts
 components.d.ts
 *.tsbuildinfo
+.claude/worktrees
