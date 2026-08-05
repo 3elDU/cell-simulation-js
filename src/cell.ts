@@ -9,7 +9,7 @@ export interface Cell {
    * Components allow storing arbitrary information,
    * associated with the cell
    */
-  components: Record<string, Record<string, any>>;
+  components: Record<string, Record<string, unknown>>;
 }
 
 /**

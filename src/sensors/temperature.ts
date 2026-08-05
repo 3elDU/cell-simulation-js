@@ -8,7 +8,7 @@ export class TemperatureSensor implements Sensor {
   title = "Temperature";
   description = "Computes cell temperature";
 
-  computeValue(cell: Cell, world: World): number | undefined {
+  computeValue(cell: Cell, _world: World): number | undefined {
     return getComponent(cell, "temperature")?.temp;
   }
 }

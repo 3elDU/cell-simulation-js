@@ -43,5 +43,8 @@ export function setComponent<T extends keyof Components>(
   id: T,
   component: Components[T]
 ) {
-  cell.components[id] = component;
+  // Interfaces have no implicit index signature, so a declared component type
+  // never satisfies `Record<string, unknown>` structurally. This function is
+  // the type-safe boundary; past it, components are just bags.
+  cell.components[id] = component as Record<string, unknown>;
 }

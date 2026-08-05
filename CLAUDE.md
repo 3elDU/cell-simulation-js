@@ -204,13 +204,22 @@ Deliberately absent, in rough order of intent — don't treat any of these as ov
 ```sh
 npm run dev        # Vite dev server
 npm run build      # production build
-npm run typecheck  # always run after changes
+npm run typecheck  # tsc against tsconfig.app.json
+npm run lint       # eslint src
+npm run format     # prettier --write over src
+npm run check      # all three — run after changes
 ```
 
-No tests, no linter. `@/*` maps to `src/*`. 2-space indent, LF (see `.editorconfig`).
+No tests. `@/*` maps to `src/*`. 2-space indent, LF (see `.editorconfig`).
 
-`typecheck` must stay `tsc -b --noEmit` — the root tsconfig is references-only, so a plain
-`tsc --noEmit` compiles nothing and passes no matter what is broken.
+`typecheck` points at `tsconfig.app.json` explicitly and must keep doing so — the root tsconfig
+is references-only, so a plain `tsc --noEmit` compiles nothing and passes no matter what is
+broken.
+
+Formatting is Prettier's job alone (`.prettierrc`: es5 trailing commas, no parens on single-arg
+arrows, semicolons). `eslint.config.ts` pulls in `eslint-config-prettier` to switch off every
+stylistic rule, so don't add formatting rules to ESLint — it lints correctness only
+(`js/recommended` + `typescript-eslint` recommended).
 
 The current branch is an active rewrite; README.md still describes things that don't exist (a Web
 Worker, per-cell kill/revive) and describes the genome as a linear program, which it hasn't been

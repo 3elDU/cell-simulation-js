@@ -21,7 +21,7 @@ export type Position = {
   y: number;
 };
 
-type TypedArray =
+export type TypedArray =
   | Uint8Array
   | Uint16Array
   | Uint32Array
@@ -85,7 +85,7 @@ export function gridMaybeGet<T extends TypedArray>(
   return gridGet(grid, position) ?? fallback;
 }
 
-type Neighbor<T> = { x: number; y: number; value: number | undefined };
+type Neighbor = { x: number; y: number; value: number | undefined };
 
 /**
  * Returns 8 neighboring cells relative to provided position.
@@ -128,14 +128,14 @@ export function gridGetNeighbors<T extends TypedArray>(
       value: gridGet(grid, { x: x2, y: y2 }),
     };
   }) as [
-    Neighbor<T>,
-    Neighbor<T>,
-    Neighbor<T>,
-    Neighbor<T>,
-    Neighbor<T>,
-    Neighbor<T>,
-    Neighbor<T>,
-    Neighbor<T>,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
+    Neighbor,
   ];
 }
 

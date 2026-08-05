@@ -27,4 +27,4 @@ if (!window.structuredClone) {
   );
 }
 
-const controller = new UIController(ctx);
+new UIController(ctx);

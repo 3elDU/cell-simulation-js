@@ -4,7 +4,7 @@ import type { System } from ".";
 import { BaseSystem } from "./base";
 import { setComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
-import { gridGet, gridGetNeighbors, gridMaybeGet, type Position } from "@/grid";
+import { gridGetNeighbors, gridMaybeGet, type Position } from "@/grid";
 
 export class TemperatureSystem extends BaseSystem implements System {
   id = "temperature";

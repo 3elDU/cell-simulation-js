@@ -1,5 +1,5 @@
 import type { Cell } from "@/cell";
-import type { GridLayer } from "@/grid";
+import type { GridLayer, TypedArray } from "@/grid";
 import type { Renderer } from "@/renderers";
 import { newWorld, type World } from "@/world";
 import { restoreProps, snapshotProps } from "./props";
@@ -52,7 +52,7 @@ export interface Snapshot {
   nextCellId: number;
 
   grid: GridLayer<Int32Array>;
-  layers: Record<string, GridLayer<any>>;
+  layers: Record<string, GridLayer<TypedArray>>;
   cells: Map<number, Cell>;
 
   systems: UnitSnapshot[];

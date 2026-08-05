@@ -1,5 +1,5 @@
 import type { Cell } from "./cell";
-import { gridEvery, type GridLayer } from "./grid";
+import { gridEvery, type GridLayer, type TypedArray } from "./grid";
 import { sortSystems, type System } from "./systems";
 import { systemRegistry } from "./systems/registry";
 
@@ -40,7 +40,7 @@ export interface World {
   /**
    * Layers allow storing arbitrary information associated with each tile
    */
-  layers: Record<string, GridLayer<any>>;
+  layers: Record<string, GridLayer<TypedArray>>;
 
   /**
    * Systems contain all behavior of the simulation
