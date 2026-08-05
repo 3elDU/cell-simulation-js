@@ -4,7 +4,7 @@ import type { System } from ".";
 import { BaseSystem } from "./base";
 import { setComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
-import { gridGet, gridMaybeGet, type Position } from "@/grid";
+import { gridGet, gridGetNeighbors, gridMaybeGet, type Position } from "@/grid";
 
 export class TemperatureSystem extends BaseSystem implements System {
   id = "temperature";
@@ -35,23 +35,9 @@ temperature.`;
 
   countNonEmptyNeighbors(world: World, base: Position) {
     // Returns the count of neighboring cells.
-
-    return [
-      [-1, -1],
-      [0, -1],
-      [1, -1],
-      [-1, 0],
-      [1, 0],
-      [-1, 1],
-      [0, 1],
-      [1, 1],
-    ]
-      .map(
-        ([dx, dy]) =>
-          gridGet(world.grid, { x: base.x + dx!, y: base.y + dy! }) ??
-          -1 !== -1,
-      )
-      .filter((exists) => exists === true).length;
+    return gridGetNeighbors(world.grid, base).filter(
+      (neighbor) => neighbor.value !== undefined,
+    ).length;
   }
 
   onCellTick(world: World, cell: Cell): void {

@@ -13,10 +13,8 @@ export class CellGenerator extends BaseSystem implements System, UIActionable {
 
   title = "Cell Generator";
   description = `Fills the map with randomly-generated
-cells
-
-Generates cells and automatically
-disables itself.`;
+cells`;
+  enabled = true;
 
   generationChance = 0.25;
   genomeMinLength = 2;
@@ -61,6 +59,7 @@ disables itself.`;
   onInit(world: World): void {
     this.world = world;
     this.generate();
+    this.enabled = false;
   }
 
   generate() {

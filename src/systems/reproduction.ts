@@ -4,22 +4,11 @@ import type { System } from ".";
 import { BaseSystem } from "./base";
 import { getComponent, setComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
-import { gridGet, type Position } from "@/grid";
+import { gridGetNeighbors, type Position } from "@/grid";
 import type { Gene } from "@/components/genome";
 import type { Sensors } from "@/components/sensors";
 import { actionRegistry } from "@/actions/registry";
 import { sensorsRegistry } from "@/sensors/registry";
-
-const NEIGHBORS: Position[] = [
-  { x: -1, y: -1 },
-  { x: 0, y: -1 },
-  { x: 1, y: -1 },
-  { x: -1, y: 0 },
-  { x: 1, y: 0 },
-  { x: -1, y: 1 },
-  { x: 0, y: 1 },
-  { x: 1, y: 1 },
-];
 
 /**
  * Splits cells that asked to, and mutates the copy of the genome the child
@@ -110,12 +99,30 @@ the child's genome.`;
     { prop: "mutationRate", label: "Mutation ×", min: 0, max: 4, step: 0.01 },
     { prop: "nudgeWeight", label: "Nudge weight", min: 0, max: 1, step: 0.01 },
     { prop: "nudgeAmount", label: "Nudge amount", min: 0, max: 1, step: 0.01 },
-    { prop: "duplicateGene", label: "Duplicate gene", min: 0, max: 1, step: 0.005 },
+    {
+      prop: "duplicateGene",
+      label: "Duplicate gene",
+      min: 0,
+      max: 1,
+      step: 0.005,
+    },
     { prop: "addGene", label: "Add gene", min: 0, max: 1, step: 0.005 },
     { prop: "deleteGene", label: "Delete gene", min: 0, max: 1, step: 0.005 },
-    { prop: "retargetAction", label: "Retarget action", min: 0, max: 1, step: 0.005 },
+    {
+      prop: "retargetAction",
+      label: "Retarget action",
+      min: 0,
+      max: 1,
+      step: 0.005,
+    },
     { prop: "addSensor", label: "Add sensor", min: 0, max: 1, step: 0.005 },
-    { prop: "removeSensor", label: "Remove sensor", min: 0, max: 1, step: 0.005 },
+    {
+      prop: "removeSensor",
+      label: "Remove sensor",
+      min: 0,
+      max: 1,
+      step: 0.005,
+    },
   ];
 
   /**
@@ -140,10 +147,7 @@ the child's genome.`;
   }
 
   private sensorIds(): (keyof Sensors)[] {
-    return Array.from(
-      sensorsRegistry.list(),
-      (def) => def.id as keyof Sensors,
-    );
+    return Array.from(sensorsRegistry.list(), (def) => def.id as keyof Sensors);
   }
 
   /**
@@ -211,16 +215,9 @@ the child's genome.`;
    * An empty neighboring tile, chosen at random, or nothing if boxed in.
    */
   freeNeighbor(world: World, position: Position): Position | undefined {
-    const free = NEIGHBORS.map((offset) => ({
-      x: position.x + offset.x,
-      y: position.y + offset.y,
-    })).filter(
-      (candidate) =>
-        candidate.x >= 0 &&
-        candidate.y >= 0 &&
-        candidate.x < world.width &&
-        candidate.y < world.height &&
-        gridGet(world.grid, candidate) === -1,
+    const free = gridGetNeighbors(world.grid, position).filter(
+      ({ x, y, value }) =>
+        x >= 0 && y >= 0 && x < world.width && y < world.height && value === -1,
     );
 
     return this.pick(free);
