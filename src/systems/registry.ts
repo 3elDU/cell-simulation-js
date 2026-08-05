@@ -13,6 +13,7 @@ import { EnergySystem } from "./energy";
 import { DeathSystem } from "./death";
 import { FeedingSystem } from "./feeding";
 import { ReproductionSystem } from "./reproduction";
+import { AgeSystem } from "./age";
 
 export const systemRegistry = new Registry<System>();
 
@@ -41,3 +42,4 @@ systemRegistry.register(d(EnergySystem));
 systemRegistry.register(d(DeathSystem));
 systemRegistry.register(d(FeedingSystem));
 systemRegistry.register(d(ReproductionSystem));
+systemRegistry.register(d(AgeSystem));

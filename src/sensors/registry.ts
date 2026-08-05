@@ -3,6 +3,7 @@ import type { Sensor } from ".";
 import { TemperatureSensor } from "./temperature";
 import { EnergySensor } from "./energy";
 import { LayerSensor, layerSensor } from "./layer";
+import { AgeSensor } from "./age";
 
 export const sensorsRegistry = new Registry<Sensor>();
 
@@ -22,6 +23,7 @@ sensorsRegistry.register(layerSensor("minerals", "Minerals"));
 sensorsRegistry.register(layerSensor("organics", "Organics"));
 sensorsRegistry.register(d(TemperatureSensor));
 sensorsRegistry.register(d(EnergySensor));
+sensorsRegistry.register(d(AgeSensor));
 
 export type SensorsMap = {
   light: LayerSensor;
@@ -29,4 +31,5 @@ export type SensorsMap = {
   organics: LayerSensor;
   temperature: TemperatureSensor;
   energy: EnergySensor;
+  age: AgeSensor;
 };
