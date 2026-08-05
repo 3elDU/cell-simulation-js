@@ -5,6 +5,24 @@ import Panzoom, { type PanzoomObject } from "@panzoom/panzoom";
 import { SystemsPane } from "./systems";
 import { RenderersPane } from "./renderers";
 import { SelectedCellController } from "./selected-cell";
+import { DishesPane, type NewDishParams } from "./dishes";
+import {
+  dishMeta,
+  loadSnapshot,
+  restoreRenderers,
+  saveDish,
+  snapshotWorld,
+  worldFromSnapshot,
+  type DishMeta,
+  type Snapshot,
+} from "@/persistence";
+
+/**
+ * Autosave fires only once *both* are satisfied, so a fast world isn't writing
+ * megabytes every few ticks and a slow one still gets saved eventually.
+ */
+const AUTOSAVE_INTERVAL_MS = 5000;
+const AUTOSAVE_INTERVAL_TICKS = 10;
 
 export class UIController {
   world: World | undefined;
@@ -13,11 +31,20 @@ export class UIController {
   buffer: CanvasRenderingContext2D | undefined;
   panzoom: PanzoomObject | undefined;
 
-  newWorldPane: Pane;
+  newWorldPane: DishesPane;
   worldPane: Pane | undefined;
   systemsPane: Pane | undefined;
   renderersPane: RenderersPane | undefined;
   selectedCell: SelectedCellController | undefined;
+
+  /**
+   * Identity of the dish currently open. Autosave writes back to this id, so
+   * a running world keeps overwriting its own record rather than littering the
+   * list with one entry per save.
+   */
+  dish: { id: string; name: string } | undefined;
+
+  saveState = { lastSavedAt: 0, lastSavedTick: 0, saving: false, status: "—" };
 
   /**
    * State of the continuous run loop, see {@link UIController.runLoop}.
@@ -34,38 +61,16 @@ export class UIController {
     this.ctx = ctx;
     this.world = undefined;
 
-    this.newWorldPane = this.buildNewWorldPane();
-  }
-
-  buildNewWorldPane(): Pane {
-    const pane = new Pane({
-      title: "New World",
-      container: elements.paneContainer,
-    });
-
-    const params = {
-      width: Math.floor(Math.random() * 184 + 72),
-      height: Math.floor(Math.random() * 184 + 72),
-    };
-
-    pane.addBinding(params, "width", {
-      step: 1,
-    });
-    pane.addBinding(params, "height", {
-      step: 1,
-    });
-
-    const btn = pane.addButton({
-      title: "New",
-    });
-    btn.on("click", () => this.newWorld(params));
-
-    return pane;
+    this.newWorldPane = new DishesPane(
+      elements.paneContainer,
+      (params) => this.newWorld(params),
+      (dish) => void this.openDish(dish),
+    );
   }
 
   buildWorldPane(): Pane {
     const pane = new Pane({
-      title: "World",
+      title: this.dish?.name ?? "World",
       container: elements.paneContainer,
     });
 
@@ -74,9 +79,12 @@ export class UIController {
       format: (v) => v.toString(),
     });
 
-    pane
-      .addButton({ title: "Clear" })
-      .on("click", () => this.newWorld(this.world!));
+    // Keeps the dish identity — clearing restarts this petri dish rather than
+    // opening a second one under the same name.
+    pane.addButton({ title: "Clear" }).on("click", () => {
+      const { width, height } = this.world!;
+      this.enterWorld(newWorld(width, height));
+    });
 
     pane
       .addButton({
@@ -105,7 +113,81 @@ export class UIController {
       format: (v) => v.toFixed(1),
     });
 
+    pane.addBinding(this.saveState, "status", {
+      label: "saved",
+      readonly: true,
+    });
+
+    pane.addButton({ title: "Save now" }).on("click", () => void this.save());
+
+    pane.addButton({ title: "Close" }).on("click", () => void this.close());
+
     return pane;
+  }
+
+  /**
+   * Writes the world, its systems and its renderers into the open dish.
+   *
+   * Guarded against overlap: the write is asynchronous and autosave keeps
+   * asking, so without this a slow disk would queue up saves of a world that
+   * has moved on since.
+   */
+  async save() {
+    if (!this.world || !this.dish || this.saveState.saving) return;
+
+    this.saveState.saving = true;
+
+    try {
+      const snapshot = snapshotWorld(
+        this.world,
+        this.renderersPane?.renderers ?? [],
+      );
+
+      await saveDish(
+        dishMeta(this.dish.id, this.dish.name, this.world),
+        snapshot,
+      );
+
+      this.saveState.lastSavedAt = performance.now();
+      this.saveState.lastSavedTick = this.world.tick;
+      this.saveState.status = new Date().toLocaleTimeString();
+    } catch (error) {
+      console.error("failed to save dish:", error);
+      this.saveState.status = "failed";
+    } finally {
+      this.saveState.saving = false;
+    }
+  }
+
+  /**
+   * Saves and tears down the current world, returning to the dish list.
+   */
+  async close() {
+    this.runParams.running = false;
+
+    await this.save();
+
+    this.disposePanes();
+
+    this.world = undefined;
+    this.dish = undefined;
+
+    elements.main.dataset.initialized = "false";
+    this.newWorldPane.hidden = false;
+    this.newWorldPane.rerollName();
+    await this.newWorldPane.refreshList();
+  }
+
+  async openDish(dish: DishMeta) {
+    const snapshot = await loadSnapshot(dish.id);
+
+    if (!snapshot) {
+      console.error("no snapshot stored for dish", dish.id);
+      return;
+    }
+
+    this.dish = { id: dish.id, name: dish.name };
+    this.enterWorld(worldFromSnapshot(snapshot), snapshot);
   }
 
   /**
@@ -123,6 +205,10 @@ export class UIController {
       const start = performance.now();
 
       await this.tick();
+
+      // Not awaited: a save takes as long as it takes, and blocking the loop
+      // on it would make the measured tps drop every five seconds.
+      if (this.shouldAutosave()) void this.save();
 
       // Recompute the budget every iteration so the slider takes effect mid-run
       const budget =
@@ -167,24 +253,54 @@ export class UIController {
     );
   }
 
-  newWorld(params: { width: number; height: number }) {
+  disposePanes() {
     this.worldPane?.dispose();
     this.systemsPane?.dispose();
     this.renderersPane?.dispose();
     this.selectedCell?.dispose();
 
-    this.world = newWorld(params.width, params.height);
+    this.worldPane = undefined;
+    this.systemsPane = undefined;
+    this.renderersPane = undefined;
+    this.selectedCell = undefined;
+  }
+
+  newWorld(params: NewDishParams) {
+    this.dish = { id: crypto.randomUUID(), name: params.name };
+
+    this.enterWorld(newWorld(params.width, params.height));
+  }
+
+  /**
+   * Swaps in a world and rebuilds every pane around it.
+   *
+   * Shared by "New" and "Open" so the two paths can't drift — a loaded world
+   * gets exactly the same panes, canvas and render as a fresh one, with the
+   * saved renderer state layered on afterwards.
+   */
+  enterWorld(world: World, snapshot?: Snapshot) {
+    this.disposePanes();
+
+    this.world = world;
     console.debug("world object:", this.world);
 
     // Initialize panes
     this.worldPane = this.buildWorldPane();
-    this.systemsPane = new SystemsPane(elements.paneContainer, this.world!);
+    this.systemsPane = new SystemsPane(elements.paneContainer, this.world);
     this.renderersPane = new RenderersPane(elements.paneContainer);
     this.selectedCell = new SelectedCellController(
       elements.paneContainer,
       elements.canvas,
-      this.world!,
+      this.world,
     );
+
+    // Renderers live outside the world, so they're restored here rather than
+    // in worldFromSnapshot — the instances only exist once the pane built them.
+    if (snapshot) {
+      restoreRenderers(this.renderersPane.renderers, snapshot);
+      this.renderersPane.refresh();
+    }
+
     this.configureCanvas();
 
     // This shows the canvas element
@@ -193,8 +309,30 @@ export class UIController {
     // Hide new world pane
     this.newWorldPane.hidden = true;
 
+    // A freshly opened dish counts as just-saved, so autosave doesn't fire on
+    // the very first tick after loading.
+    this.saveState.lastSavedAt = performance.now();
+    this.saveState.lastSavedTick = world.tick;
+    this.saveState.status = snapshot ? "loaded" : "—";
+
     // Render the scene right away
     this.render();
+
+    // Give a brand-new dish a record immediately, so it shows up in the list
+    // even if it's closed without ever being run.
+    if (!snapshot) void this.save();
+  }
+
+  /**
+   * Whether enough time *and* enough ticks have passed to warrant a save.
+   */
+  shouldAutosave(): boolean {
+    if (!this.world) return false;
+
+    return (
+      performance.now() - this.saveState.lastSavedAt >= AUTOSAVE_INTERVAL_MS &&
+      this.world.tick - this.saveState.lastSavedTick >= AUTOSAVE_INTERVAL_TICKS
+    );
   }
 
   /**
