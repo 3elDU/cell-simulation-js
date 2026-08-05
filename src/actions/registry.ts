@@ -65,7 +65,7 @@ harvest(
 actionRegistry.register({
   id: "reproduce",
   title: "Reproduce",
-  description: "Split into a free neighbouring tile",
+  description: "Split into a free neighboring tile",
   create: () => new ReproduceAction(),
 });
 

@@ -40,7 +40,7 @@ export class ReproductionSystem extends BaseSystem implements System {
   id = "reproduction";
   title = "Reproduction";
   description = `Splits cells into a free
-neighbouring tile and mutates
+neighboring tile and mutates
 the child's genome.`;
   enabled = true;
 
@@ -74,7 +74,7 @@ the child's genome.`;
   minGenes = 1;
 
   /**
-   * Scales every rate below. Lets overall mutation be dialled up or down
+   * Scales every rate below. Lets overall mutation be dialed up or down
    * mid-run without losing the balance between operators.
    */
   mutationRate = 0.5;
@@ -155,7 +155,7 @@ the child's genome.`;
     const actions = this.actionIds();
     const sensors = this.sensorIds();
 
-    let mutated = genome.map((gene) => {
+    const mutated = genome.map((gene) => {
       const copy: Gene = { ...gene, sensors: [...gene.sensors] };
 
       if (this.rolls(this.nudgeWeight)) {
@@ -197,7 +197,7 @@ the child's genome.`;
     ) {
       mutated.push({
         action: this.pick(actions)!,
-        // Near zero, so a brand-new gene barely shifts behaviour and gets a
+        // Near zero, so a brand-new gene barely shifts behavior and gets a
         // chance to drift before selection judges it.
         base: (Math.random() * 2 - 1) * 0.05,
         sensors: sensors.filter(() => Math.random() < 0.25),
@@ -208,7 +208,7 @@ the child's genome.`;
   }
 
   /**
-   * An empty neighbouring tile, chosen at random, or nothing if boxed in.
+   * An empty neighboring tile, chosen at random, or nothing if boxed in.
    */
   freeNeighbor(world: World, position: Position): Position | undefined {
     const free = NEIGHBORS.map((offset) => ({
@@ -231,7 +231,7 @@ the child's genome.`;
     if (!reproduction?.intent) return;
 
     // Intent lasts one tick, whether or not the birth happens — otherwise a
-    // boxed-in cell would split the instant a neighbour died, ticks later.
+    // boxed-in cell would split the instant a neighbor died, ticks later.
     reproduction.intent = false;
 
     // Marked for death earlier this tick. Letting it split would be a free

@@ -11,7 +11,7 @@ import type { EnergySystem } from "@/systems/energy";
  *
  * Scaled against the energy system's lethal threshold, like the energy sensor,
  * so what you see is what the cell feels. Draws nothing at all when that
- * system is off, rather than painting every cell the same colour and implying
+ * system is off, rather than painting every cell the same color and implying
  * they are all equally healthy.
  */
 export class EnergyRenderer implements Renderer {

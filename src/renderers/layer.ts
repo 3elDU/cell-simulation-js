@@ -62,7 +62,7 @@ chosen color.`;
   }
 
   /**
-   * Brightness is carried by alpha rather than by darkening the colour, so
+   * Brightness is carried by alpha rather than by darkening the color, so
    * several layers can be shown at once — an empty tile is transparent and
    * lets whatever is underneath through, instead of painting it black.
    */

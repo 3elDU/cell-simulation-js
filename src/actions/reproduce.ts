@@ -5,7 +5,7 @@ import { getComponent, setComponent } from "@/components";
 
 /**
  * Writes an intent to split. The reproduction system decides whether it can
- * actually happen — enough energy, a free neighbouring tile — and charges for
+ * actually happen — enough energy, a free neighboring tile — and charges for
  * it only if it does.
  *
  * The action's own {@link Action.cost} is what trying costs, charged by the
