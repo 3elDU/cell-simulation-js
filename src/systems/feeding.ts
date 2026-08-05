@@ -75,7 +75,7 @@ to harvest.`;
           min: 0,
           max: 1,
           step: 0.01,
-        },
+        }
       );
     }
 
@@ -91,8 +91,7 @@ to harvest.`;
     delete cell.components.harvest;
 
     const layer = world.layers[harvest.layer] as
-      | GridLayer<Float32Array>
-      | undefined;
+      GridLayer<Float32Array> | undefined;
     if (!layer) return;
 
     const energy = getComponent(cell, "energy");

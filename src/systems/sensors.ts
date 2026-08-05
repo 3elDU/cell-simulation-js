@@ -38,7 +38,7 @@ environment to cells`;
   sensors: Sensor[] = [];
 
   onInit(): void {
-    this.sensors = Array.from(sensorsRegistry.list(), (def) => def.create());
+    this.sensors = Array.from(sensorsRegistry.list(), def => def.create());
   }
 
   onCellTick(world: World, cell: Cell): void {

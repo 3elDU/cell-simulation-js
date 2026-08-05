@@ -65,8 +65,7 @@ organics layer.`;
 
   onTick(world: World): void {
     const organics = world.layers.organics as
-      | GridLayer<Float32Array>
-      | undefined;
+      GridLayer<Float32Array> | undefined;
 
     gridEvery(world.grid, (x, y, id) => {
       const cell = world.cells.get(id);
@@ -81,7 +80,7 @@ organics layer.`;
         const index = y * organics.width + x;
         organics.data[index] = Math.min(
           organics.data[index]! + (energy + this.bodyValue) * this.corpseYield,
-          LAYER_MAX,
+          LAYER_MAX
         );
       }
 

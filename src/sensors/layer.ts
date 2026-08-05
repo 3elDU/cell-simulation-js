@@ -41,7 +41,7 @@ export class LayerSensor implements Sensor {
  */
 export function layerSensor(
   layer: string,
-  title: string,
+  title: string
 ): Definition<LayerSensor> {
   return {
     id: layer,

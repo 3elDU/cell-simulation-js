@@ -27,7 +27,7 @@ type Components = {
  */
 export function getComponent<T extends keyof Components>(
   cell: Cell,
-  id: T,
+  id: T
 ): Components[T] | undefined {
   if ((id as string) in cell.components) {
     return cell.components[id] as Components[T];
@@ -41,7 +41,7 @@ export function getComponent<T extends keyof Components>(
 export function setComponent<T extends keyof Components>(
   cell: Cell,
   id: T,
-  component: Components[T],
+  component: Components[T]
 ) {
   cell.components[id] = component;
 }

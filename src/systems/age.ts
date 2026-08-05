@@ -46,7 +46,13 @@ it.`;
   config: ConfigSchema = [
     { prop: "safeAge", label: "Safe below", min: 0, step: 10 },
     { prop: "lethalAge", label: "Lethal at", min: 1, step: 10 },
-    { prop: "mortalityCurve", label: "Mortality curve", min: 0.1, max: 8, step: 0.1 },
+    {
+      prop: "mortalityCurve",
+      label: "Mortality curve",
+      min: 0.1,
+      max: 8,
+      step: 0.1,
+    },
   ];
 
   /**

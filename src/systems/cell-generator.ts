@@ -67,10 +67,10 @@ cells`;
 
     // Genomes are drawn from whatever is registered right now, so a new
     // action or sensor becomes evolvable without touching this system.
-    const actionIds = Array.from(actionRegistry.list(), (def) => def.id);
+    const actionIds = Array.from(actionRegistry.list(), def => def.id);
     const sensorIds = Array.from(
       sensorsRegistry.list(),
-      (def) => def.id as keyof Sensors,
+      def => def.id as keyof Sensors
     );
     if (actionIds.length === 0) return;
 
@@ -84,7 +84,7 @@ cells`;
 
         const genomeLength = Math.floor(
           Math.random() * (this.genomeMaxLength - this.genomeMinLength + 1) +
-            this.genomeMinLength,
+            this.genomeMinLength
         );
 
         setComponent(cell, "genome", {

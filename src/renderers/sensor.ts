@@ -48,7 +48,7 @@ export class SensorRenderer implements Renderer {
     title: string,
     sensor: string,
     low: RgbColor,
-    high: RgbColor,
+    high: RgbColor
   ) {
     this.id = id;
     this.title = title;
@@ -98,7 +98,7 @@ export function sensorRenderer(
   sensor: string,
   title: string,
   low: RgbColor,
-  high: RgbColor,
+  high: RgbColor
 ): Definition<Renderer> {
   const id = `sensor-${sensor}`;
 

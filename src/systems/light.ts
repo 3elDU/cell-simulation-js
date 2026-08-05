@@ -117,7 +117,8 @@ regrows toward a gradient.`;
         // ceiling. Otherwise a dim tile refills as fast as a bright one and
         // position stops mattering the moment anything grazes it — which
         // would make the whole light gradient decorative.
-        const rate = this.regrowRate * (this.maxLight > 0 ? max / this.maxLight : 0);
+        const rate =
+          this.regrowRate * (this.maxLight > 0 ? max / this.maxLight : 0);
 
         // Signed, so the layer also comes *down* when maxLight is dragged
         // lower mid-run rather than staying stuck above the new gradient.

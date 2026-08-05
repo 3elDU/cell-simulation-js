@@ -96,7 +96,7 @@ chosen color.`;
 export function layerRenderer(
   layer: string,
   title: string,
-  color: RgbColor,
+  color: RgbColor
 ): Definition<Renderer> {
   const id = `layer-${layer}`;
 

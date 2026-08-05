@@ -56,7 +56,7 @@ export interface GridLayer<T extends TypedArray> {
 export function gridSet<T extends TypedArray>(
   grid: GridLayer<T>,
   position: Position,
-  value: number,
+  value: number
 ) {
   grid.data[position.y * grid.width + position.x] = value;
 }
@@ -66,7 +66,7 @@ export function gridSet<T extends TypedArray>(
  */
 export function gridGet<T extends TypedArray>(
   grid: GridLayer<T>,
-  position: Position,
+  position: Position
 ): number | undefined {
   return grid.data[position.y * grid.width + position.x];
 }
@@ -78,7 +78,7 @@ export function gridGet<T extends TypedArray>(
 export function gridMaybeGet<T extends TypedArray>(
   grid: GridLayer<T> | undefined,
   position: Position,
-  fallback: number = 0,
+  fallback: number = 0
 ): number {
   if (!grid) return fallback;
 
@@ -105,7 +105,7 @@ type Neighbor<T> = { x: number; y: number; value: number | undefined };
  */
 export function gridGetNeighbors<T extends TypedArray>(
   grid: GridLayer<T>,
-  position: Position,
+  position: Position
 ) {
   const neighbors = [
     { x: -1, y: -1 },
@@ -144,7 +144,7 @@ export function gridGetNeighbors<T extends TypedArray>(
  */
 export function gridEvery<T extends TypedArray>(
   grid: GridLayer<T>,
-  callback: (x: number, y: number, value: number) => void,
+  callback: (x: number, y: number, value: number) => void
 ) {
   for (let x = 0; x < grid.width; x++) {
     for (let y = 0; y < grid.height; y++) {

@@ -63,8 +63,8 @@ export class UIController {
 
     this.newWorldPane = new DishesPane(
       elements.paneContainer,
-      (params) => this.newWorld(params),
-      (dish) => void this.openDish(dish),
+      params => this.newWorld(params),
+      dish => void this.openDish(dish)
     );
   }
 
@@ -76,7 +76,7 @@ export class UIController {
 
     pane.addBinding(this.world!, "tick", {
       readonly: true,
-      format: (v) => v.toString(),
+      format: v => v.toString(),
     });
 
     // Keeps the dish identity — clearing restarts this petri dish rather than
@@ -110,7 +110,7 @@ export class UIController {
     pane.addBinding(this.runParams, "tps", {
       label: "tps",
       readonly: true,
-      format: (v) => v.toFixed(1),
+      format: v => v.toFixed(1),
     });
 
     pane.addBinding(this.saveState, "status", {
@@ -140,12 +140,12 @@ export class UIController {
     try {
       const snapshot = snapshotWorld(
         this.world,
-        this.renderersPane?.renderers ?? [],
+        this.renderersPane?.renderers ?? []
       );
 
       await saveDish(
         dishMeta(this.dish.id, this.dish.name, this.world),
-        snapshot,
+        snapshot
       );
 
       this.saveState.lastSavedAt = performance.now();
@@ -223,8 +223,8 @@ export class UIController {
         ticksSince = 0;
       }
 
-      await new Promise((resolve) =>
-        setTimeout(resolve, Math.max(0, budget - elapsed)),
+      await new Promise(resolve =>
+        setTimeout(resolve, Math.max(0, budget - elapsed))
       );
     }
 
@@ -249,7 +249,7 @@ export class UIController {
 
     elements.canvas.parentElement!.addEventListener(
       "wheel",
-      this.panzoom.zoomWithWheel,
+      this.panzoom.zoomWithWheel
     );
   }
 
@@ -291,7 +291,7 @@ export class UIController {
     this.selectedCell = new SelectedCellController(
       elements.paneContainer,
       elements.canvas,
-      this.world,
+      this.world
     );
 
     // Renderers live outside the world, so they're restored here rather than

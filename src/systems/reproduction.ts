@@ -143,11 +143,11 @@ the child's genome.`;
    * handing out ids for actions that no longer exist.
    */
   private actionIds(): string[] {
-    return Array.from(actionRegistry.list(), (def) => def.id);
+    return Array.from(actionRegistry.list(), def => def.id);
   }
 
   private sensorIds(): (keyof Sensors)[] {
-    return Array.from(sensorsRegistry.list(), (def) => def.id as keyof Sensors);
+    return Array.from(sensorsRegistry.list(), def => def.id as keyof Sensors);
   }
 
   /**
@@ -159,7 +159,7 @@ the child's genome.`;
     const actions = this.actionIds();
     const sensors = this.sensorIds();
 
-    const mutated = genome.map((gene) => {
+    const mutated = genome.map(gene => {
       const copy: Gene = { ...gene, sensors: [...gene.sensors] };
 
       if (this.rolls(this.nudgeWeight)) {
@@ -171,7 +171,7 @@ the child's genome.`;
       }
 
       if (this.rolls(this.addSensor)) {
-        const missing = sensors.filter((id) => !copy.sensors.includes(id));
+        const missing = sensors.filter(id => !copy.sensors.includes(id));
         const added = this.pick(missing);
         if (added) copy.sensors.push(added);
       }
@@ -217,7 +217,7 @@ the child's genome.`;
   freeNeighbor(world: World, position: Position): Position | undefined {
     const free = gridGetNeighbors(world.grid, position).filter(
       ({ x, y, value }) =>
-        x >= 0 && y >= 0 && x < world.width && y < world.height && value === -1,
+        x >= 0 && y >= 0 && x < world.width && y < world.height && !value
     );
 
     return this.pick(free);

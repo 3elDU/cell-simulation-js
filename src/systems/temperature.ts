@@ -36,7 +36,7 @@ temperature.`;
   countNonEmptyNeighbors(world: World, base: Position) {
     // Returns the count of neighboring cells.
     return gridGetNeighbors(world.grid, base).filter(
-      (neighbor) => neighbor.value !== undefined,
+      neighbor => neighbor.value !== undefined
     ).length;
   }
 

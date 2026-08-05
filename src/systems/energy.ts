@@ -78,7 +78,13 @@ hoard too much and it bursts.`;
     { prop: "upkeep", label: "Upkeep / tick", min: 0, step: 0.05 },
     { prop: "safeEnergy", label: "Safe below", min: 0, step: 1 },
     { prop: "lethalEnergy", label: "Lethal at", min: 1, step: 1 },
-    { prop: "overloadCurve", label: "Overload curve", min: 0.1, max: 8, step: 0.1 },
+    {
+      prop: "overloadCurve",
+      label: "Overload curve",
+      min: 0.1,
+      max: 8,
+      step: 0.1,
+    },
     { prop: "defaultCost", label: "Default cost", min: 0, step: 0.05 },
   ];
 

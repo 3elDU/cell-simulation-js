@@ -15,10 +15,7 @@ import type { ConfigSchema, UIAction, UIActionable } from "@/ui";
  * With `toMinerals` at 0 the loop is open instead and energy simply leaves the
  * world, which is a legitimate world to run — hence a knob and not a constant.
  */
-export class OrganicsSystem
-  extends BaseSystem
-  implements System, UIActionable
-{
+export class OrganicsSystem extends BaseSystem implements System, UIActionable {
   id = "organics";
   title = "Organics";
   description = `Decays the organics layer,
@@ -100,13 +97,11 @@ Fed by dead cells.`;
 
   onTick(world: World): void {
     const organics = world.layers.organics as
-      | GridLayer<Float32Array>
-      | undefined;
+      GridLayer<Float32Array> | undefined;
     if (!organics) return;
 
     const minerals = world.layers.minerals as
-      | GridLayer<Float32Array>
-      | undefined;
+      GridLayer<Float32Array> | undefined;
 
     for (let i = 0; i < organics.data.length; i++) {
       const value = organics.data[i]!;
@@ -121,7 +116,7 @@ Fed by dead cells.`;
       if (minerals) {
         minerals.data[i] = Math.min(
           minerals.data[i]! + rotted * this.toMinerals,
-          LAYER_MAX,
+          LAYER_MAX
         );
       }
     }

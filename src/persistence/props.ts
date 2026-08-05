@@ -52,14 +52,14 @@ function isPlainData(value: unknown, depth = 0): boolean {
   }
 
   if (Array.isArray(value)) {
-    return value.every((item) => isPlainData(item, depth + 1));
+    return value.every(item => isPlainData(item, depth + 1));
   }
 
   const proto = Object.getPrototypeOf(value);
   if (proto !== Object.prototype && proto !== null) return false;
 
-  return Object.values(value as object).every((item) =>
-    isPlainData(item, depth + 1),
+  return Object.values(value as object).every(item =>
+    isPlainData(item, depth + 1)
   );
 }
 

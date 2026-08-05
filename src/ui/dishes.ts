@@ -1,6 +1,11 @@
 import { Pane } from "tweakpane";
 import type { FolderApi } from "tweakpane";
-import { deleteDish, listDishes, randomDishName, type DishMeta } from "@/persistence";
+import {
+  deleteDish,
+  listDishes,
+  randomDishName,
+  type DishMeta,
+} from "@/persistence";
 
 export interface NewDishParams {
   name: string;
@@ -24,7 +29,7 @@ export class DishesPane extends Pane {
   constructor(
     container: HTMLElement,
     private onNew: (params: NewDishParams) => void,
-    private onOpen: (dish: DishMeta) => void,
+    private onOpen: (dish: DishMeta) => void
   ) {
     super({ title: "Petri Dishes", container });
 
@@ -38,7 +43,7 @@ export class DishesPane extends Pane {
     this.addBinding(this.params, "height", { step: 1 });
 
     this.addButton({ title: "New" }).on("click", () =>
-      this.onNew({ ...this.params }),
+      this.onNew({ ...this.params })
     );
 
     void this.refreshList();
@@ -83,12 +88,10 @@ export class DishesPane extends Pane {
           ].join("\n"),
         },
         "info",
-        { readonly: true, label: undefined, multiline: true, rows: 4 },
+        { readonly: true, label: undefined, multiline: true, rows: 4 }
       );
 
-      folder
-        .addButton({ title: "Open" })
-        .on("click", () => this.onOpen(dish));
+      folder.addButton({ title: "Open" }).on("click", () => this.onOpen(dish));
 
       folder.addButton({ title: "Delete" }).on("click", async () => {
         await deleteDish(dish.id);

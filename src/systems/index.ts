@@ -61,9 +61,7 @@ export function sortSystems(systems: System[]) {
 
     // Find the greatest index of a dependency, and place this system after it.
     const newIdx = Math.max(
-      ...(system.after?.map((id) => arr.findIndex((sys) => sys.id === id)) ?? [
-        idx,
-      ])
+      ...(system.after?.map(id => arr.findIndex(sys => sys.id === id)) ?? [idx])
     );
 
     // Insert system after the dependency with greatest index

@@ -57,9 +57,9 @@ export interface World {
  */
 export function getEnabledSystem<T extends System>(
   world: World,
-  id: string,
+  id: string
 ): T | undefined {
-  const system = world.systems.find((system) => system.id === id);
+  const system = world.systems.find(system => system.id === id);
 
   return system?.enabled ? (system as T) : undefined;
 }
@@ -129,7 +129,7 @@ export function doTick(world: World) {
   // Clear internal components
   gridEvery(
     world.grid,
-    (_x, _y, id) => delete world.cells.get(id)!.components.internal,
+    (_x, _y, id) => delete world.cells.get(id)!.components.internal
   );
 
   world.tick++;

@@ -28,10 +28,7 @@ interface Vent {
  * down rather than a flow they sip — a patch stays worth living on for a while
  * after its vent shuts off, and stops being worth it eventually.
  */
-export class MineralsSystem
-  extends BaseSystem
-  implements System, UIActionable
-{
+export class MineralsSystem extends BaseSystem implements System, UIActionable {
   id = "minerals";
   title = "Minerals";
   description = `Fills the minerals layer from
@@ -115,7 +112,10 @@ pulse on and off.`;
 
     const vary = (base: number) =>
       this.timing === "jittered"
-        ? Math.max(1, Math.round(base * (1 + (Math.random() * 2 - 1) * this.jitter)))
+        ? Math.max(
+            1,
+            Math.round(base * (1 + (Math.random() * 2 - 1) * this.jitter))
+          )
         : base;
 
     this.vents = Array.from({ length: this.ventCount }, () => {
@@ -139,8 +139,7 @@ pulse on and off.`;
 
   clearLayer() {
     const layer = this.world?.layers.minerals as
-      | GridLayer<Float32Array>
-      | undefined;
+      GridLayer<Float32Array> | undefined;
 
     layer?.data.fill(0);
   }

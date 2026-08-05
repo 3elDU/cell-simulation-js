@@ -72,12 +72,12 @@ export function snapshotWorld(world: World, renderers: Renderer[]): Snapshot {
     layers: world.layers,
     cells: world.cells,
 
-    systems: world.systems.map((system) => ({
+    systems: world.systems.map(system => ({
       id: system.id,
       enabled: system.enabled,
       props: snapshotProps(system),
     })),
-    renderers: renderers.map((renderer) => ({
+    renderers: renderers.map(renderer => ({
       id: renderer.id,
       enabled: renderer.enabled,
       props: snapshotProps(renderer),
@@ -120,7 +120,7 @@ export function worldFromSnapshot(snapshot: Snapshot): World {
   world.cells = snapshot.cells;
 
   for (const saved of snapshot.systems) {
-    const system = world.systems.find((system) => system.id === saved.id);
+    const system = world.systems.find(system => system.id === saved.id);
     // A system present in the save but gone from the registry is simply
     // dropped, the same way a genome's gene for a missing action goes inert.
     if (!system) continue;
@@ -136,12 +136,9 @@ export function worldFromSnapshot(snapshot: Snapshot): World {
  * Applies saved renderer state onto instances the renderers pane already
  * created. Renderers aren't owned by the world, so they're restored separately.
  */
-export function restoreRenderers(
-  renderers: Renderer[],
-  snapshot: Snapshot,
-) {
+export function restoreRenderers(renderers: Renderer[], snapshot: Snapshot) {
   for (const saved of snapshot.renderers) {
-    const renderer = renderers.find((renderer) => renderer.id === saved.id);
+    const renderer = renderers.find(renderer => renderer.id === saved.id);
     if (!renderer) continue;
 
     renderer.enabled = saved.enabled;

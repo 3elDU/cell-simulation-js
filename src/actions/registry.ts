@@ -35,7 +35,7 @@ const harvest = (
   description: string,
   layer: string,
   rate: number,
-  cost: number,
+  cost: number
 ) =>
   actionRegistry.register({
     id,
@@ -50,7 +50,7 @@ harvest(
   "Draw energy from the light layer",
   "light",
   2,
-  0.1,
+  0.1
 );
 
 harvest(
@@ -59,7 +59,7 @@ harvest(
   "Draw energy from the minerals layer",
   "minerals",
   2,
-  0.1,
+  0.1
 );
 
 actionRegistry.register({

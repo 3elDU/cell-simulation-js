@@ -76,7 +76,7 @@ action`;
         // inhibit as well as excite, and so listening to more sensors raises
         // sensitivity without inflating the gene's baseline score.
         // A missing reading lands on exactly 0 — no influence either way.
-        .map((id) => (sensors[id] ?? 0.5) - 0.5)
+        .map(id => (sensors[id] ?? 0.5) - 0.5)
         // Seeded with 0 — a gene listening to no sensors is legal, and an
         // unseeded reduce throws on an empty array.
         .reduce((prev, cur) => prev + cur, 0)
@@ -120,13 +120,13 @@ action`;
    */
   chooseAction(scores: Map<string, number>): string | undefined {
     const candidates = Array.from(scores).filter(
-      ([, score]) => score >= this.threshold,
+      ([, score]) => score >= this.threshold
     );
     if (candidates.length === 0) return undefined;
 
     if (this.selection === "argmax") {
       return candidates.reduce((best, current) =>
-        current[1] > best[1] ? current : best,
+        current[1] > best[1] ? current : best
       )[0];
     }
 
@@ -134,7 +134,7 @@ action`;
     // scores from overflowing; it cancels out in the ratio.
     const max = Math.max(...candidates.map(([, score]) => score));
     const weights = candidates.map(([, score]) =>
-      Math.exp((score - max) * this.gain),
+      Math.exp((score - max) * this.gain)
     );
     const total = weights.reduce((sum, weight) => sum + weight, 0);
 
