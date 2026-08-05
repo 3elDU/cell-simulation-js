@@ -43,10 +43,25 @@ organics layer.`;
    */
   corpseYield = 1;
 
+  /**
+   * How many corpses stay in `world.cells` for inspection.
+   *
+   * Dead cells are kept so you can still ask what killed them, but once cells
+   * reproduce that is an unbounded pile of genomes nothing will ever read
+   * again. The oldest are dropped past this point.
+   */
+  keepCorpses = 500;
+
   config: ConfigSchema = [
     { prop: "bodyValue", label: "Body value", min: 0, step: 1 },
     { prop: "corpseYield", label: "Corpse yield", min: 0, max: 1, step: 0.01 },
+    { prop: "keepCorpses", label: "Keep corpses", min: 0, step: 10 },
   ];
+
+  /**
+   * Ids of cleared corpses in the order they died, oldest first.
+   */
+  corpses: number[] = [];
 
   onTick(world: World): void {
     const organics = world.layers.organics as
@@ -74,6 +89,12 @@ organics layer.`;
 
       // Off the grid now, so doTick's end-of-tick sweep will never reach it.
       delete cell.components.internal;
+
+      this.corpses.push(id);
     });
+
+    while (this.corpses.length > this.keepCorpses) {
+      world.cells.delete(this.corpses.shift()!);
+    }
   }
 }

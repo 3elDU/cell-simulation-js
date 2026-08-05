@@ -29,6 +29,15 @@ export interface World {
   cells: Map<number, Cell>;
 
   /**
+   * Id handed to the next cell created.
+   *
+   * A counter rather than `cells.size`, because corpses get pruned once there
+   * are enough of them — with reproduction running, deriving an id from the
+   * map size would start handing out ids that are already taken.
+   */
+  nextCellId: number;
+
+  /**
    * Layers allow storing arbitrary information associated with each tile
    */
   layers: Record<string, GridLayer<any>>;
@@ -69,6 +78,7 @@ export function newWorld(width: number, height: number): World {
       data: new Int32Array(width * height).fill(-1),
     },
     cells: new Map(),
+    nextCellId: 1,
     layers: {},
     systems: [],
   };

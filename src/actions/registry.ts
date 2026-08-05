@@ -4,6 +4,7 @@ import { MoveAction } from "./move";
 import { IdleAction } from "./idle";
 import { DieAction } from "./die";
 import { HarvestAction } from "./harvest";
+import { ReproduceAction } from "./reproduce";
 import type { MovementDirection } from "@/components/movement";
 
 export const actionRegistry = new Registry<Action>();
@@ -60,6 +61,13 @@ harvest(
   2,
   0.1,
 );
+
+actionRegistry.register({
+  id: "reproduce",
+  title: "Reproduce",
+  description: "Split into a free neighbouring tile",
+  create: () => new ReproduceAction(),
+});
 
 actionRegistry.register({
   id: "die",

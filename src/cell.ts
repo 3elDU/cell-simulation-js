@@ -22,7 +22,7 @@ export function addCell(world: World, x: number, y: number): Cell {
     components: {},
   };
 
-  const id = world.cells.size + 1;
+  const id = world.nextCellId++;
   world.cells.set(id, cell);
   cell.id = id;
 
