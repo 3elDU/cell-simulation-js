@@ -11,13 +11,17 @@ interface Vent {
   y: number;
 
   /**
-   * Tick offset into this vent's own cycle. Zero for every vent in
-   * synchronized mode.
+   * Where this vent starts in its own cycle, as a fraction of one. Zero for
+   * every vent in synchronized mode.
+   *
+   * A fraction rather than a tick count, so a vent keeps its place in the
+   * cycle when the configured durations change under it.
    */
   phase: number;
 
-  active: number;
-  cooldown: number;
+  /** Multipliers on the configured durations. One when not jittered. */
+  activeScale: number;
+  cooldownScale: number;
 }
 
 /**
@@ -52,7 +56,7 @@ pulse on and off.`;
 
   /**
    * How far per-vent durations may stray from the values above, as a fraction.
-   * Only used in "jittered" mode.
+   * Only used in "jittered" mode, and only drawn at spawn.
    */
   jitter = 0.5;
 
@@ -79,8 +83,8 @@ pulse on and off.`;
   actions: UIAction[] = [
     {
       title: "Respawn vents",
-      // Vent placement and timing are drawn once at init, so the knobs above
-      // only take effect on a respawn.
+      // Placement, phase and jitter are drawn once, so those knobs only take
+      // effect on a respawn. The durations apply live.
       callback: () => this.spawnVents(),
     },
     {
@@ -110,31 +114,20 @@ pulse on and off.`;
     const world = this.world;
     if (!world) return;
 
-    const vary = (base: number) =>
+    const vary = () =>
       this.timing === "jittered"
-        ? Math.max(
-            1,
-            Math.round(base * (1 + (Math.random() * 2 - 1) * this.jitter))
-          )
-        : base;
+        ? Math.max(0.01, 1 + (Math.random() * 2 - 1) * this.jitter)
+        : 1;
 
-    this.vents = Array.from({ length: this.ventCount }, () => {
-      const active = vary(this.activeTicks);
-      const cooldown = vary(this.cooldownTicks);
-
-      return {
-        x: Math.floor(Math.random() * world.width),
-        y: Math.floor(Math.random() * world.height),
-        // Without an offset every vent would erupt on the same tick even in
-        // "independent" mode, since they all read the same world clock.
-        phase:
-          this.timing === "synchronized"
-            ? 0
-            : Math.floor(Math.random() * (active + cooldown)),
-        active,
-        cooldown,
-      };
-    });
+    this.vents = Array.from({ length: this.ventCount }, () => ({
+      x: Math.floor(Math.random() * world.width),
+      y: Math.floor(Math.random() * world.height),
+      // Without an offset every vent would erupt on the same tick even in
+      // "independent" mode, since they all read the same world clock.
+      phase: this.timing === "synchronized" ? 0 : Math.random(),
+      activeScale: vary(),
+      cooldownScale: vary(),
+    }));
   }
 
   clearLayer() {
@@ -144,8 +137,27 @@ pulse on and off.`;
     layer?.data.fill(0);
   }
 
+  /**
+   * One vent's cycle in ticks, read from the live config every call so moving
+   * the duration sliders retimes vents that already exist.
+   */
+  cycle(vent: Vent): { active: number; period: number } {
+    // A vent restored from a save written before the scales existed has none.
+    const ticks = (base: number, scale: number) =>
+      Math.max(1, Math.round(base * (scale || 1)));
+
+    const active = ticks(this.activeTicks, vent.activeScale);
+
+    return {
+      active,
+      period: active + ticks(this.cooldownTicks, vent.cooldownScale),
+    };
+  }
+
   isErupting(vent: Vent, tick: number): boolean {
-    return (tick + vent.phase) % (vent.active + vent.cooldown) < vent.active;
+    const { active, period } = this.cycle(vent);
+
+    return (tick + Math.round(vent.phase * period)) % period < active;
   }
 
   /**
