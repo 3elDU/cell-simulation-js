@@ -5,6 +5,7 @@ import Panzoom, { type PanzoomObject } from "@panzoom/panzoom";
 import { SystemsPane } from "./systems";
 import { RenderersPane } from "./renderers";
 import { SelectedCellController } from "./selected-cell";
+import { MetricsPane } from "./metrics";
 import { DishesPane, type NewDishParams } from "./dishes";
 import {
   dishMeta,
@@ -35,6 +36,7 @@ export class UIController {
   worldPane: Pane | undefined;
   systemsPane: Pane | undefined;
   renderersPane: RenderersPane | undefined;
+  metricsPane: MetricsPane | undefined;
   selectedCell: SelectedCellController | undefined;
 
   /**
@@ -251,11 +253,13 @@ export class UIController {
     this.worldPane?.dispose();
     this.systemsPane?.dispose();
     this.renderersPane?.dispose();
+    this.metricsPane?.dispose();
     this.selectedCell?.dispose();
 
     this.worldPane = undefined;
     this.systemsPane = undefined;
     this.renderersPane = undefined;
+    this.metricsPane = undefined;
     this.selectedCell = undefined;
   }
 
@@ -281,6 +285,7 @@ export class UIController {
     this.worldPane = this.buildWorldPane();
     this.systemsPane = new SystemsPane(elements.paneContainer, this.world);
     this.renderersPane = new RenderersPane(elements.paneContainer);
+    this.metricsPane = new MetricsPane(elements.paneContainer, this.world);
     this.selectedCell = new SelectedCellController(
       elements.paneContainer,
       elements.canvas,
@@ -374,6 +379,7 @@ export class UIController {
       this.worldPane!.refresh();
       this.systemsPane!.refresh();
       this.renderersPane!.refresh();
+      this.metricsPane!.sample();
       this.selectedCell!.refresh();
     } finally {
       this.ticking = false;
