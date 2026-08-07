@@ -158,6 +158,9 @@ action`;
     genome.lastAction = chosen;
 
     if (chosen) {
+      const counts = (genome.counts ??= {});
+      counts[chosen] = (counts[chosen] ?? 0) + 1;
+
       this.actions.get(chosen)!.perform(world, cell);
     }
   }

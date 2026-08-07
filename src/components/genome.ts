@@ -48,4 +48,13 @@ export interface Genome {
    */
   lastAction?: string;
   scores?: Record<string, number>;
+
+  /**
+   * How many times each action was picked over this cell's life, so what it
+   * spent that life doing can be read off it long after the fact.
+   *
+   * Not inherited: a child starts with an empty record, since these count what
+   * happened rather than what the genome says should.
+   */
+  counts?: Record<string, number>;
 }
