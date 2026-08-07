@@ -1,6 +1,5 @@
 import type { Cell } from "@/cell";
 import type { GridLayer, TypedArray } from "@/grid";
-import type { Renderer } from "@/renderers";
 import { newWorld, type World } from "@/world";
 import { restoreProps, snapshotProps } from "./props";
 
@@ -30,10 +29,57 @@ export interface DishMeta {
   cells: number;
 }
 
-interface UnitSnapshot {
+/** Anything the registries hand out: an id, a switch and some knobs. */
+interface Unit {
   id: string;
   enabled: boolean;
+}
+
+interface UnitSnapshot extends Unit {
   props: Record<string, unknown>;
+}
+
+/**
+ * Settings that belong to the panes rather than to the world, so that
+ * reopening a dish resumes at the speed and sampling resolution it was left
+ * at.
+ */
+export interface UISnapshot {
+  maxTps: number;
+  sampleEvery: number;
+
+  /** Raw value each graph tops out at, keyed by metric id. */
+  ceiling: Record<string, number>;
+}
+
+/**
+ * The parts of a session that outlive the world object: instances the panes
+ * own, and the panes' own settings.
+ */
+export interface Session {
+  renderers: Unit[];
+  metrics: Unit[];
+  ui: UISnapshot;
+}
+
+function unitSnapshot(unit: Unit): UnitSnapshot {
+  return { id: unit.id, enabled: unit.enabled, props: snapshotProps(unit) };
+}
+
+/**
+ * Applies saved state onto instances matched by id.
+ *
+ * A unit present in the save but gone from the registry is simply dropped,
+ * the same way a genome's gene for a missing action goes inert.
+ */
+export function restoreUnits(units: Unit[], saved: UnitSnapshot[] = []) {
+  for (const state of saved) {
+    const unit = units.find(unit => unit.id === state.id);
+    if (!unit) continue;
+
+    unit.enabled = state.enabled;
+    restoreProps(unit, state.props);
+  }
 }
 
 /**
@@ -57,9 +103,13 @@ export interface Snapshot {
 
   systems: UnitSnapshot[];
   renderers: UnitSnapshot[];
+
+  /** Absent in dishes saved before metrics existed. */
+  metrics?: UnitSnapshot[];
+  ui?: UISnapshot;
 }
 
-export function snapshotWorld(world: World, renderers: Renderer[]): Snapshot {
+export function snapshotWorld(world: World, session: Session): Snapshot {
   return {
     version: SNAPSHOT_VERSION,
 
@@ -72,16 +122,10 @@ export function snapshotWorld(world: World, renderers: Renderer[]): Snapshot {
     layers: world.layers,
     cells: world.cells,
 
-    systems: world.systems.map(system => ({
-      id: system.id,
-      enabled: system.enabled,
-      props: snapshotProps(system),
-    })),
-    renderers: renderers.map(renderer => ({
-      id: renderer.id,
-      enabled: renderer.enabled,
-      props: snapshotProps(renderer),
-    })),
+    systems: world.systems.map(unitSnapshot),
+    renderers: session.renderers.map(unitSnapshot),
+    metrics: session.metrics.map(unitSnapshot),
+    ui: { ...session.ui, ceiling: { ...session.ui.ceiling } },
   };
 }
 
@@ -113,29 +157,7 @@ export function worldFromSnapshot(snapshot: Snapshot): World {
   world.layers = snapshot.layers;
   world.cells = snapshot.cells;
 
-  for (const saved of snapshot.systems) {
-    const system = world.systems.find(system => system.id === saved.id);
-    // A system present in the save but gone from the registry is simply
-    // dropped, the same way a genome's gene for a missing action goes inert.
-    if (!system) continue;
-
-    system.enabled = saved.enabled;
-    restoreProps(system, saved.props);
-  }
+  restoreUnits(world.systems, snapshot.systems);
 
   return world;
-}
-
-/**
- * Applies saved renderer state onto instances the renderers pane already
- * created. Renderers aren't owned by the world, so they're restored separately.
- */
-export function restoreRenderers(renderers: Renderer[], snapshot: Snapshot) {
-  for (const saved of snapshot.renderers) {
-    const renderer = renderers.find(renderer => renderer.id === saved.id);
-    if (!renderer) continue;
-
-    renderer.enabled = saved.enabled;
-    restoreProps(renderer, saved.props);
-  }
 }

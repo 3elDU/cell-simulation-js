@@ -10,11 +10,12 @@ import { DishesPane, type NewDishParams } from "./dishes";
 import {
   dishMeta,
   loadSnapshot,
-  restoreRenderers,
+  restoreUnits,
   saveDish,
   snapshotWorld,
   worldFromSnapshot,
   type DishMeta,
+  type Session,
   type Snapshot,
 } from "@/persistence";
 
@@ -128,6 +129,33 @@ export class UIController {
   }
 
   /**
+   * The pane-owned half of what a dish is worth saving: instances the
+   * registries handed out, plus the settings that aren't the world's.
+   */
+  private session(): Session {
+    return {
+      renderers: this.renderersPane?.renderers ?? [],
+      metrics: this.metricsPane?.metrics ?? [],
+      ui: {
+        maxTps: this.runParams.maxTps,
+        sampleEvery: this.metricsPane?.params.sampleEvery ?? 1,
+        ceiling: this.metricsPane?.ceiling ?? {},
+      },
+    };
+  }
+
+  private restoreSession(snapshot: Snapshot) {
+    restoreUnits(this.renderersPane!.renderers, snapshot.renderers);
+    this.renderersPane!.refresh();
+
+    restoreUnits(this.metricsPane!.metrics, snapshot.metrics);
+    this.metricsPane!.restore(snapshot.ui);
+
+    if (snapshot.ui) this.runParams.maxTps = snapshot.ui.maxTps;
+    this.worldPane!.refresh();
+  }
+
+  /**
    * Writes the world, its systems and its renderers into the open dish.
    *
    * Guarded against overlap — a slow save shouldn't queue up behind autosave
@@ -139,10 +167,7 @@ export class UIController {
     this.saveState.saving = true;
 
     try {
-      const snapshot = snapshotWorld(
-        this.world,
-        this.renderersPane?.renderers ?? []
-      );
+      const snapshot = snapshotWorld(this.world, this.session());
 
       await saveDish(
         dishMeta(this.dish.id, this.dish.name, this.world),
@@ -292,12 +317,10 @@ export class UIController {
       this.world
     );
 
-    // Renderers live outside the world, so they're restored here rather than
-    // in worldFromSnapshot — the instances only exist once the pane built them.
-    if (snapshot) {
-      restoreRenderers(this.renderersPane.renderers, snapshot);
-      this.renderersPane.refresh();
-    }
+    // Renderers, metrics and the panes' own settings live outside the world,
+    // so they're restored here rather than in worldFromSnapshot — the
+    // instances only exist once the panes built them.
+    if (snapshot) this.restoreSession(snapshot);
 
     this.configureCanvas();
 

@@ -1,5 +1,6 @@
 import type { Metric } from "@/metrics";
 import { metricsRegistry } from "@/metrics/registry";
+import type { UISnapshot } from "@/persistence";
 import type { World } from "@/world";
 import { Pane } from "tweakpane";
 
@@ -25,9 +26,12 @@ export class MetricsPane extends Pane {
   /** The same samples in the metric's own units, for the readout. */
   private raw: Record<string, number> = {};
   /** Raw value each graph tops out at, in the metric's own units. */
-  private ceiling: Record<string, number> = {};
+  ceiling: Record<string, number> = {};
 
   params = { sampleEvery: 30 };
+
+  /** Re-hides a metric's graph and readout to match its enabled flag. */
+  private syncVisibility: (() => void)[] = [];
 
   constructor(container: HTMLElement, world: World) {
     super({ container, title: "Metrics" });
@@ -99,6 +103,29 @@ export class MetricsPane extends Pane {
       blade.hidden = !metric.enabled;
       enabled.on("change", ev => (blade.hidden = !ev.value));
     }
+
+    this.syncVisibility.push(() => {
+      for (const blade of [graph, readout]) blade.hidden = !metric.enabled;
+    });
+  }
+
+  /**
+   * Reinstates saved sampling and graph ceilings.
+   *
+   * Enabled flags are restored alongside the other registries, so this only
+   * has to bring the blades they control back in line.
+   */
+  restore(ui: UISnapshot | undefined) {
+    if (ui) {
+      this.params.sampleEvery = ui.sampleEvery;
+
+      for (const [id, ceiling] of Object.entries(ui.ceiling)) {
+        if (id in this.ceiling) this.ceiling[id] = ceiling;
+      }
+    }
+
+    for (const sync of this.syncVisibility) sync();
+    this.refresh();
   }
 
   /**
