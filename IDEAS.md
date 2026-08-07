@@ -13,3 +13,10 @@ by deleting snapshots in-between.
 
 a reimagined cell inspector that's not just snowing the raw json, but providing
 insight into how the cell operates - what
+
+# hormones
+
+an instruction to write hormone can either be an explicit action, or be implicitly
+triggered as part of other actions.
+
+hormones can be read like any other sensors. amount of hormones is evolvable.
