@@ -6,6 +6,7 @@ import { DieAction } from "./die";
 import { HarvestAction } from "./harvest";
 import { ReproduceAction } from "./reproduce";
 import { ShareAction } from "./share";
+import { AttackAction } from "./attack";
 import type { MovementDirection } from "@/components/movement";
 
 export const actionRegistry = new Registry<Action>();
@@ -75,6 +76,13 @@ actionRegistry.register({
   title: "Share",
   description: "Split energy between the surrounding cells",
   create: () => new ShareAction(),
+});
+
+actionRegistry.register({
+  id: "attack",
+  title: "Attack",
+  description: "Drain energy out of the surrounding cells",
+  create: () => new AttackAction(),
 });
 
 actionRegistry.register({

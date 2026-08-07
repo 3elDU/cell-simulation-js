@@ -16,6 +16,7 @@ import { ReproductionSystem } from "./reproduction";
 import { AgeSystem } from "./age";
 import { TaintSystem } from "./taint";
 import { SharingSystem } from "./sharing";
+import { PredationSystem } from "./predation";
 
 export const systemRegistry = new Registry<System>();
 
@@ -47,3 +48,4 @@ systemRegistry.register(d(ReproductionSystem));
 systemRegistry.register(d(AgeSystem));
 systemRegistry.register(d(TaintSystem));
 systemRegistry.register(d(SharingSystem));
+systemRegistry.register(d(PredationSystem));
