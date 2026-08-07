@@ -1,4 +1,4 @@
-import { gridGet, gridSet, type Position } from "./grid";
+import { gridGet, gridGetAdjacent, gridSet, type Position } from "./grid";
 import type { World } from "./world";
 
 export interface Cell {
@@ -29,6 +29,15 @@ export function addCell(world: World, x: number, y: number): Cell {
   gridSet(world.grid, { x, y }, id);
 
   return cell;
+}
+
+/**
+ * Number of the reachable neighboring tiles holding a cell.
+ */
+export function countAdjacentCells(world: World, position: Position): number {
+  return gridGetAdjacent(world.grid, position).filter(
+    ({ value }) => value !== undefined && value !== -1
+  ).length;
 }
 
 /**

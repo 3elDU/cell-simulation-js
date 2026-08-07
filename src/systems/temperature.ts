@@ -1,10 +1,10 @@
-import type { Cell } from "@/cell";
+import { countAdjacentCells, type Cell } from "@/cell";
 import type { World } from "@/world";
 import type { System } from ".";
 import { BaseSystem } from "./base";
 import { setComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
-import { gridGetNeighbors, gridMaybeGet, type Position } from "@/grid";
+import { ADJACENT_TILES, gridMaybeGet } from "@/grid";
 
 export class TemperatureSystem extends BaseSystem implements System {
   id = "temperature";
@@ -33,17 +33,10 @@ temperature.`;
     },
   ];
 
-  countNonEmptyNeighbors(world: World, base: Position) {
-    return gridGetNeighbors(world.grid, base).filter(
-      neighbor => neighbor.value !== undefined
-    ).length;
-  }
-
   onCellTick(world: World, cell: Cell): void {
     const lightness = gridMaybeGet(world.layers.light, cell.position, 0) / 255;
 
-    // Divide by 8 (cell has 8 neighboring tiles) to get a value from 0 to 1
-    const crowding = this.countNonEmptyNeighbors(world, cell.position) / 8;
+    const crowding = countAdjacentCells(world, cell.position) / ADJACENT_TILES;
 
     setComponent(cell, "temperature", {
       temp: lightness * this.sunFactor + crowding * this.crowdingFactor,

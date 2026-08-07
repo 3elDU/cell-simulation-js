@@ -4,7 +4,7 @@ import type { System } from ".";
 import { BaseSystem } from "./base";
 import { getComponent, setComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
-import { gridGetNeighbors, type Position } from "@/grid";
+import { gridGetAdjacent, type Position } from "@/grid";
 import type { Gene } from "@/components/genome";
 import type { Sensors } from "@/components/sensors";
 import { actionRegistry } from "@/actions/registry";
@@ -218,9 +218,8 @@ the child's genome.`;
    * An empty neighboring tile, chosen at random, or nothing if boxed in.
    */
   freeNeighbor(world: World, position: Position): Position | undefined {
-    const free = gridGetNeighbors(world.grid, position).filter(
-      ({ x, y, value }) =>
-        x >= 0 && y >= 0 && x < world.width && y < world.height && value === -1
+    const free = gridGetAdjacent(world.grid, position).filter(
+      ({ value }) => value === -1
     );
 
     return this.pick(free);

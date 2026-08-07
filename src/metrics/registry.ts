@@ -25,3 +25,5 @@ metricsRegistry.register(layerMetric("organics", "Organics"));
 metricsRegistry.register(sensorMetric("energy", "Cell Energy"));
 metricsRegistry.register(sensorMetric("age", "Cell Age"));
 metricsRegistry.register(sensorMetric("temperature", "Temperature"));
+metricsRegistry.register(sensorMetric("crowding", "Crowding"));
+metricsRegistry.register(sensorMetric("kinship", "Kinship"));

@@ -42,3 +42,19 @@ renderRegistry.register(
     { r: 0.85, g: 0.85, b: 0.9 }
   )
 );
+renderRegistry.register(
+  sensorRenderer(
+    "crowding",
+    "Cell Crowding",
+    { r: 0.1, g: 0.2, b: 0.3 },
+    { r: 1, g: 0.85, b: 0.2 }
+  )
+);
+renderRegistry.register(
+  sensorRenderer(
+    "kinship",
+    "Cell Kinship",
+    { r: 0.35, g: 0.1, b: 0.5 },
+    { r: 0.3, g: 0.95, b: 0.9 }
+  )
+);

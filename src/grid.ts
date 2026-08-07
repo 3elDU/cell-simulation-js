@@ -77,55 +77,46 @@ export function gridMaybeGet<T extends TypedArray>(
 type Neighbor = { x: number; y: number; value: number | undefined };
 
 /**
- * Returns 8 neighboring cells relative to provided position.
- *
- * Neighbors are returned in exact order:
- * - Top left
+ * How many tiles a position borders on.
+ */
+export const ADJACENT_TILES = 4;
+
+/**
+ * Returns the tiles reachable from the given position, in exact order:
  * - Top
- * - Top right
  * - Left
  * - Right
- * - Bottom left
  * - Bottom
- * - Bottom right
  *
- * If neighboring coordinates are out-of-bounds, undefined will be returned
- * in place of the neighbor, but strict order is still guaranteed.
+ * Diagonals are left out on purpose: nothing can step onto them, so a reading
+ * that counted them would describe surroundings a cell can neither reach nor
+ * act on.
+ *
+ * Out-of-bounds neighbors carry an undefined value, but strict order is still
+ * guaranteed.
  */
-export function gridGetNeighbors<T extends TypedArray>(
+export function gridGetAdjacent<T extends TypedArray>(
   grid: GridLayer<T>,
   position: Position
 ) {
-  const neighbors = [
-    { x: -1, y: -1 },
+  const offsets = [
     { x: 0, y: -1 },
-    { x: 1, y: -1 },
     { x: -1, y: 0 },
     { x: 1, y: 0 },
-    { x: -1, y: 1 },
     { x: 0, y: 1 },
-    { x: 1, y: 1 },
   ];
 
-  return neighbors.map(({ x, y }) => {
+  return offsets.map(({ x, y }) => {
     const x2 = position.x + x;
     const y2 = position.y + y;
+    const inside = x2 >= 0 && y2 >= 0 && x2 < grid.width && y2 < grid.height;
 
     return {
       x: x2,
       y: y2,
-      value: gridGet(grid, { x: x2, y: y2 }),
+      value: inside ? gridGet(grid, { x: x2, y: y2 }) : undefined,
     };
-  }) as [
-    Neighbor,
-    Neighbor,
-    Neighbor,
-    Neighbor,
-    Neighbor,
-    Neighbor,
-    Neighbor,
-    Neighbor,
-  ];
+  }) as [Neighbor, Neighbor, Neighbor, Neighbor];
 }
 
 /**
