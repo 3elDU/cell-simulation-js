@@ -217,7 +217,7 @@ the child's genome.`;
   freeNeighbor(world: World, position: Position): Position | undefined {
     const free = gridGetNeighbors(world.grid, position).filter(
       ({ x, y, value }) =>
-        x >= 0 && y >= 0 && x < world.width && y < world.height && !value
+        x >= 0 && y >= 0 && x < world.width && y < world.height && value === -1
     );
 
     return this.pick(free);
