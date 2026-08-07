@@ -9,6 +9,7 @@ import type { Harvest } from "./harvest";
 import type { Reproduction } from "./reproduction";
 import type { Age } from "./age";
 import type { Taint } from "./taint";
+import type { Share } from "./share";
 
 // Registry of all components in the system
 type Components = {
@@ -22,6 +23,7 @@ type Components = {
   reproduction: Reproduction;
   age: Age;
   taint: Taint;
+  share: Share;
 };
 
 /**

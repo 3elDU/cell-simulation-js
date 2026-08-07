@@ -5,6 +5,7 @@ import { IdleAction } from "./idle";
 import { DieAction } from "./die";
 import { HarvestAction } from "./harvest";
 import { ReproduceAction } from "./reproduce";
+import { ShareAction } from "./share";
 import type { MovementDirection } from "@/components/movement";
 
 export const actionRegistry = new Registry<Action>();
@@ -67,6 +68,13 @@ actionRegistry.register({
   title: "Reproduce",
   description: "Split into a free neighboring tile",
   create: () => new ReproduceAction(),
+});
+
+actionRegistry.register({
+  id: "share",
+  title: "Share",
+  description: "Split energy between the surrounding cells",
+  create: () => new ShareAction(),
 });
 
 actionRegistry.register({
