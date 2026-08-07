@@ -3,6 +3,7 @@ import type { Metric } from ".";
 import { layerMetric } from "./layer";
 import { sensorMetric } from "./sensor";
 import { PopulationMetric } from "./population";
+import { GenomeMetrics as GenomeMetric } from "./genome";
 
 export const metricsRegistry = new Registry<Metric>();
 
@@ -19,6 +20,7 @@ const d = (ctor: new () => Metric): Definition<Metric> => {
 };
 
 metricsRegistry.register(d(PopulationMetric));
+metricsRegistry.register(d(GenomeMetric));
 metricsRegistry.register(layerMetric("light", "Light"));
 metricsRegistry.register(layerMetric("minerals", "Minerals"));
 metricsRegistry.register(layerMetric("organics", "Organics"));

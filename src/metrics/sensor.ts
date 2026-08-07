@@ -25,7 +25,7 @@ export class SensorMetric extends BaseMetric implements Metric {
   sensor: string;
 
   range = 1;
-  format = (value: number) => value.toFixed(3);
+  format = (value: number) => value.toFixed(4);
 
   config: ConfigSchema = [{ prop: "sensor", label: "Sensor" }];
 
