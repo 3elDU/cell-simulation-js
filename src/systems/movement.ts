@@ -19,7 +19,10 @@ export class MovementSystem extends BaseSystem implements System {
     const movement = getComponent(cell, "movement");
     if (!movement) return;
 
-    const position = structuredClone(cell.position);
+    const position: Position = {
+      x: cell.position.x,
+      y: cell.position.y,
+    };
 
     let vector: Position;
     switch (movement.dir) {
