@@ -15,3 +15,9 @@ an instruction to write hormone can either be an explicit action, or be implicit
 triggered as part of other actions.
 
 hormones can be read like any other sensors. amount of hormones is evolvable.
+
+# improving metrics
+
+- metric types other than graph based, like text
+  - lists. example: most prevalent genome instructions: ["idle: 67%", "reproduction: 30%", ...] that will be rendered as a list in tweakpane
+  - strings. simple string for one value
