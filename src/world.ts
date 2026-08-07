@@ -65,6 +65,17 @@ export function getEnabledSystem<T extends System>(
 }
 
 /**
+ * Announces a birth to every enabled system, so what a cell hands down is
+ * decided by whoever owns that data rather than by whoever performed the split.
+ */
+export function emitBirth(world: World, parent: Cell, child: Cell) {
+  for (const system of world.systems) {
+    if (!system.enabled) continue;
+    system.onCellBirth?.(world, parent, child);
+  }
+}
+
+/**
  * Creates a new world object with no systems, layers or cells, and an empty grid.
  */
 export function newWorld(width: number, height: number): World {

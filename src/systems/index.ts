@@ -32,6 +32,13 @@ export interface System extends UIDescription {
    * currently present on the map.
    */
   onCellTick?(world: World, cell: Cell): void;
+
+  /**
+   * Called when a cell is born from another one, before the child takes its
+   * first tick. Lets a system decide what its own data does across a birth —
+   * inherited, dropped, or inherited with a change.
+   */
+  onCellBirth?(world: World, parent: Cell, child: Cell): void;
 }
 
 /**

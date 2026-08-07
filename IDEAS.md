@@ -1,8 +1,3 @@
-# taint cells
-
-cell can be tainted with a color, which will be shown in the cell renderer. the color will be applied
-to all cell descendants, but with a slight change, when mutation occurs.
-
 # rollback slider
 
 a slider that allows to roll back the simulation in time, saves every 100 ticks

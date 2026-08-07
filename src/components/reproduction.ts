@@ -21,6 +21,15 @@ export interface Reproduction {
   generation: number;
 
   /**
+   * Id of the cell this one split from, absent on cells that were never born.
+   *
+   * An id rather than a reference, so a line walked upwards ends where the
+   * world stopped keeping the dead, instead of pinning every ancestor in
+   * memory forever.
+   */
+  parent?: number;
+
+  /**
    * Successful births, not attempts.
    */
   children: number;

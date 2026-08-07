@@ -36,6 +36,12 @@ export interface Genome {
   genome: Gene[];
 
   /**
+   * Whether this genome came out of birth different from the parent's. Absent
+   * on cells that were never born from another.
+   */
+  mutated?: boolean;
+
+  /**
    * Action chosen on the last tick, and the score every action reached.
    *
    * Written by the genome system purely so a cell can be inspected — a

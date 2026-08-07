@@ -1,5 +1,5 @@
 import { addCell, type Cell } from "@/cell";
-import type { World } from "@/world";
+import { emitBirth, type World } from "@/world";
 import type { System } from ".";
 import { BaseSystem } from "./base";
 import { getComponent, setComponent } from "@/components";
@@ -151,64 +151,76 @@ the child's genome.`;
   }
 
   /**
-   * Returns a mutated deep copy. The parent's genome is never touched — a
-   * mutation that reaches back into the parent would be inheritance of
-   * acquired characteristics, which is a very different simulation.
+   * Returns a mutated deep copy, and whether any operator actually fired —
+   * most births change nothing. The parent's genome is never touched: a
+   * mutation reaching back into it would be inheritance of acquired
+   * characteristics, which is a very different simulation.
    */
-  mutate(genome: Gene[]): Gene[] {
+  mutate(genome: Gene[]): { genes: Gene[]; mutated: boolean } {
     const actions = this.actionIds();
     const sensors = this.sensorIds();
 
-    const mutated = genome.map(gene => {
+    let mutated = false;
+
+    const genes = genome.map(gene => {
       const copy: Gene = { ...gene, sensors: [...gene.sensors] };
 
       if (this.rolls(this.nudgeWeight)) {
         copy.base += (Math.random() * 2 - 1) * this.nudgeAmount;
+        mutated = true;
       }
 
       if (actions.length > 0 && this.rolls(this.retargetAction)) {
         copy.action = this.pick(actions)!;
+        mutated = true;
       }
 
       if (this.rolls(this.addSensor)) {
         const missing = sensors.filter(id => !copy.sensors.includes(id));
         const added = this.pick(missing);
-        if (added) copy.sensors.push(added);
+        if (added) {
+          copy.sensors.push(added);
+          mutated = true;
+        }
       }
 
       if (copy.sensors.length > 0 && this.rolls(this.removeSensor)) {
         copy.sensors.splice(Math.floor(Math.random() * copy.sensors.length), 1);
+        mutated = true;
       }
 
       return copy;
     });
 
-    if (mutated.length > this.minGenes && this.rolls(this.deleteGene)) {
-      mutated.splice(Math.floor(Math.random() * mutated.length), 1);
+    if (genes.length > this.minGenes && this.rolls(this.deleteGene)) {
+      genes.splice(Math.floor(Math.random() * genes.length), 1);
+      mutated = true;
     }
 
-    if (mutated.length < this.maxGenes && this.rolls(this.duplicateGene)) {
-      const source = this.pick(mutated);
+    if (genes.length < this.maxGenes && this.rolls(this.duplicateGene)) {
+      const source = this.pick(genes);
       if (source) {
-        mutated.push({ ...source, sensors: [...source.sensors] });
+        genes.push({ ...source, sensors: [...source.sensors] });
+        mutated = true;
       }
     }
 
     if (
       actions.length > 0 &&
-      mutated.length < this.maxGenes &&
+      genes.length < this.maxGenes &&
       this.rolls(this.addGene)
     ) {
-      mutated.push({
+      genes.push({
         action: this.pick(actions)!,
         // Near zero, so a brand-new gene barely shifts behavior and gets a
         // chance to drift before selection judges it.
         base: (Math.random() * 2 - 1) * 0.05,
         sensors: sensors.filter(() => Math.random() < 0.25),
       });
+      mutated = true;
     }
 
-    return mutated;
+    return { genes, mutated };
   }
 
   /**
@@ -251,13 +263,17 @@ the child's genome.`;
 
     const genome = getComponent(cell, "genome");
     if (genome) {
-      setComponent(child, "genome", { genome: this.mutate(genome.genome) });
+      const { genes, mutated } = this.mutate(genome.genome);
+      setComponent(child, "genome", { genome: genes, mutated });
     }
 
     setComponent(child, "reproduction", {
       generation: reproduction.generation + 1,
       children: 0,
+      parent: cell.id,
     });
+
+    emitBirth(world, cell, child);
 
     reproduction.children++;
 
