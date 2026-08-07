@@ -9,15 +9,11 @@ import type { ConfigSchema } from "@/ui";
 /**
  * Ages cells and eventually kills them for it.
  *
- * Shaped like the energy system's overload risk on purpose: a safe stretch, a
- * ramp, and certain death at the end. A hard maximum age would make every
- * lineage tick over in lockstep and turn population into a sawtooth; a rising
- * chance spreads deaths out and leaves room for luck.
+ * Shaped like the energy system's overload risk — a safe stretch, a ramp,
+ * then certain death.
  *
- * What this adds that starvation doesn't is a cost to *lasting*. Without it a
- * cell that found a bright tile and sat on it is immortal, and a lineage that
- * never reproduces can still win by never dying. Age makes reproduction the
- * only way to persist.
+ * Unlike starvation, this adds a cost to lasting: it's what keeps a cell
+ * sitting on a good tile from being immortal.
  */
 export class AgeSystem extends BaseSystem implements System {
   id = "age";
@@ -56,8 +52,8 @@ it.`;
   ];
 
   /**
-   * Chance of dying of age this tick, from 0 below {@link safeAge} to 1 at
-   * {@link lethalAge}.
+   * Chance of dying of age this tick, from 0 below `safeAge` to 1 at
+   * `lethalAge`.
    */
   mortalityChance(age: number): number {
     const span = this.lethalAge - this.safeAge;

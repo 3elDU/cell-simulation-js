@@ -13,20 +13,17 @@ export class SystemsPane extends Pane {
       const folder = this.addFolder({ title: system.title, expanded: false });
       folder.addBinding(system, "enabled", { label: "Enabled" });
 
-      // Add system description as readonly field without a label
       folder.addBinding(system, "description", {
         readonly: true,
         label: undefined,
         multiline: true,
       });
 
-      // Add per-system configuration
       for (const binding of system.config ?? []) {
         const target = (binding.object ?? system) as Record<string, unknown>;
         folder.addBinding(target, binding.prop, binding);
       }
 
-      // Add action buttons
       for (const action of extractActions(system)) {
         folder
           .addButton({

@@ -43,8 +43,7 @@ export class MovementSystem extends BaseSystem implements System {
     position.x += vector.x;
     position.y += vector.y;
 
-    // Out-of-bounds check.
-    // No wrapping here, just don't allow the cell to move any further
+    // Clamped rather than wrapped at the edges.
     if (position.x < 0) {
       position.x = 0;
     }
@@ -58,20 +57,15 @@ export class MovementSystem extends BaseSystem implements System {
       position.y = world.height - 1;
     }
 
-    // Abort early if the space is occupied by another cell
     if (!this.canMoveTo(world, position)) {
       return;
     }
 
-    // Set previous cell location to empty space
     gridSet(world.grid, { x: prevX, y: prevY }, -1);
-    // Move set to current location
     gridSet(world.grid, position, cell.id);
 
-    // Update position
     cell.position = position;
 
-    // Clear movement direction
     delete cell.components.movement;
   }
 }

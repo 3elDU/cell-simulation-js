@@ -6,7 +6,7 @@ import { sensorRenderer } from "./sensor";
 
 export const renderRegistry = new Registry<Renderer>();
 
-// Converts System into a Definition
+// Converts a Renderer class into a Definition
 const d = (constructor: new () => Renderer): Definition<Renderer> => {
   const system = new constructor();
 

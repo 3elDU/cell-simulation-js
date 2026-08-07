@@ -111,8 +111,7 @@ Fed by dead cells.`;
 
       organics.data[i] = value - rotted;
 
-      // Skipped rather than faked when the minerals system is off, so the
-      // energy is simply lost instead of accumulating in a layer nobody owns.
+      // Skip processing if minerals layer doesn't exist
       if (minerals) {
         minerals.data[i] = Math.min(
           minerals.data[i]! + rotted * this.toMinerals,

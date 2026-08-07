@@ -8,7 +8,7 @@ import { getComponent, setComponent } from "@/components";
  * actually happen — enough energy, a free neighboring tile — and charges for
  * it only if it does.
  *
- * The action's own {@link Action.cost} is what trying costs, charged by the
+ * The action's own `cost` is what trying costs, charged by the
  * energy system whether or not a child appears. The real price of a birth is
  * the reproduction system's knob. Splitting them means a boxed-in cell
  * spamming this pays a small tax rather than nothing, without paying full

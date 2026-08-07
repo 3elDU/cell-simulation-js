@@ -27,7 +27,7 @@ const AUTOSAVE_INTERVAL_TICKS = 10;
 export class UIController {
   world: World | undefined;
   ctx: CanvasRenderingContext2D;
-  /** Offscreen canvas renderers compose onto, see {@link UIController.render} */
+  /** Offscreen canvas renderers compose onto. */
   buffer: CanvasRenderingContext2D | undefined;
   panzoom: PanzoomObject | undefined;
 
@@ -47,14 +47,14 @@ export class UIController {
   saveState = { lastSavedAt: 0, lastSavedTick: 0, saving: false, status: "—" };
 
   /**
-   * State of the continuous run loop, see {@link UIController.runLoop}.
+   * State of the continuous run loop.
    *
    * `maxTps` of 0 means unthrottled — the loop still yields between ticks,
    * so it goes as fast as ticking and rendering allow. `tps` is the measured
-   * rate, which is what actually tells you whether the limit is doing anything.
+   * rate.
    */
   runParams = { running: false, maxTps: 0, tps: 0 };
-  /** Guards against overlapping ticks, see {@link UIController.tick} */
+  /** Guards against overlapping ticks. */
   ticking = false;
 
   constructor(ctx: CanvasRenderingContext2D) {
@@ -128,9 +128,8 @@ export class UIController {
   /**
    * Writes the world, its systems and its renderers into the open dish.
    *
-   * Guarded against overlap: the write is asynchronous and autosave keeps
-   * asking, so without this a slow disk would queue up saves of a world that
-   * has moved on since.
+   * Guarded against overlap — a slow save shouldn't queue up behind autosave
+   * asking again.
    */
   async save() {
     if (!this.world || !this.dish || this.saveState.saving) return;
@@ -194,8 +193,7 @@ export class UIController {
    * Ticks continuously until stopped, throttled to `runParams.maxTps`.
    *
    * Each iteration yields through a timeout even when unthrottled, so the
-   * browser gets to paint and the panes stay responsive instead of the loop
-   * hogging the main thread.
+   * browser gets to paint and the panes stay responsive.
    */
   async runLoop() {
     let measuredAt = performance.now();
@@ -206,8 +204,7 @@ export class UIController {
 
       await this.tick();
 
-      // Not awaited: a save takes as long as it takes, and blocking the loop
-      // on it would make the measured tps drop every five seconds.
+      // Not awaited — blocking here would drop the measured tps every autosave.
       if (this.shouldAutosave()) void this.save();
 
       // Recompute the budget every iteration so the slider takes effect mid-run
@@ -231,10 +228,7 @@ export class UIController {
     this.runParams.tps = 0;
   }
 
-  /**
-   * Resizes canvas to match world size, and attaches
-   * panzoom to it to allow zooming in with wheel/touch.
-   */
+  /** Resizes the canvas to world size and attaches panzoom for wheel/touch zoom. */
   configureCanvas() {
     elements.canvas.width = this.world!.width;
     elements.canvas.height = this.world!.height;
@@ -284,7 +278,6 @@ export class UIController {
     this.world = world;
     console.debug("world object:", this.world);
 
-    // Initialize panes
     this.worldPane = this.buildWorldPane();
     this.systemsPane = new SystemsPane(elements.paneContainer, this.world);
     this.renderersPane = new RenderersPane(elements.paneContainer);
@@ -303,10 +296,7 @@ export class UIController {
 
     this.configureCanvas();
 
-    // This shows the canvas element
     elements.main.dataset.initialized = "true";
-
-    // Hide new world pane
     this.newWorldPane.hidden = true;
 
     // A freshly opened dish counts as just-saved, so autosave doesn't fire on
@@ -315,7 +305,6 @@ export class UIController {
     this.saveState.lastSavedTick = world.tick;
     this.saveState.status = snapshot ? "loaded" : "—";
 
-    // Render the scene right away
     this.render();
 
     // Give a brand-new dish a record immediately, so it shows up in the list
@@ -336,12 +325,9 @@ export class UIController {
   }
 
   /**
-   * Renderers draw asynchronously, and every await yields to the browser,
-   * which is free to composite a frame mid-loop. Drawing straight onto the
-   * visible canvas therefore flashes: first empty, then partially layered.
-   *
-   * So everything is composed on an offscreen buffer and blitted onto the
-   * visible canvas in one synchronous step at the end.
+   * Composes renderers onto an offscreen buffer, then blits it to the
+   * visible canvas in one synchronous step — renderers draw asynchronously,
+   * and drawing straight onto the visible canvas would flash partial frames.
    */
   bufferCtx(): CanvasRenderingContext2D {
     const { width, height } = this.ctx.canvas;

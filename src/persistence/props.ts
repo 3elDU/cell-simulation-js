@@ -1,14 +1,10 @@
 /**
  * Snapshotting the plain-data fields of a system or renderer.
  *
- * Deliberately *not* driven by `ConfigSchema`. Two config items may share a
- * `prop` while pointing at different objects — `feeding` exposes a rate and an
- * efficiency both keyed by layer name — so the schema has no stable key to
- * save under. It also wouldn't be enough: `minerals.vents` and `death.corpses`
- * are state nobody put a knob on, and a world reloaded without them would look
- * right and behave differently.
+ * Deliberately *not* driven by `ConfigSchema` — a config item's `prop` isn't
+ * always a stable save key, and some state has no config item at all.
  *
- * So instead: keep every own field that is plain data, drop everything else.
+ * Keeps every own field that is plain data, drops everything else.
  */
 
 /**
@@ -31,9 +27,9 @@ const SKIP = new Set([
 /**
  * Whether a value survives a round trip as plain data.
  *
- * Rejects class instances (`sensors.sensors`, `genome.actions`) by checking the
- * prototype — an object carrying methods is a live wiring reference, not state,
- * and the fresh instance already has its own.
+ * Rejects class instances by checking the prototype — an object carrying
+ * methods is a live wiring reference, not state, and the fresh instance
+ * already has its own.
  */
 function isPlainData(value: unknown, depth = 0): boolean {
   if (depth > 4) return false;
@@ -85,8 +81,8 @@ export function snapshotProps(source: object): Record<string, unknown> {
  *
  * Plain objects are merged key by key rather than replaced, because tweakpane
  * bindings hold a reference to the object they were built against — swapping
- * `energy.costs` for a new object would leave every cost slider bound to the
- * orphan and silently stop applying.
+ * it for a new object would leave every bound slider pointed at the orphan
+ * and silently stop applying.
  *
  * Keys absent from the target are dropped: a save written before a system
  * gained or lost a field shouldn't graft the old shape back on.

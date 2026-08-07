@@ -13,13 +13,13 @@ import { HarvestAction } from "@/actions/harvest";
  *
  * This is the only system that *grants* energy; the energy system is purely
  * the sink. Every food source funnels through the one harvest component, so
- * adding a source means registering another {@link HarvestAction} — this file
- * never learns its name.
+ * adding a source means registering another harvest action — this file never
+ * learns its name.
  *
- * Runs before the energy system so a cell that fed this tick has the energy
- * before upkeep is charged against it. The consequence is that a brand-new
- * cell can't feed on its very first tick, because the energy system is what
- * creates its energy component. One tick, and it owns that lifecycle cleanly.
+ * Runs before the energy system, so a cell that fed this tick has the energy
+ * before upkeep is charged against it. A brand-new cell still can't feed on
+ * its first tick, since the energy system is what creates its energy
+ * component.
  */
 export class FeedingSystem extends BaseSystem implements System {
   id = "feeding";
@@ -99,9 +99,7 @@ to harvest.`;
 
     const index = cell.position.y * layer.width + cell.position.x;
 
-    // Capped by what is actually there, so a stripped tile yields nothing —
-    // which is what makes cells compete over good ground instead of every
-    // cell subsisting equally wherever it happens to stand.
+    // Capped by what is actually there, so a stripped tile yields nothing.
     const taken = Math.min(this.rates[harvest.layer] ?? 0, layer.data[index]!);
     if (taken <= 0) return;
 

@@ -102,7 +102,6 @@ export function newWorld(width: number, height: number): World {
 
   sortSystems(world.systems);
 
-  // Run onInit on all systems
   for (const system of world.systems) {
     system.onInit?.(world);
   }
@@ -123,7 +122,6 @@ export function doTick(world: World) {
     if (id == -1) continue;
     const cell = world.cells.get(id)!;
 
-    // Ensure every cell can be processed only once;
     if (cell.components.internal?.processed === true) {
       continue;
     }
@@ -137,7 +135,6 @@ export function doTick(world: World) {
     }
   }
 
-  // Clear internal components
   gridEvery(
     world.grid,
     (_x, _y, id) => delete world.cells.get(id)!.components.internal

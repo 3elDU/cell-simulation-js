@@ -1,5 +1,5 @@
 /**
- * Definitions for the {@link GridLayer} type and utility functions for it.
+ * Definitions for the grid layer type and utility functions for it.
  */
 
 /**
@@ -11,11 +11,7 @@
  */
 export const LAYER_MAX = 255;
 
-/**
- * A utility interface to store a position of something.
- *
- * Cannot be used as a key directly
- */
+/** A position on the grid. Cannot be used as a key directly. */
 export type Position = {
   x: number;
   y: number;
@@ -39,14 +35,7 @@ export interface GridLayer<T extends TypedArray> {
   width: number;
   height: number;
 
-  /**
-   * Wrap data inside an array, if it's a non-array type.
-   *
-   * Types like Uint8Array are not wrapped because they are already, an array.
-   *
-   * Data is assumed to already be of [width*height] elements, so that indexing
-   * would not fail.
-   */
+  /** Backing storage, already sized to `width * height` elements. */
   data: T;
 }
 

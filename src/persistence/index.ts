@@ -41,7 +41,7 @@ interface UnitSnapshot {
  *
  * Stored as live structures rather than JSON: IndexedDB structured-clones on
  * write, so typed arrays keep their element type and the cell `Map` stays a
- * `Map`. Encoding them by hand would only lose that.
+ * `Map`.
  */
 export interface Snapshot {
   version: number;
@@ -100,15 +100,9 @@ export function dishMeta(id: string, name: string, world: World): DishMeta {
 /**
  * Rebuilds a world from a snapshot.
  *
- * Goes through {@link newWorld} rather than assembling the world by hand, so
- * systems get their usual `onInit` — that is where they take their reference
- * to the world and build their runtime-generated config, and skipping it would
- * leave half of them holding `undefined`. The state `onInit` produces (a filled
- * light gradient, freshly spawned vents, a map of generated cells) is then
+ * Goes through `newWorld` rather than assembling the world by hand, so
+ * systems still get their usual `onInit` — the state it generates is then
  * overwritten wholesale by what was saved.
- *
- * The wasted generation pass costs a fraction of a second and buys a load path
- * that can't drift out of sync with the normal one.
  */
 export function worldFromSnapshot(snapshot: Snapshot): World {
   const world = newWorld(snapshot.width, snapshot.height);

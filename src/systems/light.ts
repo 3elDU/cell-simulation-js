@@ -9,11 +9,9 @@ export type RegrowMode = "fixed" | "proportional";
 /**
  * Fills and regrows the light layer.
  *
- * Light is a *stock*, not a constant. Photosynthesis draws a tile down and it
- * climbs back toward its place on the gradient over time, so a crowded bright
- * patch is worth less than an empty one and spreading out has a payoff.
- * Without that, the bright rows would support unlimited biomass and there
- * would be no carrying capacity at all.
+ * Light is a stock, not a constant — photosynthesis draws a tile down and it
+ * climbs back toward its place on the gradient over time, so a crowded
+ * bright patch is worth less than an empty one.
  */
 export class LightSystem extends BaseSystem implements System, UIActionable {
   id = "light";
@@ -114,9 +112,7 @@ regrows toward a gradient.`;
         if (deficit === 0) continue;
 
         // Recovery scales with the tile's place on the gradient, not just its
-        // ceiling. Otherwise a dim tile refills as fast as a bright one and
-        // position stops mattering the moment anything grazes it — which
-        // would make the whole light gradient decorative.
+        // ceiling — otherwise a dim tile refills as fast as a bright one.
         const rate =
           this.regrowRate * (this.maxLight > 0 ? max / this.maxLight : 0);
 

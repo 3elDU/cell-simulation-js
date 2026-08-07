@@ -24,7 +24,7 @@ export class HarvestAction implements Action {
 
   /**
    * Amount taken per tick when the tile has that much left. Seeded into a knob
-   * on the feeding system, like {@link Action.cost} is into the energy system.
+   * on the feeding system, like `cost` is into the energy system.
    */
   rate: number;
 

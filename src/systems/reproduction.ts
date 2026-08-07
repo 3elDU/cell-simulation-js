@@ -14,16 +14,9 @@ import { sensorsRegistry } from "@/sensors/registry";
  * Splits cells that asked to, and mutates the copy of the genome the child
  * gets.
  *
- * This is the system that turns everything before it into selection rather
- * than drift. Up to now a cell with a good feeding gene just lived longer;
- * now it leaves more copies of that gene behind.
- *
- * Mutation operates on the genome shape described in CLAUDE.md — a flat list
- * of votes — so every operator is a small, local edit: nudge a weight,
- * duplicate a gene so the copy can drift, add one for a random registered
- * action, delete one, retarget one, or change which sensors a gene listens to.
- * New genes start near zero on purpose: a gene that fires hard from birth gets
- * selected away before it can drift into anything useful.
+ * Mutation operators are small, local edits over the genome's flat list of
+ * votes (see CLAUDE.md) — nudge a weight, add/remove a gene or sensor,
+ * retarget an action.
  */
 export class ReproductionSystem extends BaseSystem implements System {
   id = "reproduction";
@@ -152,9 +145,7 @@ the child's genome.`;
 
   /**
    * Returns a mutated deep copy, and whether any operator actually fired —
-   * most births change nothing. The parent's genome is never touched: a
-   * mutation reaching back into it would be inheritance of acquired
-   * characteristics, which is a very different simulation.
+   * most births change nothing. The parent's genome is never touched.
    */
   mutate(genome: Gene[]): { genes: Gene[]; mutated: boolean } {
     const actions = this.actionIds();

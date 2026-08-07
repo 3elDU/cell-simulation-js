@@ -10,9 +10,8 @@ import type { Sensors } from "./sensors";
  */
 export interface Gene {
   /**
-   * Stores the action id, not the reference.
-   *
-   * This is intentional. If action is disabled globaly, gene becomes a no-op.
+   * Stores the action id, not the reference — a globally disabled action
+   * turns the gene into a no-op.
    */
   action: string;
 

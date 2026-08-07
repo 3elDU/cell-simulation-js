@@ -10,16 +10,13 @@ import type { Sensor } from "@/sensors";
 /**
  * Colors cells by one sensor reading, blended between two colors.
  *
- * Reuses a sensor rather than reading components directly, because the two
- * were doing the same work: a sensor is already "one number in 0..1, or
- * nothing when its dependency is missing", which is exactly what a per-cell
- * color needs. It also means the picture shows literally what the cell can
- * feel, so the inspector and the canvas can never disagree about, say, how
- * close something is to bursting.
+ * Reuses a sensor rather than reading components directly — a sensor is
+ * already "one number in 0..1, or nothing when its dependency is missing",
+ * exactly what a per-cell color needs, and keeps the canvas unable to
+ * disagree with the inspector.
  *
- * A missing or unregistered sensor draws nothing, so switching off the system
- * a sensor depends on quietly empties this layer instead of painting every
- * cell the same color and implying they are all alike.
+ * A missing or unregistered sensor draws nothing, so switching off a
+ * dependency quietly empties this layer.
  */
 export class SensorRenderer implements Renderer {
   enabled = false;

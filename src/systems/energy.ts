@@ -112,8 +112,8 @@ hoard too much and it bursts.`;
   }
 
   /**
-   * Chance of bursting this tick, from 0 below {@link safeEnergy} to 1 at
-   * {@link lethalEnergy}.
+   * Chance of bursting this tick, from 0 below `safeEnergy` to 1 at
+   * `lethalEnergy`.
    */
   overloadChance(energy: number): number {
     const span = this.lethalEnergy - this.safeEnergy;

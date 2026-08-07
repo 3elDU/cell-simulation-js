@@ -26,7 +26,6 @@ export class RenderersPane extends Pane {
         title: instance.title,
       });
 
-      // Add description as readonly binding with no title
       folder.addBinding(instance, "description", {
         readonly: true,
         label: undefined,
@@ -37,7 +36,6 @@ export class RenderersPane extends Pane {
         title: "Enabled",
       });
 
-      // Add per-renderer config
       for (const binding of instance.config ?? []) {
         const target = (binding.object ?? instance) as Record<string, unknown>;
         folder.addBinding(target, binding.prop, binding);
