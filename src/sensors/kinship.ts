@@ -6,6 +6,25 @@ import { gridGetAdjacent } from "@/grid";
 import type { Gene } from "@/components/genome";
 
 /**
+ * Slot every profile stores a given reason under.
+ *
+ * Positions are handed out on first sight and never move, so two profiles
+ * built at different moments still line up. Filled lazily instead of from the
+ * registries, which would import this module back.
+ */
+const slots = new Map<string, number>();
+
+function slotOf(key: string): number {
+  let slot = slots.get(key);
+  if (slot === undefined) {
+    slot = slots.size;
+    slots.set(key, slot);
+  }
+
+  return slot;
+}
+
+/**
  * Weight a genome puts behind each thing it might do, and behind each reason
  * it might do it. Two genomes agreeing on both want the same things for the
  * same reasons.
@@ -13,14 +32,28 @@ import type { Gene } from "@/components/genome";
  * A profile rather than the gene list itself, because genes are variable
  * length and unordered — two identical policies can be written down in any
  * number of ways.
+ *
+ * Scaled to unit length on the way in, so comparing two of them is a plain
+ * dot product. `filled` lists the slots actually carrying weight — a short
+ * genome shouldn't pay for the slots of every gene it doesn't have.
  */
-type Profile = Map<string, number>;
+type Profile = {
+  weights: Float32Array;
+  filled: Int32Array;
+};
 
 function profileOf(genes: Gene[]): Profile {
-  const profile: Profile = new Map();
+  // Sized to fit every slot this genome could claim, including ones nothing
+  // has named yet: writing past the end of a typed array is silently dropped.
+  let capacity = slots.size;
+  for (const gene of genes) capacity += 1 + gene.sensors.length;
 
-  const add = (key: string, weight: number) =>
-    profile.set(key, (profile.get(key) ?? 0) + weight);
+  const weights = new Float32Array(capacity);
+
+  const add = (key: string, weight: number) => {
+    const slot = slotOf(key);
+    weights[slot] = weights[slot]! + weight;
+  };
 
   for (const gene of genes) {
     add(gene.action, gene.base);
@@ -30,27 +63,39 @@ function profileOf(genes: Gene[]): Profile {
     }
   }
 
-  return profile;
+  let norm = 0;
+  for (const weight of weights) norm += weight * weight;
+  norm = Math.sqrt(norm);
+
+  const filled: number[] = [];
+  for (let i = 0; i < weights.length; i++) {
+    const weight = weights[i]!;
+    if (weight === 0) continue;
+
+    if (norm > 0) weights[i] = weight / norm;
+    filled.push(i);
+  }
+
+  return { weights, filled: Int32Array.from(filled) };
 }
 
 /**
  * Cosine similarity of two profiles, mapped onto 0..1.
  */
 function similarity(a: Profile, b: Profile): number {
-  let dot = 0;
-  let normA = 0;
-  let normB = 0;
+  if (a.filled.length === 0 || b.filled.length === 0) return 0;
 
-  for (const [key, weight] of a) {
-    dot += weight * (b.get(key) ?? 0);
-    normA += weight * weight;
+  let dot = 0;
+
+  for (const slot of a.filled) {
+    // A profile built before the other's genome introduced a slot is simply
+    // shorter, and holds no weight there.
+    if (slot >= b.weights.length) break;
+
+    dot += a.weights[slot]! * b.weights[slot]!;
   }
 
-  for (const weight of b.values()) normB += weight * weight;
-
-  if (normA === 0 || normB === 0) return 0;
-
-  return (dot / Math.sqrt(normA * normB) + 1) / 2;
+  return (dot + 1) / 2;
 }
 
 /**
