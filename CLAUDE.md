@@ -114,6 +114,11 @@ npm run check      # all three — run after changes
 
 No tests. `@/*` maps to `src/*`. 2-space indent, LF (see `.editorconfig`).
 
+With no test suite, `npm run check` says nothing about behavior. A change to a system, renderer,
+sensor, action or the UI gets verified in the running app by the `browser-test` agent — launch it
+without asking, and tell it what to look for rather than how to look. A typecheck-clean change is
+not a working one.
+
 `typecheck` points at `tsconfig.app.json` explicitly and must keep doing so — the root tsconfig
 is references-only, so a plain `tsc --noEmit` compiles nothing and passes no matter what is
 broken.

@@ -1,12 +1,18 @@
 ---
 name: browser-test
-description: Drive this simulation in Firefox to verify a change actually works — start the dev server, click through the tweakpane panes, read the canvas and IndexedDB. Use whenever a change needs checking in the real app rather than only typechecking, or when asked to run/screenshot/test the app.
+description: Drives the simulation in Firefox to verify a change actually works — starts the dev server, clicks through the tweakpane panes, reads the canvas and IndexedDB, and reports what it saw. Use whenever a change needs checking in the real app rather than only typechecking, or when asked to run/screenshot/test the app.
+tools: Bash, Read, Glob, Grep, ToolSearch, mcp__firefox-devtools__new_page, mcp__firefox-devtools__navigate_page, mcp__firefox-devtools__list_pages, mcp__firefox-devtools__select_page, mcp__firefox-devtools__close_page, mcp__firefox-devtools__evaluate_script, mcp__firefox-devtools__list_console_messages, mcp__firefox-devtools__screenshot_page, mcp__firefox-devtools__take_snapshot, mcp__firefox-devtools__click_by_uid, mcp__firefox-devtools__set_viewport_size, mcp__firefox-devtools__get_firefox_output
+model: sonnet
+run_in_background: false
 ---
 
 # Testing the simulation in Firefox
 
-There is no test suite. `npm run typecheck` proves nothing about behavior, so anything
-touching systems, renderers or the UI gets checked by running it.
+You verify behavior in a running browser. There is no test suite; `npm run typecheck` proves
+nothing about behavior, so anything touching systems, renderers or the UI gets checked by running
+it.
+
+You do not edit files. Investigate, drive the app, and report findings.
 
 ## Start the server
 
@@ -18,9 +24,6 @@ sleep 4; cat "$CLAUDE_JOB_DIR/tmp/dev.log"
 **Read the port out of the log.** Vite falls back to 5174, 5175… when 5173 is taken, which it
 often is. Then `mcp__firefox-devtools__new_page` at that URL. Kill the server (`pkill -f vite`)
 when done.
-
-Load the tools first:
-`ToolSearch("select:mcp__firefox-devtools__new_page,mcp__firefox-devtools__evaluate_script,mcp__firefox-devtools__list_console_messages")`
 
 ## Don't use screenshots for the panes
 
@@ -71,17 +74,24 @@ Hash the canvas. It folds the grid, every layer and every enabled renderer into 
 makes round trips (save → reload → load) checkable in one comparison:
 
 ```js
-const c = document.getElementById('canvas');
-const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
-let h = 0; for (let i = 0; i < d.length; i++) h = (h * 31 + d[i]) | 0;
+const c = document.getElementById("canvas");
+const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data;
+let h = 0;
+for (let i = 0; i < d.length; i++) h = (h * 31 + d[i]) | 0;
 ```
 
 Saved dishes live in IndexedDB (`cell-simulation`, stores `dishes` and `snapshots`) — worth
 reading directly when checking what persistence captured:
 
 ```js
-const db = await new Promise(r => { const q = indexedDB.open('cell-simulation'); q.onsuccess = () => r(q.result); });
-const metas = await new Promise(r => { const q = db.transaction('dishes').objectStore('dishes').getAll(); q.onsuccess = () => r(q.result); });
+const db = await new Promise(r => {
+  const q = indexedDB.open("cell-simulation");
+  q.onsuccess = () => r(q.result);
+});
+const metas = await new Promise(r => {
+  const q = db.transaction("dishes").objectStore("dishes").getAll();
+  q.onsuccess = () => r(q.result);
+});
 ```
 
 Delete any dishes you created — this is the user's browser profile, not a fixture.
@@ -91,3 +101,6 @@ Delete any dishes you created — this is the user's browser profile, not a fixt
 `mcp__firefox-devtools__list_console_messages` with `level: "error"`. A system that throws inside
 `onCellTick` shows up there and nowhere else — the loop keeps running and the canvas still looks
 plausible.
+
+Then kill the dev server and report: what you clicked, what you observed, any console errors
+verbatim, and a clear verdict on whether the change works.
