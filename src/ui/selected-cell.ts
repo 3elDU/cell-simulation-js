@@ -1,7 +1,6 @@
 import { getCell, type Cell } from "@/cell";
 import type { World } from "@/world";
 import { Pane } from "tweakpane";
-import { taintLineage } from "@/components/taint";
 
 export class SelectedCellController extends Pane {
   world: World;
@@ -33,20 +32,6 @@ export class SelectedCellController extends Pane {
       readonly: true,
       multiline: true,
       rows: 10,
-    });
-
-    this.addButton({ title: "Taint" }).on("click", () => {
-      if (!this.selectedCell) return;
-
-      taintLineage(this.world, this.selectedCell);
-      this.refresh();
-    });
-
-    this.addButton({ title: "Clear taint" }).on("click", () => {
-      if (!this.selectedCell) return;
-
-      delete this.selectedCell.components.taint;
-      this.refresh();
     });
 
     this.canvas = canvas;

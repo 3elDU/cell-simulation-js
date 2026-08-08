@@ -3,7 +3,7 @@ import type { World } from "@/world";
 import type { System } from ".";
 import { BaseSystem } from "./base";
 import { getComponent } from "@/components";
-import { taint } from "@/components/taint";
+import { clampTaintChannel, taint } from "@/components/taint";
 import type { ConfigSchema } from "@/ui";
 
 /**
@@ -16,9 +16,9 @@ import type { ConfigSchema } from "@/ui";
 export class TaintSystem extends BaseSystem implements System {
   id = "taint";
   title = "Taint";
-  description = `Descendants of a tainted
-cell inherit its color, drifting
-slightly on every mutation.`;
+  description = `Children inherit their
+parent's color, drifting slightly
+on every mutation.`;
   enabled = true;
 
   /**
@@ -32,9 +32,7 @@ slightly on every mutation.`;
   ];
 
   private shift(value: number): number {
-    const drifted = value + (Math.random() * 2 - 1) * this.drift;
-
-    return Math.round(Math.min(Math.max(drifted, 0), 255));
+    return clampTaintChannel(value + (Math.random() * 2 - 1) * this.drift);
   }
 
   onCellBirth(_world: World, parent: Cell, child: Cell): void {

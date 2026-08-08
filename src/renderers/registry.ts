@@ -3,6 +3,7 @@ import { type Renderer } from ".";
 import { CellRenderer } from "./cell";
 import { layerRenderer } from "./layer";
 import { sensorRenderer } from "./sensor";
+import { TaintRenderer } from "./taint";
 
 export const renderRegistry = new Registry<Renderer>();
 
@@ -26,6 +27,7 @@ renderRegistry.register(
   layerRenderer("organics", "Organics", { r: 0.7, g: 0.35, b: 0.1 })
 );
 renderRegistry.register(d(CellRenderer));
+renderRegistry.register(d(TaintRenderer));
 renderRegistry.register(
   sensorRenderer(
     "energy",

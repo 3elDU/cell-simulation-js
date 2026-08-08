@@ -4,9 +4,11 @@ import { BaseSystem } from "./base";
 import type { World } from "@/world";
 import { addCell } from "@/cell";
 import { setComponent } from "@/components";
+import { taint } from "@/components/taint";
 import { actionRegistry } from "@/actions/registry";
 import { sensorsRegistry } from "@/sensors/registry";
 import type { Sensors } from "@/components/sensors";
+import { gridEvery, gridSet } from "@/grid";
 
 export class CellGenerator extends BaseSystem implements System, UIActionable {
   id = "cell-generator";
@@ -52,6 +54,10 @@ cells`;
       title: "Generate",
       callback: this.generate.bind(this),
     },
+    {
+      title: "Kill all cells",
+      callback: this.killAll.bind(this),
+    },
   ];
 
   world: World | undefined;
@@ -87,6 +93,8 @@ cells`;
             this.genomeMinLength
         );
 
+        taint(cell);
+
         setComponent(cell, "genome", {
           genome: Array.from({ length: genomeLength }, () => ({
             // Base weights start near zero so no gene is born decisive —
@@ -99,5 +107,18 @@ cells`;
         });
       }
     }
+  }
+
+  killAll() {
+    if (
+      this.world === undefined ||
+      !window.confirm("This will erase all cells. Are you sure?")
+    )
+      return;
+
+    gridEvery(this.world.grid, (x, y, value) => {
+      gridSet(this.world!.grid, { x, y }, -1);
+      this.world!.cells.delete(value);
+    });
   }
 }

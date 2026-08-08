@@ -19,9 +19,7 @@ export class CellRenderer implements Renderer {
   title = "Cell Renderer";
   description = `Shows every cell, colored by
 the balance between two actions
-it has taken over its life.
-
-A taint color wins over both.`;
+it has taken over its life.`;
 
   /**
    * Drawn for a cell that has taken neither action, so "no diet yet" stays
@@ -51,10 +49,6 @@ A taint color wins over both.`;
     await drawImage(ctx, (x, y) => {
       const cell = getCell(world, x, y);
       if (!cell) return undefined;
-
-      // A marked lineage keeps its own color, whatever it eats.
-      const taint = getComponent(cell, "taint")?.color;
-      if (taint) return taint;
 
       const counts = getComponent(cell, "genome")?.counts;
       const lows = counts?.[this.lowAction] ?? 0;
