@@ -1,12 +1,26 @@
 import type { Cell } from "../cell";
 import type { ConfigSchema, UIDescription } from "../ui";
 import type { World } from "../world";
+import type { Modifier, Stat } from "./stats";
 
 export interface System extends UIDescription {
   id: string;
   enabled: boolean;
 
   config?: ConfigSchema;
+
+  /**
+   * Numbers this system owns that a cell's state is allowed to scale. The
+   * system applies the factor itself and never learns where it came from.
+   */
+  stats?: Stat[];
+
+  /**
+   * Set together to scale other systems' stats — see `Modifier`. A system
+   * with factors but no `affects` scales nothing.
+   */
+  affects?: Modifier["affects"];
+  factors?: Modifier["factors"];
 
   /**
    * A system can be specified to run after another system, if it uses

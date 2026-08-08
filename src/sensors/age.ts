@@ -1,5 +1,5 @@
 import type { Cell } from "@/cell";
-import { getEnabledSystem, type World } from "@/world";
+import { getEnabledSystem, statFactor, type World } from "@/world";
 import type { Sensor } from ".";
 import { getComponent } from "@/components";
 import type { AgeSystem } from "@/systems/age";
@@ -27,6 +27,9 @@ export class AgeSensor implements Sensor {
     const age = getComponent(cell, "age");
     if (!age) return undefined;
 
-    return Math.min(Math.max(age.age / system.lethalAge, 0), 1);
+    const lethal = system.lethalAge * statFactor(world, cell, "age.lifespan");
+    if (lethal <= 0) return 1;
+
+    return Math.min(Math.max(age.age / lethal, 0), 1);
   }
 }

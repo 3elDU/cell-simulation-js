@@ -1,6 +1,7 @@
 import type { Cell } from "@/cell";
-import type { World } from "@/world";
+import { statFactor, type World } from "@/world";
 import type { System } from ".";
+import type { Stat } from "./stats";
 import { BaseSystem } from "./base";
 import { getComponent, setComponent } from "@/components";
 import { kill } from "@/components/death";
@@ -71,6 +72,8 @@ hoard too much and it bursts.`;
    */
   costs: Record<string, number> = {};
 
+  stats: Stat[] = [{ id: "energy.upkeep", title: "Energy upkeep" }];
+
   config: ConfigSchema = [];
 
   private baseConfig: ConfigSchema = [
@@ -135,7 +138,7 @@ hoard too much and it bursts.`;
       setComponent(cell, "energy", energy);
     }
 
-    energy.energy -= this.upkeep;
+    energy.energy -= this.upkeep * statFactor(world, cell, "energy.upkeep");
 
     const chosen = getComponent(cell, "genome")?.lastAction;
     if (chosen) energy.energy -= this.costs[chosen] ?? this.defaultCost;

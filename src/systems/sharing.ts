@@ -1,6 +1,7 @@
 import type { Cell } from "@/cell";
-import type { World } from "@/world";
+import { statFactor, type World } from "@/world";
 import type { System } from ".";
+import type { Stat } from "./stats";
 import { BaseSystem } from "./base";
 import { getComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
@@ -40,6 +41,8 @@ is allowed, and fatal.`;
    * not only the giver.
    */
   efficiency = 1;
+
+  stats: Stat[] = [{ id: "sharing.efficiency", title: "Share efficiency" }];
 
   config: ConfigSchema = [
     { prop: "amount", label: "Amount", min: 0, step: 0.5 },
@@ -87,7 +90,13 @@ is allowed, and fatal.`;
 
     energy.energy -= given;
 
-    const each = (given / receivers.length) * this.efficiency;
+    // Capped at 1: a gift can leak on the way, never arrive larger than it left.
+    const efficiency = Math.min(
+      this.efficiency * statFactor(world, cell, "sharing.efficiency"),
+      1
+    );
+
+    const each = (given / receivers.length) * efficiency;
     for (const receiver of receivers) receiver.energy += each;
   }
 }

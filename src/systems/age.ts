@@ -1,6 +1,7 @@
 import type { Cell } from "@/cell";
-import type { World } from "@/world";
+import { statFactor, type World } from "@/world";
 import type { System } from ".";
+import type { Stat } from "./stats";
 import { BaseSystem } from "./base";
 import { getComponent, setComponent } from "@/components";
 import { kill } from "@/components/death";
@@ -39,6 +40,8 @@ it.`;
    */
   mortalityCurve = 2;
 
+  stats: Stat[] = [{ id: "age.lifespan", title: "Lifespan" }];
+
   config: ConfigSchema = [
     { prop: "safeAge", label: "Safe below", min: 0, step: 10 },
     { prop: "lethalAge", label: "Lethal at", min: 1, step: 10 },
@@ -54,12 +57,17 @@ it.`;
   /**
    * Chance of dying of age this tick, from 0 below `safeAge` to 1 at
    * `lethalAge`.
+   *
+   * A lifespan above 1 makes the cell count its own age slower, stretching
+   * both ends of the ramp rather than only the far one.
    */
-  mortalityChance(age: number): number {
+  mortalityChance(age: number, lifespan = 1): number {
     const span = this.lethalAge - this.safeAge;
-    if (span <= 0) return age >= this.lethalAge ? 1 : 0;
+    const scaled = lifespan > 0 ? age / lifespan : Infinity;
 
-    const excess = (age - this.safeAge) / span;
+    if (span <= 0) return scaled >= this.lethalAge ? 1 : 0;
+
+    const excess = (scaled - this.safeAge) / span;
 
     return Math.min(Math.max(excess, 0), 1) ** this.mortalityCurve;
   }
@@ -77,7 +85,9 @@ it.`;
 
     age.age++;
 
-    if (Math.random() < this.mortalityChance(age.age)) {
+    const lifespan = statFactor(world, cell, "age.lifespan");
+
+    if (Math.random() < this.mortalityChance(age.age, lifespan)) {
       kill(cell, "old age", world.tick);
     }
   }

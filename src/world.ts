@@ -2,6 +2,7 @@ import type { Cell } from "./cell";
 import { gridEvery, type GridLayer, type TypedArray } from "./grid";
 import { sortSystems, type System } from "./systems";
 import { systemRegistry } from "./systems/registry";
+import type { StatId } from "./systems/stats";
 
 /**
  * World by itself is behavior-less. It only contains the state
@@ -62,6 +63,26 @@ export function getEnabledSystem<T extends System>(
   const system = world.systems.find(system => system.id === id);
 
   return system?.enabled ? (system as T) : undefined;
+}
+
+/**
+ * How much the states a cell is in scale one of a system's numbers — 1 when
+ * nothing is bending it.
+ *
+ * The two ends never name each other: the system asks for its own stat, and
+ * whoever answers only has to know the same id.
+ */
+export function statFactor(world: World, cell: Cell, stat: StatId): number {
+  let factor = 1;
+
+  for (const system of world.systems) {
+    if (!system.enabled || !system.factors) continue;
+    if (!system.affects?.(cell)) continue;
+
+    factor *= system.factors[stat] ?? 1;
+  }
+
+  return factor;
 }
 
 /**

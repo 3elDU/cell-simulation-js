@@ -1,5 +1,6 @@
 import { addCell, type Cell } from "@/cell";
-import { emitBirth, type World } from "@/world";
+import { emitBirth, statFactor, type World } from "@/world";
+import type { Stat } from "./stats";
 import type { System } from ".";
 import { BaseSystem } from "./base";
 import { getComponent, setComponent } from "@/components";
@@ -82,6 +83,11 @@ the child's genome.`;
 
   /** Per gene: stop listening to one. */
   removeSensor = 0.05;
+
+  stats: Stat[] = [
+    { id: "reproduction.cost", title: "Birth cost" },
+    { id: "reproduction.threshold", title: "Birth threshold" },
+  ];
 
   config: ConfigSchema = [
     { prop: "minEnergy", label: "Min energy", min: 0, step: 1 },
@@ -237,13 +243,19 @@ the child's genome.`;
     // extra child every time a cell starves.
     if (getComponent(cell, "death")) return;
 
+    const threshold =
+      this.minEnergy * statFactor(world, cell, "reproduction.threshold");
+
     const energy = getComponent(cell, "energy");
-    if (!energy || energy.energy < this.minEnergy) return;
+    if (!energy || energy.energy < threshold) return;
 
     const target = this.freeNeighbor(world, cell.position);
     if (!target) return;
 
-    const remaining = energy.energy - this.reproduceCost;
+    const cost =
+      this.reproduceCost * statFactor(world, cell, "reproduction.cost");
+
+    const remaining = energy.energy - cost;
     if (remaining <= 0) return;
 
     const child = addCell(world, target.x, target.y);
