@@ -80,7 +80,17 @@ function profileOf(genes: Gene[]): Profile {
 }
 
 /**
- * Cosine similarity of two profiles, mapped onto 0..1.
+ * How much drift it takes before two genomes stop reading as family.
+ *
+ * Hardcoded because sensors carry no config of their own yet.
+ */
+const falloff = 0.5;
+
+/**
+ * How alike two profiles are, 1 for identical and falling off steeply.
+ *
+ * Steep on purpose: a single gene apart is still a genome that might have
+ * grown a weapon, and a gentle curve reports it as family.
  */
 function similarity(a: Profile, b: Profile): number {
   if (a.filled.length === 0 || b.filled.length === 0) return 0;
@@ -95,7 +105,10 @@ function similarity(a: Profile, b: Profile): number {
     dot += a.weights[slot]! * b.weights[slot]!;
   }
 
-  return (dot + 1) / 2;
+  // Both profiles are unit length, so this is the gap between their tips.
+  const distance = Math.sqrt(Math.max(0, 2 - 2 * dot));
+
+  return Math.exp(-distance / falloff);
 }
 
 /**
