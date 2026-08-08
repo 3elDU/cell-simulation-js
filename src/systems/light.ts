@@ -7,6 +7,14 @@ import type { ConfigSchema, UIAction, UIActionable } from "@/ui";
 export type RegrowMode = "fixed" | "proportional";
 
 /**
+ * Eases 0..1 in and out, so a moving gradient starts and stops gently instead
+ * of lurching.
+ */
+function smoothstep(t: number): number {
+  return t * t * (3 - 2 * t);
+}
+
+/**
  * Fills and regrows the light layer.
  *
  * Light is a stock, not a constant — photosynthesis draws a tile down and it
@@ -19,7 +27,9 @@ export class LightSystem extends BaseSystem implements System, UIActionable {
   description = `Manages the light layer.
 
 Depleted by photosynthesis and
-regrows toward a gradient.`;
+regrows toward a gradient that
+can drift and change with the
+seasons.`;
   enabled = true;
 
   /**
@@ -27,7 +37,7 @@ regrows toward a gradient.`;
    */
   maxLight = LAYER_MAX;
 
-  regrowMode: RegrowMode = "fixed";
+  regrowMode: RegrowMode = "proportional";
 
   /**
    * In "fixed" mode, the value recovered per tick at the brightest end of the
@@ -36,6 +46,33 @@ regrows toward a gradient.`;
    * fast at first, then asymptotic.
    */
   regrowRate = 0.5;
+
+  /**
+   * Whether the bright end of the gradient wanders from one edge to the other.
+   */
+  flipGradient = true;
+
+  /**
+   * Ticks the gradient spends easing from one edge to the other, and ticks it
+   * rests at an edge before setting off again.
+   */
+  flipTicks = 600;
+  peaceTicks = 1200;
+
+  /**
+   * Whether regrowth waxes and wanes on a cycle.
+   */
+  seasons = false;
+
+  /**
+   * Ticks in a full year — one trip from summer to winter and back.
+   */
+  seasonLength = 2000;
+
+  /**
+   * Fraction of the regrow rate left at the depth of winter.
+   */
+  winterRegrow = 0.25;
 
   config: ConfigSchema = [
     { prop: "maxLight", label: "Max light", min: 0, max: LAYER_MAX, step: 1 },
@@ -48,6 +85,18 @@ regrows toward a gradient.`;
       },
     },
     { prop: "regrowRate", label: "Regrow rate", min: 0, max: 8, step: 0.01 },
+    { prop: "flipGradient", label: "Flip gradient" },
+    { prop: "flipTicks", label: "Flip ticks", min: 1, step: 1 },
+    { prop: "peaceTicks", label: "Peace ticks", min: 0, step: 1 },
+    { prop: "seasons", label: "Seasons" },
+    { prop: "seasonLength", label: "Season length", min: 1, step: 1 },
+    {
+      prop: "winterRegrow",
+      label: "Winter regrow",
+      min: 0,
+      max: 1,
+      step: 0.01,
+    },
   ];
 
   actions: UIAction[] = [
@@ -60,11 +109,45 @@ regrows toward a gradient.`;
   world: World | undefined;
 
   /**
-   * Value a tile recovers toward — brightest at the bottom of the map, dark at
-   * the top.
+   * Where the bright end of the gradient sits: 1 at the bottom of the map, 0
+   * at the top, and an even wash in between.
+   */
+  gradientBias(tick: number): number {
+    if (!this.flipGradient) return 1;
+
+    const half = this.peaceTicks + this.flipTicks;
+    const phase = tick % (half * 2);
+    const elapsed = phase % half;
+
+    const progress =
+      elapsed < this.peaceTicks
+        ? 0
+        : smoothstep((elapsed - this.peaceTicks) / this.flipTicks);
+
+    return phase < half ? 1 - progress : progress;
+  }
+
+  /**
+   * Share of the regrow rate in effect right now, sweeping between winter and
+   * full summer over one season length.
+   */
+  seasonFactor(tick: number): number {
+    if (!this.seasons) return 1;
+
+    const summer = (Math.cos((tick / this.seasonLength) * Math.PI * 2) + 1) / 2;
+
+    return this.winterRegrow + (1 - this.winterRegrow) * summer;
+  }
+
+  /**
+   * Value a tile recovers toward — brightest at whichever edge the gradient
+   * currently leans toward.
    */
   luminanceForPosition(_x: number, y: number, world: World): number {
-    return (y / world.height) * this.maxLight;
+    const depth = y / world.height; // 64
+    const bias = this.gradientBias(world.tick); // 0
+
+    return (bias * depth + (1 - bias) * (1 - depth)) * this.maxLight;
   }
 
   onInit(world: World): void {
@@ -104,6 +187,8 @@ regrows toward a gradient.`;
     const grid = world.layers.light as GridLayer<Float32Array> | undefined;
     if (!grid) return;
 
+    const regrowRate = this.regrowRate * this.seasonFactor(world.tick);
+
     for (let x = 0; x < world.width; x++) {
       for (let y = 0; y < world.height; y++) {
         const index = y * grid.width + x;
@@ -113,15 +198,14 @@ regrows toward a gradient.`;
 
         // Recovery scales with the tile's place on the gradient, not just its
         // ceiling — otherwise a dim tile refills as fast as a bright one.
-        const rate =
-          this.regrowRate * (this.maxLight > 0 ? max / this.maxLight : 0);
+        const rate = regrowRate * (this.maxLight > 0 ? max / this.maxLight : 0);
 
         // Signed, so the layer also comes *down* when maxLight is dragged
         // lower mid-run rather than staying stuck above the new gradient.
         const step =
           this.regrowMode === "fixed"
             ? Math.sign(deficit) * Math.min(rate, Math.abs(deficit))
-            : deficit * this.regrowRate;
+            : deficit * regrowRate;
 
         grid.data[index]! += step;
       }

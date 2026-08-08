@@ -27,12 +27,3 @@ hormones can be read like any other sensors. amount of hormones is evolvable.
 # genome
 
 write for each action in genome, how many times it was choosed, useful for metrics.
-
-# seasons
-
-the light system is currently static. cells fill up the bottom side of the screen,
-because that's where there is more light.
-
-implement multiple independent modes, that can be turned on at once:
-- flip gradient: smoothly flips gradient every X ticks. followed by Y ticks of peace
-- seasons: controls the regrow rate as a fraction of global regrow rate. 

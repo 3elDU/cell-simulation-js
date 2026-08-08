@@ -18,6 +18,13 @@ interface Vent {
 
   active: number;
   cooldown: number;
+
+  /**
+   * Diagonal heading, ±1 on each axis. Scaled by the drift speed knob so the
+   * knob stays live rather than baked in at spawn.
+   */
+  vx: number;
+  vy: number;
 }
 
 /**
@@ -58,6 +65,16 @@ pulse on and off.`;
 
   timing: VentTiming = "independent";
 
+  /**
+   * Whether vents wander the map, bouncing off its edges.
+   */
+  drifting = false;
+
+  /**
+   * Tiles a drifting vent covers per tick, on each axis.
+   */
+  driftSpeed = 0.1;
+
   config: ConfigSchema = [
     {
       prop: "timing",
@@ -74,6 +91,8 @@ pulse on and off.`;
     { prop: "activeTicks", label: "Active ticks", min: 1, step: 1 },
     { prop: "cooldownTicks", label: "Cooldown ticks", min: 1, step: 1 },
     { prop: "jitter", label: "Jitter", min: 0, max: 1, step: 0.01 },
+    { prop: "drifting", label: "Drifting" },
+    { prop: "driftSpeed", label: "Drift speed", min: 0, max: 2, step: 0.01 },
   ];
 
   actions: UIAction[] = [
@@ -133,8 +152,35 @@ pulse on and off.`;
             : Math.floor(Math.random() * (active + cooldown)),
         active,
         cooldown,
+        vx: Math.random() < 0.5 ? -1 : 1,
+        vy: Math.random() < 0.5 ? -1 : 1,
       };
     });
+  }
+
+  /**
+   * Advances a vent one step, reflecting it off the edges of the map.
+   */
+  drift(vent: Vent, world: World) {
+    // Vents restored from a save written before drift existed carry no heading.
+    vent.vx ||= 1;
+    vent.vy ||= 1;
+
+    const step = (
+      position: number,
+      heading: number,
+      limit: number
+    ): [number, number] => {
+      const next = position + heading * this.driftSpeed;
+
+      if (next < 0) return [-next, -heading];
+      if (next > limit) return [2 * limit - next, -heading];
+
+      return [next, heading];
+    };
+
+    [vent.x, vent.vx] = step(vent.x, vent.vx, world.width - 1);
+    [vent.y, vent.vy] = step(vent.y, vent.vy, world.height - 1);
   }
 
   clearLayer() {
@@ -154,15 +200,17 @@ pulse on and off.`;
    */
   erupt(layer: GridLayer<Float32Array>, vent: Vent) {
     const r = this.ventRadius;
+    const centerX = Math.round(vent.x);
+    const centerY = Math.round(vent.y);
 
     for (let dx = -r; dx <= r; dx++) {
-      const x = vent.x + dx;
+      const x = centerX + dx;
       if (x < 0 || x >= layer.width) continue;
 
       const span = r - Math.abs(dx);
 
       for (let dy = -span; dy <= span; dy++) {
-        const y = vent.y + dy;
+        const y = centerY + dy;
         if (y < 0 || y >= layer.height) continue;
 
         const distance = Math.abs(dx) + Math.abs(dy);
@@ -179,6 +227,7 @@ pulse on and off.`;
     if (!layer) return;
 
     for (const vent of this.vents) {
+      if (this.drifting) this.drift(vent, world);
       if (this.isErupting(vent, world.tick)) this.erupt(layer, vent);
     }
   }
