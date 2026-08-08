@@ -11,6 +11,7 @@ import type { Age } from "./age";
 import type { Taint } from "./taint";
 import type { Share } from "./share";
 import type { Attack } from "./attack";
+import type { Anchor } from "./anchor";
 
 // Registry of all components in the system
 type Components = {
@@ -26,6 +27,7 @@ type Components = {
   taint: Taint;
   share: Share;
   attack: Attack;
+  anchor: Anchor;
 };
 
 /**

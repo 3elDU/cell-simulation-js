@@ -18,6 +18,7 @@ import { TaintSystem } from "./taint";
 import { SharingSystem } from "./sharing";
 import { PredationSystem } from "./predation";
 import { ModifiersSystem } from "./modifiers";
+import { AnchorSystem } from "./anchor";
 
 export const systemRegistry = new Registry<System>();
 
@@ -50,4 +51,5 @@ systemRegistry.register(d(AgeSystem));
 systemRegistry.register(d(TaintSystem));
 systemRegistry.register(d(SharingSystem));
 systemRegistry.register(d(PredationSystem));
+systemRegistry.register(d(AnchorSystem));
 systemRegistry.register(d(ModifiersSystem));

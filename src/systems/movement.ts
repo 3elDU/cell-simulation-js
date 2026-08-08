@@ -11,6 +11,9 @@ export class MovementSystem extends BaseSystem implements System {
   description = "Allows cell to move in any direction";
   enabled = true;
 
+  // Late enough for anything that revokes a move to have done so.
+  after = ["anchor"];
+
   canMoveTo(world: World, to: Position): boolean {
     return getCell(world, to.x, to.y) === undefined;
   }

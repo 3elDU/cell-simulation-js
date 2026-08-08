@@ -7,6 +7,7 @@ import { HarvestAction } from "./harvest";
 import { ReproduceAction } from "./reproduce";
 import { ShareAction } from "./share";
 import { AttackAction } from "./attack";
+import { AnchorAction } from "./anchor";
 import type { MovementDirection } from "@/components/movement";
 
 export const actionRegistry = new Registry<Action>();
@@ -90,4 +91,11 @@ actionRegistry.register({
   title: "Die",
   description: "Give up and leave a corpse",
   create: () => new DieAction(),
+});
+
+actionRegistry.register({
+  id: "anchor",
+  title: "Anchor",
+  description: "Settle onto the current tile, giving up movement",
+  create: () => new AnchorAction(),
 });

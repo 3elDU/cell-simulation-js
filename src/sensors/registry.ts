@@ -7,6 +7,8 @@ import { AgeSensor } from "./age";
 import { CrowdingSensor } from "./crowding";
 import { KinshipSensor } from "./kinship";
 import { HostilitySensor } from "./hostility";
+import { AnchoredNeighborsSensor } from "./anchored-neighbors";
+import { AnchoredSensor } from "./anchored";
 
 export const sensorsRegistry = new Registry<Sensor>();
 
@@ -30,6 +32,8 @@ sensorsRegistry.register(d(AgeSensor));
 sensorsRegistry.register(d(CrowdingSensor));
 sensorsRegistry.register(d(KinshipSensor));
 sensorsRegistry.register(d(HostilitySensor));
+sensorsRegistry.register(d(AnchoredSensor));
+sensorsRegistry.register(d(AnchoredNeighborsSensor));
 
 export type SensorsMap = {
   light: LayerSensor;
@@ -41,4 +45,6 @@ export type SensorsMap = {
   crowding: CrowdingSensor;
   kinship: KinshipSensor;
   hostility: HostilitySensor;
+  anchored: AnchoredSensor;
+  "anchored-neighbors": AnchoredNeighborsSensor;
 };

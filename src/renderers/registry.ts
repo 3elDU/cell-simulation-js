@@ -68,3 +68,11 @@ renderRegistry.register(
     { r: 1, g: 0.15, b: 0.25 }
   )
 );
+renderRegistry.register(
+  sensorRenderer(
+    "anchored",
+    "Cell Anchored",
+    { r: 0.12, g: 0.13, b: 0.18 },
+    { r: 0.8, g: 0.45, b: 1 }
+  )
+);

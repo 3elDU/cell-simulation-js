@@ -1,5 +1,5 @@
 import type { Cell } from "@/cell";
-import { getEnabledSystem, type World } from "@/world";
+import { getEnabledSystem, statFactor, type World } from "@/world";
 import type { Sensor } from ".";
 import { getComponent } from "@/components";
 import type { EnergySystem } from "@/systems/energy";
@@ -24,6 +24,10 @@ export class EnergySensor implements Sensor {
     const energy = getComponent(cell, "energy");
     if (!energy) return undefined;
 
-    return Math.min(Math.max(energy.energy / system.lethalEnergy, 0), 1);
+    const lethal =
+      system.lethalEnergy * statFactor(world, cell, "energy.overload");
+    if (lethal <= 0) return 1;
+
+    return Math.min(Math.max(energy.energy / lethal, 0), 1);
   }
 }

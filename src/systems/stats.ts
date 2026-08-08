@@ -11,7 +11,9 @@ import type { World } from "@/world";
  */
 export type StatId =
   | "energy.upkeep"
+  | "energy.overload"
   | "age.lifespan"
+  | "predation.bite"
   | "reproduction.cost"
   | "reproduction.threshold"
   | "sharing.efficiency";

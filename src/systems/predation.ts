@@ -1,11 +1,11 @@
 import type { Cell } from "@/cell";
-import type { World } from "@/world";
+import { statFactor, type World } from "@/world";
 import type { System } from ".";
 import { BaseSystem } from "./base";
 import { getComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
-import type { Energy } from "@/components/energy";
 import { gridGetAdjacent } from "@/grid";
+import type { Stat } from "./stats";
 
 /**
  * Takes energy out of the cells around one that attacked, and hands part of it
@@ -41,24 +41,26 @@ a bigger risk of bursting.`;
    */
   efficiency = 1;
 
+  stats: Stat[] = [{ id: "predation.bite", title: "Bite taken" }];
+
   config: ConfigSchema = [
     { prop: "amount", label: "Amount", min: 0, step: 0.5 },
     { prop: "efficiency", label: "Efficiency", min: 0, max: 1, step: 0.01 },
   ];
 
   /**
-   * Energy of every neighboring cell holding some.
+   * Every neighboring cell holding energy. The cell comes along with it: how
+   * much a bite takes is the victim's business as much as the attacker's.
    */
-  private victims(world: World, cell: Cell): Energy[] {
-    const found: Energy[] = [];
+  private victims(world: World, cell: Cell): Cell[] {
+    const found: Cell[] = [];
 
     for (const { value } of gridGetAdjacent(world.grid, cell.position)) {
       if (value === undefined || value === -1) continue;
 
       const neighbor = world.cells.get(value);
-      const energy = neighbor && getComponent(neighbor, "energy");
 
-      if (energy) found.push(energy);
+      if (neighbor && getComponent(neighbor, "energy")) found.push(neighbor);
     }
 
     return found;
@@ -81,10 +83,13 @@ a bigger risk of bursting.`;
     let taken = 0;
 
     for (const victim of this.victims(world, cell)) {
-      const bite = Math.min(this.amount, victim.energy);
+      const held = getComponent(victim, "energy")!;
+
+      const amount = this.amount * statFactor(world, victim, "predation.bite");
+      const bite = Math.min(amount, held.energy);
       if (bite <= 0) continue;
 
-      victim.energy -= bite;
+      held.energy -= bite;
       taken += bite;
     }
 

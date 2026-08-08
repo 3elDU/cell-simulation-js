@@ -72,7 +72,10 @@ hoard too much and it bursts.`;
    */
   costs: Record<string, number> = {};
 
-  stats: Stat[] = [{ id: "energy.upkeep", title: "Energy upkeep" }];
+  stats: Stat[] = [
+    { id: "energy.upkeep", title: "Energy upkeep" },
+    { id: "energy.overload", title: "Overload headroom" },
+  ];
 
   config: ConfigSchema = [];
 
@@ -117,12 +120,17 @@ hoard too much and it bursts.`;
   /**
    * Chance of bursting this tick, from 0 below `safeEnergy` to 1 at
    * `lethalEnergy`.
+   *
+   * Headroom above 1 makes the cell count what it holds as less than it is,
+   * moving both ends of the ramp out rather than only the far one.
    */
-  overloadChance(energy: number): number {
+  overloadChance(energy: number, headroom = 1): number {
     const span = this.lethalEnergy - this.safeEnergy;
-    if (span <= 0) return energy >= this.lethalEnergy ? 1 : 0;
+    const scaled = headroom > 0 ? energy / headroom : Infinity;
 
-    const excess = (energy - this.safeEnergy) / span;
+    if (span <= 0) return scaled >= this.lethalEnergy ? 1 : 0;
+
+    const excess = (scaled - this.safeEnergy) / span;
 
     return Math.min(Math.max(excess, 0), 1) ** this.overloadCurve;
   }
@@ -149,7 +157,9 @@ hoard too much and it bursts.`;
       return;
     }
 
-    if (Math.random() < this.overloadChance(energy.energy)) {
+    const headroom = statFactor(world, cell, "energy.overload");
+
+    if (Math.random() < this.overloadChance(energy.energy, headroom)) {
       kill(cell, "burst", world.tick);
     }
   }
