@@ -1,6 +1,6 @@
 import type { Cell } from "@/cell";
 import type { World } from "@/world";
-import type { Action } from ".";
+import { ActionClassification, type Action } from ".";
 import { setComponent } from "@/components";
 
 /**
@@ -15,6 +15,7 @@ import { setComponent } from "@/components";
  */
 export class HarvestAction implements Action {
   id: string;
+  class = ActionClassification.peaceful;
   cost: number;
 
   /**

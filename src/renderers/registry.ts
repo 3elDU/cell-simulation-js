@@ -58,3 +58,11 @@ renderRegistry.register(
     { r: 0.3, g: 0.95, b: 0.9 }
   )
 );
+renderRegistry.register(
+  sensorRenderer(
+    "hostility",
+    "Cell Hostility",
+    { r: 0.15, g: 0.3, b: 0.2 },
+    { r: 1, g: 0.15, b: 0.25 }
+  )
+);

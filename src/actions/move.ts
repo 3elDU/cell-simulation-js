@@ -1,6 +1,6 @@
 import type { Cell } from "@/cell";
 import type { World } from "@/world";
-import type { Action } from ".";
+import { ActionClassification, type Action } from ".";
 import { setComponent } from "@/components";
 import type { MovementDirection } from "@/components/movement";
 
@@ -12,6 +12,7 @@ import type { MovementDirection } from "@/components/movement";
 export class MoveAction implements Action {
   id: string;
   cost = 1;
+  class = ActionClassification.peaceful;
   dir: MovementDirection;
 
   constructor(dir: MovementDirection) {

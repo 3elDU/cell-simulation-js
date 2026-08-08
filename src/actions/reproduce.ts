@@ -1,6 +1,6 @@
 import type { Cell } from "@/cell";
 import type { World } from "@/world";
-import type { Action } from ".";
+import { ActionClassification, type Action } from ".";
 import { getComponent, setComponent } from "@/components";
 
 /**
@@ -16,6 +16,7 @@ import { getComponent, setComponent } from "@/components";
  */
 export class ReproduceAction implements Action {
   id = "reproduce";
+  class = ActionClassification.peaceful;
   cost = 0.5;
 
   perform(_world: World, cell: Cell): void {

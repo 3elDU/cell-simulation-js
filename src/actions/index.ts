@@ -1,8 +1,17 @@
 import type { Cell } from "@/cell";
 import type { World } from "@/world";
 
+/**
+ * Is the action peaceful or hostile towards other cells?
+ */
+export enum ActionClassification {
+  peaceful,
+  hostile,
+}
+
 export interface Action {
   id: string;
+  class: ActionClassification;
 
   /**
    * What performing this costs, in energy.

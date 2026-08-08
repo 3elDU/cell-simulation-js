@@ -6,6 +6,7 @@ import { LayerSensor, layerSensor } from "./layer";
 import { AgeSensor } from "./age";
 import { CrowdingSensor } from "./crowding";
 import { KinshipSensor } from "./kinship";
+import { HostilitySensor } from "./hostility";
 
 export const sensorsRegistry = new Registry<Sensor>();
 
@@ -28,6 +29,7 @@ sensorsRegistry.register(d(EnergySensor));
 sensorsRegistry.register(d(AgeSensor));
 sensorsRegistry.register(d(CrowdingSensor));
 sensorsRegistry.register(d(KinshipSensor));
+sensorsRegistry.register(d(HostilitySensor));
 
 export type SensorsMap = {
   light: LayerSensor;
@@ -38,4 +40,5 @@ export type SensorsMap = {
   age: AgeSensor;
   crowding: CrowdingSensor;
   kinship: KinshipSensor;
+  hostility: HostilitySensor;
 };

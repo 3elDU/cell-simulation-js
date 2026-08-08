@@ -1,6 +1,6 @@
 import type { Cell } from "@/cell";
 import type { World } from "@/world";
-import type { Action } from ".";
+import { ActionClassification, type Action } from ".";
 import { kill } from "@/components/death";
 
 /**
@@ -13,6 +13,7 @@ import { kill } from "@/components/death";
  */
 export class DieAction implements Action {
   id = "die";
+  class = ActionClassification.peaceful;
   cost = 0;
 
   perform(world: World, cell: Cell): void {

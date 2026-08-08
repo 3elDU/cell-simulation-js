@@ -31,3 +31,4 @@ metricsRegistry.register(sensorMetric("age", "Cell Age"));
 metricsRegistry.register(sensorMetric("temperature", "Temperature"));
 metricsRegistry.register(sensorMetric("crowding", "Crowding"));
 metricsRegistry.register(sensorMetric("kinship", "Kinship"));
+metricsRegistry.register(sensorMetric("hostility", "Hostility"));

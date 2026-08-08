@@ -1,4 +1,4 @@
-import type { Action } from ".";
+import { ActionClassification, type Action } from ".";
 
 /**
  * Does nothing, on purpose.
@@ -8,6 +8,7 @@ import type { Action } from ".";
  */
 export class IdleAction implements Action {
   id = "idle";
+  class = ActionClassification.peaceful;
   cost = 0;
 
   perform(): void {}
