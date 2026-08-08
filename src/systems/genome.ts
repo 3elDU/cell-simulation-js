@@ -103,15 +103,40 @@ action`;
   /**
    * Combines a gene's base weight with the sensors it listens to into a raw
    * score for its action.
+   *
+   * Each sensor contributes by how close its reading sits to the gene's
+   * target for it:
+   *
+   *     +w/2 |      ╱╲          peak where reading == target
+   *        0 |────╱────╲────
+   *     -w/2 |  ╱        ╲
+   *          └───────────────
+   *          0   target    1
+   *
+   * The fold at the peak is the whole point. On either side of it the gene
+   * wants the reading to move the other way, and that reversal is what a
+   * scale factor alone can never say. A target at one end of the range gives
+   * back plain "more is better" (or, with a negative weight, "less is
+   * better"); one in the middle asks for moderation. Note the tent narrows as
+   * the target moves inward, so a gene asking for a middling reading has less
+   * pull than one asking for an extreme.
    */
   computeActivation(gene: Gene, sensors: Sensors): number {
     let activation = gene.base;
 
-    // Readings arrive in 0..1, centered here to -0.5..0.5 so a sensor can
-    // inhibit as well as excite, and so listening to more sensors raises
-    // sensitivity without inflating the gene's baseline score.
-    // A missing reading lands on exactly 0 — no influence either way.
-    for (const id of gene.sensors) activation += (sensors[id] ?? 0.5) - 0.5;
+    for (const id in gene.sensors) {
+      const key = id as keyof Sensors;
+
+      // A sensor with nothing to report leaves its key out entirely, and a
+      // gene listening to it must fall through to no influence at all —
+      // substituting a reading here would let a target sitting on that value
+      // collect full credit for a measurement nobody took.
+      const reading = sensors[key];
+      if (reading === undefined) continue;
+
+      const { weight, target } = gene.sensors[key]!;
+      activation += weight * (0.5 - Math.abs(reading - target));
+    }
 
     return activation;
   }

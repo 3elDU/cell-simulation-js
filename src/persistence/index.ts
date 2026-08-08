@@ -1,4 +1,6 @@
 import type { Cell } from "@/cell";
+import { getComponent } from "@/components";
+import type { Sensors } from "@/components/sensors";
 import type { GridLayer, TypedArray } from "@/grid";
 import { newWorld, type World } from "@/world";
 import { restoreProps, snapshotProps } from "./props";
@@ -11,7 +13,7 @@ export { listDishes, loadSnapshot, deleteDish, saveDish } from "./db";
  * through. Restoring is forgiving by design — unknown systems are ignored,
  * missing ones keep their defaults — so this is only for a real break.
  */
-export const SNAPSHOT_VERSION = 1;
+export const SNAPSHOT_VERSION = 2;
 
 /**
  * What the dish list needs, without the megabytes behind it.
@@ -142,6 +144,31 @@ export function dishMeta(id: string, name: string, world: World): DishMeta {
 }
 
 /**
+ * Brings genomes saved before genes weighted their sensors up to date.
+ *
+ * The values chosen leave behavior identical: a full weight aimed at the top
+ * of the range reproduces exactly the fixed, always-excitatory reading those
+ * genes were scored with.
+ */
+function migrateSensorWeights(cells: Map<number, Cell>) {
+  for (const cell of cells.values()) {
+    const genome = getComponent(cell, "genome");
+    if (!genome) continue;
+
+    for (const gene of genome.genome) {
+      if (!Array.isArray(gene.sensors)) continue;
+
+      gene.sensors = Object.fromEntries(
+        (gene.sensors as (keyof Sensors)[]).map(id => [
+          id,
+          { weight: 1, target: 1 },
+        ])
+      );
+    }
+  }
+}
+
+/**
  * Rebuilds a world from a snapshot.
  *
  * Goes through `newWorld` rather than assembling the world by hand, so
@@ -156,6 +183,8 @@ export function worldFromSnapshot(snapshot: Snapshot): World {
   world.grid = snapshot.grid;
   world.layers = snapshot.layers;
   world.cells = snapshot.cells;
+
+  if (snapshot.version < 2) migrateSensorWeights(world.cells);
 
   restoreUnits(world.systems, snapshot.systems);
 

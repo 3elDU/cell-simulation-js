@@ -4,6 +4,7 @@ import type { Sensor } from ".";
 import { getComponent } from "@/components";
 import { gridGetAdjacent } from "@/grid";
 import type { Gene } from "@/components/genome";
+import type { Sensors } from "@/components/sensors";
 
 /**
  * Slot every profile stores a given reason under.
@@ -46,7 +47,8 @@ function profileOf(genes: Gene[]): Profile {
   // Sized to fit every slot this genome could claim, including ones nothing
   // has named yet: writing past the end of a typed array is silently dropped.
   let capacity = slots.size;
-  for (const gene of genes) capacity += 1 + gene.sensors.length;
+  for (const gene of genes)
+    capacity += 1 + 2 * Object.keys(gene.sensors).length;
 
   const weights = new Float32Array(capacity);
 
@@ -58,8 +60,14 @@ function profileOf(genes: Gene[]): Profile {
   for (const gene of genes) {
     add(gene.action, gene.base);
 
-    for (const sensor of gene.sensors) {
-      add(`${gene.action}:${sensor}`, gene.base);
+    for (const sensor in gene.sensors) {
+      const { weight, target } = gene.sensors[sensor as keyof Sensors]!;
+
+      // Split across the two ends of the reading's range, so that wanting a
+      // lot and wanting a little of the same thing land in different slots
+      // instead of reading as the same taste held with the same conviction.
+      add(`${gene.action}:${sensor}:low`, weight * (1 - target));
+      add(`${gene.action}:${sensor}:high`, weight * target);
     }
   }
 

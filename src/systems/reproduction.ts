@@ -6,7 +6,7 @@ import { BaseSystem } from "./base";
 import { getComponent, setComponent } from "@/components";
 import type { ConfigSchema } from "@/ui";
 import { gridGetAdjacent, type Position } from "@/grid";
-import type { Gene } from "@/components/genome";
+import { copySensors, type Gene } from "@/components/genome";
 import type { Sensors } from "@/components/sensors";
 import { actionRegistry } from "@/actions/registry";
 import { sensorsRegistry } from "@/sensors/registry";
@@ -66,6 +66,22 @@ the child's genome.`;
   nudgeWeight = 0.2;
   nudgeAmount = 0.15;
 
+  /** Per sensor: shift how much reaching its target is worth. */
+  nudgeSensorWeight = 0.15;
+
+  /** Per sensor: shift which reading it favors. */
+  nudgeSensorTarget = 0.15;
+
+  /**
+   * Ceiling on the magnitude of every weight in a genome.
+   *
+   * Weights are what a score is built out of, and the score is exponentiated
+   * when an action is picked. Left to drift freely they grow, and a lineage
+   * ends up deciding the same way every tick regardless of where the
+   * selection knobs are set.
+   */
+  maxWeight = 1;
+
   /** Per genome: copy a random gene so the copy can drift separately. */
   duplicateGene = 0.02;
 
@@ -98,6 +114,21 @@ the child's genome.`;
     { prop: "mutationRate", label: "Mutation ×", min: 0, max: 4, step: 0.01 },
     { prop: "nudgeWeight", label: "Nudge weight", min: 0, max: 1, step: 0.01 },
     { prop: "nudgeAmount", label: "Nudge amount", min: 0, max: 1, step: 0.01 },
+    {
+      prop: "nudgeSensorWeight",
+      label: "Nudge sensor weight",
+      min: 0,
+      max: 1,
+      step: 0.01,
+    },
+    {
+      prop: "nudgeSensorTarget",
+      label: "Nudge sensor target",
+      min: 0,
+      max: 1,
+      step: 0.01,
+    },
+    { prop: "maxWeight", label: "Max weight", min: 0, max: 4, step: 0.05 },
     {
       prop: "duplicateGene",
       label: "Duplicate gene",
@@ -136,6 +167,15 @@ the child's genome.`;
     return items[Math.floor(Math.random() * items.length)];
   }
 
+  /** A signed step of at most `nudgeAmount`. */
+  private jitter(): number {
+    return (Math.random() * 2 - 1) * this.nudgeAmount;
+  }
+
+  private clamp(weight: number): number {
+    return Math.min(Math.max(weight, -this.maxWeight), this.maxWeight);
+  }
+
   /**
    * Ids of everything currently registered. Read fresh each birth so a system
    * being toggled mid-run changes what mutation can reach, rather than
@@ -160,10 +200,10 @@ the child's genome.`;
     let mutated = false;
 
     const genes = genome.map(gene => {
-      const copy: Gene = { ...gene, sensors: [...gene.sensors] };
+      const copy: Gene = { ...gene, sensors: copySensors(gene.sensors) };
 
       if (this.rolls(this.nudgeWeight)) {
-        copy.base += (Math.random() * 2 - 1) * this.nudgeAmount;
+        copy.base = this.clamp(copy.base + this.jitter());
         mutated = true;
       }
 
@@ -172,17 +212,37 @@ the child's genome.`;
         mutated = true;
       }
 
-      if (this.rolls(this.addSensor)) {
-        const missing = sensors.filter(id => !copy.sensors.includes(id));
-        const added = this.pick(missing);
-        if (added) {
-          copy.sensors.push(added);
+      for (const id in copy.sensors) {
+        const entry = copy.sensors[id as keyof Sensors]!;
+
+        if (this.rolls(this.nudgeSensorWeight)) {
+          entry.weight = this.clamp(entry.weight + this.jitter());
+          mutated = true;
+        }
+
+        if (this.rolls(this.nudgeSensorTarget)) {
+          // Targets live on the 0..1 scale readings arrive in; outside it a
+          // gene would be chasing a value no sensor can ever report.
+          entry.target = Math.min(Math.max(entry.target + this.jitter(), 0), 1);
           mutated = true;
         }
       }
 
-      if (copy.sensors.length > 0 && this.rolls(this.removeSensor)) {
-        copy.sensors.splice(Math.floor(Math.random() * copy.sensors.length), 1);
+      if (this.rolls(this.addSensor)) {
+        const added = this.pick(sensors.filter(id => !(id in copy.sensors)));
+        if (added) {
+          // Inert on arrival: at zero weight the target is not yet worth
+          // anything, so the new listener costs nothing until drift gives it
+          // a weight, and selection judges it only once it does something.
+          // That also makes the starting target free to be anything.
+          copy.sensors[added] = { weight: 0, target: Math.random() };
+          mutated = true;
+        }
+      }
+
+      const listened = Object.keys(copy.sensors) as (keyof Sensors)[];
+      if (listened.length > 0 && this.rolls(this.removeSensor)) {
+        delete copy.sensors[this.pick(listened)!];
         mutated = true;
       }
 
@@ -197,7 +257,7 @@ the child's genome.`;
     if (genes.length < this.maxGenes && this.rolls(this.duplicateGene)) {
       const source = this.pick(genes);
       if (source) {
-        genes.push({ ...source, sensors: [...source.sensors] });
+        genes.push({ ...source, sensors: copySensors(source.sensors) });
         mutated = true;
       }
     }
@@ -212,7 +272,17 @@ the child's genome.`;
         // Near zero, so a brand-new gene barely shifts behavior and gets a
         // chance to drift before selection judges it.
         base: (Math.random() * 2 - 1) * 0.05,
-        sensors: sensors.filter(() => Math.random() < 0.25),
+        // Its sensors arrive weak for the same reason, but not silent: a gene
+        // that says nothing at all gives selection nothing to judge, and
+        // would need several more births before it ever mattered.
+        sensors: Object.fromEntries(
+          sensors
+            .filter(() => Math.random() < 0.25)
+            .map(id => [
+              id,
+              { weight: (Math.random() * 2 - 1) * 0.25, target: Math.random() },
+            ])
+        ),
       });
       mutated = true;
     }

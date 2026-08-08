@@ -102,7 +102,18 @@ cells`;
             // it ever has a chance to drift into something useful.
             base: Math.random() * 0.6 - 0.3,
             action: actionIds[Math.floor(Math.random() * actionIds.length)]!,
-            sensors: sensorIds.filter(() => Math.random() < this.sensorChance),
+            // Sensor weights and targets, unlike the base, start spread over
+            // their full range: this is the pool selection has to work with,
+            // and a population that all reads the world the same way leaves
+            // mutation to invent every preference from scratch.
+            sensors: Object.fromEntries(
+              sensorIds
+                .filter(() => Math.random() < this.sensorChance)
+                .map(id => [
+                  id,
+                  { weight: Math.random() * 2 - 1, target: Math.random() },
+                ])
+            ),
           })),
         });
       }

@@ -1,6 +1,29 @@
 import type { Sensors } from "./sensors";
 
 /**
+ * How one gene reads one sensor.
+ *
+ * Together the pair describes a preferred amount rather than a direction:
+ * `target` is the reading the gene likes best, `weight` is how much reaching
+ * it is worth. A gene can therefore want a middling reading — something no
+ * amount of plain scaling can express, since scaling only ever produces "more
+ * is better" or "less is better".
+ */
+export interface SensorWeight {
+  /**
+   * Signed. Negative flips the preference inside out: the target becomes the
+   * reading the gene most wants to avoid.
+   *
+   * Magnitude is capped at birth, so no lineage can evolve scores large
+   * enough to turn the genome system's softmax into a winner-takes-all.
+   */
+  weight: number;
+
+  /** The favored reading, on the same 0..1 scale sensors report in. */
+  target: number;
+}
+
+/**
  * A single vote for an action.
  *
  * A gene combines its base weight with the sensors it listens to into a score.
@@ -23,12 +46,29 @@ export interface Gene {
   base: number;
 
   /**
-   * Which sensors this gene listens to, by id.
+   * Which sensors this gene listens to, and how it reads each.
    *
    * A gene may listen to none (making it react only to its base weight),
    * one, or several. Sensors it doesn't list simply don't affect it.
    */
-  sensors: (keyof Sensors)[];
+  sensors: Partial<Record<keyof Sensors, SensorWeight>>;
+}
+
+/**
+ * Copies a gene's sensor map deeply, so the copy's entries can be nudged
+ * without the original drifting with them.
+ */
+export function copySensors(
+  sensors: Gene["sensors"]
+): Partial<Record<keyof Sensors, SensorWeight>> {
+  const copy: Partial<Record<keyof Sensors, SensorWeight>> = {};
+
+  for (const id in sensors) {
+    const key = id as keyof Sensors;
+    copy[key] = { ...sensors[key]! };
+  }
+
+  return copy;
 }
 
 export interface Genome {
