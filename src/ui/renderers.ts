@@ -8,7 +8,7 @@ export class RenderersPane extends Pane {
    */
   renderers: Renderer[];
 
-  constructor(container: HTMLElement) {
+  constructor(container: HTMLElement, onRendererToggled: () => void) {
     super({
       container,
       title: "Renderers",
@@ -32,9 +32,13 @@ export class RenderersPane extends Pane {
         multiline: true,
       });
 
-      folder.addBinding(instance, "enabled", {
-        title: "Enabled",
-      });
+      folder
+        .addBinding(instance, "enabled", {
+          title: "Enabled",
+        })
+        .on("change", () => {
+          onRendererToggled();
+        });
 
       for (const binding of instance.config ?? []) {
         const target = (binding.object ?? instance) as Record<string, unknown>;

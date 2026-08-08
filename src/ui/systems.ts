@@ -3,7 +3,11 @@ import type { World } from "@/world";
 import { Pane } from "tweakpane";
 
 export class SystemsPane extends Pane {
-  constructor(container: HTMLElement, world: World) {
+  constructor(
+    container: HTMLElement,
+    world: World,
+    onActionExecuted: () => void
+  ) {
     super({
       title: "Systems",
       container,
@@ -29,7 +33,10 @@ export class SystemsPane extends Pane {
           .addButton({
             title: action.title,
           })
-          .on("click", action.callback);
+          .on("click", () => {
+            action.callback();
+            onActionExecuted();
+          });
       }
     }
   }

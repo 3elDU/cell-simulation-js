@@ -308,8 +308,18 @@ export class UIController {
     console.debug("world object:", this.world);
 
     this.worldPane = this.buildWorldPane();
-    this.systemsPane = new SystemsPane(elements.paneContainer, this.world);
-    this.renderersPane = new RenderersPane(elements.paneContainer);
+    this.systemsPane = new SystemsPane(
+      elements.paneContainer,
+      this.world,
+      () => {
+        // re-render on every action executed
+        this.render();
+      }
+    );
+    this.renderersPane = new RenderersPane(elements.paneContainer, () => {
+      // re-render immediately when a renderer is enabled/disabled
+      this.render();
+    });
     this.metricsPane = new MetricsPane(elements.paneContainer, this.world);
     this.selectedCell = new SelectedCellController(
       elements.paneContainer,
