@@ -383,7 +383,16 @@ export class UIController {
     return this.buffer;
   }
 
+  /**
+   * Guards against calling render when it's already in-progress,
+   * since render() is async
+   */
+  private renderInProgress = false;
+
   async render() {
+    if (this.renderInProgress) return;
+    this.renderInProgress = true;
+
     const ctx = this.bufferCtx();
     ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
@@ -397,6 +406,7 @@ export class UIController {
 
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
     this.ctx.drawImage(ctx.canvas, 0, 0);
+    this.renderInProgress = false;
   }
 
   async tick() {
